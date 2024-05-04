@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+using EwAdminApi.Extensions;
 using EwAdminApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EwAdminApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class PosAdminController : ControllerBase
 {
     private readonly PosShopRepository _posShopRepository;
@@ -29,12 +31,12 @@ public class PosAdminController : ControllerBase
         var shop = await _posShopRepository.GetShopDetailAsync(accountId, shopId);
         if (shop == null)
         {
-            return NotFound(new { message = "Shop not found." });
+            return new CustomNotFoundRequestResult("Shop not found.");
         }
         return Ok(shop);
     }
 
-    [HttpGet("shopworkdaylist")]
+    [HttpGet("shopworkdaydetaillist")]
     public async Task<IActionResult> GetShopWorkdayDetailList(
         [FromQuery] int accountId, [FromQuery] int shopId, 
         [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate,
@@ -44,12 +46,12 @@ public class PosAdminController : ControllerBase
         // if user has not input the start date, assume to fetch the last 5 records 
         if (page <= 0 || pageSize <= 0)
         {
-            return BadRequest("Page and PageSize must be greater than zero.");
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
         }
 
         if (pageSize > 100)
         {
-            return BadRequest("PageSize must be smaller or equal to 100.");
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
         
         // get the shop workday detail list from PosShopWorkdayDetailRepository
@@ -59,20 +61,20 @@ public class PosAdminController : ControllerBase
         return Ok(resultList);
     }
     
-    [HttpGet("shopworkdayperiodlist")]
+    [HttpGet("shopworkdayperioddetaillist")]
     public async Task<IActionResult> GetShopWorkdayPeriodDetailList(
-        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] int workdayDetailId,
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] int workdayDetailId,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         // Implementation to fetch shop workday period detail
         if (page <= 0 || pageSize <= 0)
         {
-            return BadRequest("Page and PageSize must be greater than zero.");
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
         }
 
         if (pageSize > 100)
         {
-            return BadRequest("PageSize must be smaller or equal to 100.");
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
         
         // get the shop workday period detail list from PosShopWorkdayPeriodDetailRepository

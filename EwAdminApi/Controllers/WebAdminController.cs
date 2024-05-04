@@ -1,3 +1,4 @@
+using EwAdminApi.Extensions;
 using EwAdminApi.Models.WebAdmin;
 using EwAdminApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace EwAdminApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class WebAdminController : ControllerBase
 {
     private readonly WebAdminCompanyMasterRepository _webAdminCompanyMasterRepository;
@@ -35,13 +36,13 @@ public class WebAdminController : ControllerBase
         // Check if the page or pageSize is less than or equal to 0. If so, return a BadRequest.
         if (page <= 0 || pageSize <= 0)
         {
-            return BadRequest("Page and PageSize must be greater than zero.");
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
         }
 
         // Check if the pageSize is more than 100. If so, return a BadRequest.
         if (pageSize > 100)
         {
-            return BadRequest("PageSize must be smaller or equal to 100.");
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
 
         // Fetch the list of companies from the repository.
