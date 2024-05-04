@@ -4,7 +4,9 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-      <UserSecretsId>77d9e3b2-eea2-4ec7-83d1-61293ea48109</UserSecretsId>
+        <UserSecretsId>77d9e3b2-eea2-4ec7-83d1-61293ea48109</UserSecretsId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +15,7 @@
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
         <PackageReference Include="MondaySharp.NET" Version="1.0.23" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
     </ItemGroup>
 
 </Project>

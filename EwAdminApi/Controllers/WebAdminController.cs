@@ -1,5 +1,7 @@
+using EwAdminApi.Models.WebAdmin;
 using EwAdminApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace EwAdminApi.Controllers;
 
@@ -14,21 +16,39 @@ public class WebAdminController : ControllerBase
         _webAdminCompanyMasterRepository = webAdminCompanyMasterRepository;
     }
 
-    [HttpGet("GetAllCompanies")]
-    public async Task<IActionResult> GetAllCompanies(
+
+    /// <summary>
+    /// This method is responsible for fetching a list of companies.
+    /// </summary>
+    /// <param name="page">The page number to fetch. Defaults to 1 if not provided.</param>
+    /// <param name="pageSize">The number of records per page. Defaults to 20 if not provided.</param>
+    /// <returns>A list of companies for the given page and pageSize. If the page or pageSize is invalid, it returns a BadRequest. If the pageSize is more than 100, it also returns a BadRequest.</returns>
+    [HttpGet("companylist")]
+    [SwaggerOperation(Summary = "Creates a new company", Tags = new[] { "Company" })]
+    [ProducesResponseType(typeof(IEnumerable<CompanyMaster>), 200)]
+    [ProducesResponseType(typeof(string), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetCompanyList(
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
+        // Check if the page or pageSize is less than or equal to 0. If so, return a BadRequest.
         if (page <= 0 || pageSize <= 0)
         {
             return BadRequest("Page and PageSize must be greater than zero.");
         }
 
+        // Check if the pageSize is more than 100. If so, return a BadRequest.
         if (pageSize > 100)
         {
             return BadRequest("PageSize must be smaller or equal to 100.");
         }
 
-        var resultList = await _webAdminCompanyMasterRepository.GetCompanyMasterListAsync(page, pageSize).ConfigureAwait(false);
+        // Fetch the list of companies from the repository.
+        var resultList = await _webAdminCompanyMasterRepository.GetCompanyMasterListAsync(page, pageSize)
+            .ConfigureAwait(false);
+
+        // Return the fetched list of companies.
         return Ok(resultList);
     }
 }

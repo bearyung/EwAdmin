@@ -1,16 +1,27 @@
 using System.Data;
+using System.Reflection;
 using EwAdminApi.Middlewares;
 using EwAdminApi.Repositories;
 using EwAdminApi.Services;
 using Microsoft.Data.SqlClient;
+using Microsoft.OpenApi.Models;
 using MondaySharp.NET.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Define the name of the XML documentation file based on the executing assembly's name
+var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+
+// Combine the base directory path with the XML file name to get the full path to the XML documentation file
+var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
 // Add services to the container.
 builder.Services.AddSingleton<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<WebAdminCompanyMasterRepository>();
 builder.Services.AddScoped<PosShopRepository>();
+builder.Services.AddScoped<PosShopWorkdayDetailRepository>();
+builder.Services.AddScoped<PosShopWorkdayDetailRepository>();
+
 // builder.Services.TryAddMondayClient(options =>
 // {
 //     options.EndPoint = new System.Uri(builder.Configuration.GetSection("Monday:Endpoint").Value ?? string.Empty);
@@ -27,7 +38,18 @@ builder.Services.AddHttpClient("MondayClient", client =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "EwAdminApi", 
+        Version = "v1",
+        Description = "These APIs are used for internal admin purpose."
+    });
+    
+    // c.EnableAnnotations();
+    c.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
