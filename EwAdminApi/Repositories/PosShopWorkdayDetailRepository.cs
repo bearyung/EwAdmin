@@ -132,8 +132,13 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
     // output: boolean indicating success
     public async Task<bool> DeleteShopWorkdayDetailAsync(ShopWorkdayDetail shopWorkdayDetail)
     {
+        // delete the shop workday detail with the given workday detail id
+        // delete the shop workday period details with the same workday detail id
+        // the shop workday period details are deleted within the same transaction
         using var db = await GetPosDatabaseConnection(shopWorkdayDetail.AccountId, shopWorkdayDetail.ShopId)
             .ConfigureAwait(false);
+        db.Open();
+        using var transaction = db.BeginTransaction();
         var query = @"
         DELETE FROM [dbo].[ShopWorkdayDetail]
         WHERE AccountId = @AccountId
@@ -141,8 +146,19 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
         AND WorkdayDetailId = @WorkdayDetailId
         ";
 
-        if (db != null)
-            await db.ExecuteAsync(query, shopWorkdayDetail).ConfigureAwait(false);
+        await db.ExecuteAsync(query, shopWorkdayDetail, transaction).ConfigureAwait(false);
+
+        var query2 = @"
+            DELETE FROM [dbo].[ShopWorkdayPeriodDetail]
+            WHERE AccountId = @AccountId
+            AND ShopId = @ShopId
+            AND WorkdayDetailId = @WorkdayDetailId
+            ";
+
+        await db.ExecuteAsync(query2, shopWorkdayDetail, transaction).ConfigureAwait(false);
+
+        transaction.Commit();
+        
 
         return true;
     }
