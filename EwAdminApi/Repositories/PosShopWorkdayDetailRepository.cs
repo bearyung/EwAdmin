@@ -126,4 +126,24 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
 
         return shopWorkdayDetail;
     }
+    
+    // DeleteShopWorkdayDetailAsync
+    // input: ShopWorkdayDetail
+    // output: boolean indicating success
+    public async Task<bool> DeleteShopWorkdayDetailAsync(ShopWorkdayDetail shopWorkdayDetail)
+    {
+        using var db = await GetPosDatabaseConnection(shopWorkdayDetail.AccountId, shopWorkdayDetail.ShopId)
+            .ConfigureAwait(false);
+        var query = @"
+        DELETE FROM [dbo].[ShopWorkdayDetail]
+        WHERE AccountId = @AccountId
+        AND ShopId = @ShopId
+        AND WorkdayDetailId = @WorkdayDetailId
+        ";
+
+        if (db != null)
+            await db.ExecuteAsync(query, shopWorkdayDetail).ConfigureAwait(false);
+
+        return true;
+    }
 }

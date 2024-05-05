@@ -14,15 +14,18 @@ public class PosAdminController : ControllerBase
     private readonly PosShopRepository _posShopRepository;
     private readonly PosShopWorkdayDetailRepository _posShopWorkdayDetailRepository;
     private readonly PosShopWorkdayPeriodDetailRepository _posShopWorkdayPeriodDetailRepository;
+    private readonly PosTxRepository _posTxRepository;
 
     public PosAdminController(
         PosShopRepository posShopRepository,
         PosShopWorkdayDetailRepository posShopWorkdayDetailRepository,
-        PosShopWorkdayPeriodDetailRepository posShopWorkdayPeriodDetailRepository)
+        PosShopWorkdayPeriodDetailRepository posShopWorkdayPeriodDetailRepository,
+        PosTxRepository posTxRepository)
     {
         _posShopRepository = posShopRepository;
         _posShopWorkdayDetailRepository = posShopWorkdayDetailRepository;
         _posShopWorkdayPeriodDetailRepository = posShopWorkdayPeriodDetailRepository;
+        _posTxRepository = posTxRepository;
     }
     
     /// <summary>
@@ -227,4 +230,38 @@ public class PosAdminController : ControllerBase
         
         return Ok(updatedShopWorkdayDetail);
     }
+    
+    // deleteShopWorkdayDetail API endpoint using HTTP DELETE method
+    // input: ShopWorkdayDetail
+    // output: boolean indicating success
+    [HttpDelete("deleteShopWorkdayDetail")]
+    [ProducesResponseType(typeof(bool), 200)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> DeleteShopWorkdayDetail(
+        [FromBody] ShopWorkdayDetail shopWorkdayDetail)
+    {
+        // Validate the ID fields
+        if (shopWorkdayDetail.AccountId == 0 || shopWorkdayDetail.ShopId == 0 || shopWorkdayDetail.WorkdayDetailId == 0)
+        {
+            return new CustomBadRequestResult("AccountId, ShopId and WorkdayDetailId must be greater than zero.");
+        }
+        
+        // check if there are any transactions in the given workday detail id
+        var txCount = 
+            await _posTxRepository.GetTxCountInWorkdayDetailIdAsync(shopWorkdayDetail.AccountId, shopWorkdayDetail.ShopId, shopWorkdayDetail.WorkdayDetailId).ConfigureAwait(false);
+        
+        // return error to user if there are transactions in the workday detail
+        if (txCount > 0)
+        {
+            return new CustomBadRequestResult("Cannot delete workday detail with transactions.");
+        }
+
+        // Implementation to delete shop workday detail
+        var isDeleted = 
+            await _posShopWorkdayDetailRepository.DeleteShopWorkdayDetailAsync(shopWorkdayDetail).ConfigureAwait(false);
+        
+        return Ok(isDeleted);
+    }
+    
 }
