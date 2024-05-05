@@ -1,6 +1,6 @@
 using Dapper;
 using EwAdminApi.Models.Pos;
-using EwAdminApi.Repositories.BaseClass;
+using EwAdminApi.Repositories.BaseClasses;
 using EwAdminApi.Services;
 
 namespace EwAdminApi.Repositories;
@@ -56,6 +56,9 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
         }
         else
         {
+            // if enddate is null, set it to the startdate + 1 day
+            endDate ??= startDate.Value.AddDays(1);
+            
             var offset = (page - 1) * pageSize;
             var query = @"
             SELECT 

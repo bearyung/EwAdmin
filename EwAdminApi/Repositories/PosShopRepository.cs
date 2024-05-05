@@ -1,6 +1,6 @@
 using Dapper;
 using EwAdminApi.Models.Pos;
-using EwAdminApi.Repositories.BaseClass;
+using EwAdminApi.Repositories.BaseClasses;
 using EwAdminApi.Services;
 
 namespace EwAdminApi.Repositories;

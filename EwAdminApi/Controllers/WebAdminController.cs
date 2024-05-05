@@ -2,7 +2,6 @@ using EwAdminApi.Extensions;
 using EwAdminApi.Models.WebAdmin;
 using EwAdminApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace EwAdminApi.Controllers;
 
@@ -25,9 +24,8 @@ public class WebAdminController : ControllerBase
     /// <param name="pageSize">The number of records per page. Defaults to 20 if not provided.</param>
     /// <returns>A list of companies for the given page and pageSize. If the page or pageSize is invalid, it returns a BadRequest. If the pageSize is more than 100, it also returns a BadRequest.</returns>
     [HttpGet("companylist")]
-    [SwaggerOperation(Summary = "Creates a new company", Tags = new[] { "Company" })]
     [ProducesResponseType(typeof(IEnumerable<CompanyMaster>), 200)]
-    [ProducesResponseType(typeof(string), 400)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetCompanyList(

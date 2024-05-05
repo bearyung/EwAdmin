@@ -3,7 +3,7 @@ using Dapper;
 using EwAdminApi.Models.WebAdmin;
 using EwAdminApi.Services;
 
-namespace EwAdminApi.Repositories.BaseClass;
+namespace EwAdminApi.Repositories.BaseClasses;
 
 public class PosRepositoryBase
 {
