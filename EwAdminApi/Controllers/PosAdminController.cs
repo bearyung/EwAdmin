@@ -152,8 +152,8 @@ public class PosAdminController : ControllerBase
     /// - If the shop workday period detail is updated successfully, it returns an HTTP 200 status code along with the updated shop workday period detail.
     /// - If the user data is not found, it returns an HTTP 400 status code with a custom error message.
     /// </returns>
-    
-    [HttpPost("updateShopWorkdayPeriodDetail")]
+        
+    [HttpPatch("updateShopWorkdayPeriodDetail")]
     [ProducesResponseType(typeof(ShopWorkdayPeriodDetail), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]
@@ -161,6 +161,12 @@ public class PosAdminController : ControllerBase
     public async Task<IActionResult> UpdateShopWorkdayPeriodDetail(
         [FromBody] ShopWorkdayPeriodDetail shopWorkdayPeriodDetail)
     {
+        // Validate the identify fields
+        if (shopWorkdayPeriodDetail.AccountId == 0 || shopWorkdayPeriodDetail.ShopId == 0 || shopWorkdayPeriodDetail.WorkdayPeriodDetailId == 0)
+        {
+            return new CustomBadRequestResult("AccountId, ShopId and ShopWorkdayPeriodDetailId must be greater than zero.");
+        }
+
         // Get the Monday user data from the HttpContext
         var mondayUserData = HttpContext.Items["MondayUserData"] as MondayUserResponse;
 
@@ -189,7 +195,7 @@ public class PosAdminController : ControllerBase
     /// - If the shop workday detail is updated successfully, it returns an HTTP 200 status code along with the updated shop workday detail.
     /// - If the user data is not found, it returns an HTTP 400 status code with a custom error message.
     /// </returns>
-    [HttpPost("updateShopWorkdayDetail")]
+    [HttpPatch("updateShopWorkdayDetail")]
     [ProducesResponseType(typeof(ShopWorkdayDetail), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]
@@ -197,6 +203,12 @@ public class PosAdminController : ControllerBase
     public async Task<IActionResult> UpdateShopWorkdayDetail(
         [FromBody] ShopWorkdayDetail shopWorkdayDetail)
     {
+        // Validate the ID fields
+        if (shopWorkdayDetail.AccountId == 0 || shopWorkdayDetail.ShopId == 0 || shopWorkdayDetail.WorkdayDetailId == 0)
+        {
+            return new CustomBadRequestResult("AccountId, ShopId and WorkdayDetailId must be greater than zero.");
+        }
+
         // Get the Monday user data from the HttpContext
         var mondayUserData = HttpContext.Items["MondayUserData"] as MondayUserResponse;
 
