@@ -147,7 +147,7 @@ public class PosAdminController : ControllerBase
     }
     
     /// <summary>
-    /// Handles the POST request to update a shop workday period detail.
+    /// Handles the PATCH request to update a shop workday period detail.
     /// </summary>
     /// <param name="shopWorkdayPeriodDetail">The shop workday period detail to be updated. Only startdatetime, enddatetime, and enabled fields are updated.</param>
     /// <returns>
@@ -190,7 +190,7 @@ public class PosAdminController : ControllerBase
     }
     
     /// <summary>
-    /// Handles the POST request to update a shop workday detail.
+    /// Handles the PATCH request to update a shop workday detail.
     /// </summary>
     /// <param name="shopWorkdayDetail">The shop workday detail to be updated. Only opendatetime, closedatetime, isclosed, enabled, and modifiedby fields are updated.</param>
     /// <returns>
@@ -231,9 +231,15 @@ public class PosAdminController : ControllerBase
         return Ok(updatedShopWorkdayDetail);
     }
     
-    // deleteShopWorkdayDetail API endpoint using HTTP DELETE method
-    // input: ShopWorkdayDetail
-    // output: boolean indicating success
+    /// <summary>
+    /// Handles the DELETE request to delete a shop workday detail.
+    /// </summary>
+    /// <param name="shopWorkdayDetail"></param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the shop workday detail is deleted successfully, it returns an HTTP 200 status code along with a boolean indicating success.
+    /// - If there are transactions in the workday detail, it returns an HTTP 400 status code with a custom error message.
+    /// </returns>
     [HttpDelete("deleteShopWorkdayDetail")]
     [ProducesResponseType(typeof(bool), 200)]
     [Produces("application/json")]
@@ -262,6 +268,35 @@ public class PosAdminController : ControllerBase
             await _posShopWorkdayDetailRepository.DeleteShopWorkdayDetailAsync(shopWorkdayDetail).ConfigureAwait(false);
         
         return Ok(isDeleted);
+    }
+    
+    /// <summary>
+    /// Handles the GET request to fetch the details of a specific transaction header.
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="shopId"></param>
+    /// <param name="txSalesHeaderId"></param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the transaction header is found, it returns an HTTP 200 status code along with the transaction header details.
+    /// - If the transaction header is not found, it returns an HTTP 404 status code with a custom error message.
+    /// </returns>
+    [HttpGet("txheader")]
+    [ProducesResponseType(typeof(TxSalesHeader), 200)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetTxHeader(
+        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] int txSalesHeaderId)
+    {
+        // Implementation to fetch transaction header
+        var txHeader = await _posTxRepository.GetTxDetailsAsync(accountId, shopId, txSalesHeaderId).ConfigureAwait(false);
+        
+        // If the transaction header is not found, return a custom 404 Not Found response with a custom error message.
+        if (txHeader == null)
+        {
+            return new CustomNotFoundRequestResult("Transaction header not found.");
+        }
+        return Ok(txHeader);
     }
     
 }

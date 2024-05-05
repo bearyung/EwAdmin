@@ -1,4 +1,5 @@
 using Dapper;
+using EwAdminApi.Models.Pos;
 using EwAdminApi.Repositories.BaseClasses;
 using EwAdminApi.Services;
 
@@ -45,4 +46,218 @@ public class PosTxRepository : PosRepositoryBase
             return -1;
     }
     
+    /// <summary>
+    /// Returns the details of a transaction given the txsalesheaderid, accountid, and shopid.
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="shopId"></param>
+    /// <param name="txSalesHeaderId"></param>
+    /// <returns></returns>
+    public async Task<TxSalesHeader?> GetTxDetailsAsync(int accountId, int shopId, int txSalesHeaderId)
+    {
+        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        var query = @"
+            SELECT 
+                [TxSalesHeaderId]
+              ,[AccountId]
+              ,[ShopId]
+              ,[TxCode]
+              ,[TxDate]
+              ,[ReceiptNo]
+              ,[IsCurrentTx]
+              ,[Voided]
+              ,[Enabled]
+              ,[TableId]
+              ,[TableCode]
+              ,[PreviousTableId]
+              ,[PreviousTableCode]
+              ,[SectionId]
+              ,[SectionName]
+              ,[CheckinDatetime]
+              ,[CheckoutDatetime]
+              ,[CheckinUserId]
+              ,[CheckinUserName]
+              ,[CheckoutUserId]
+              ,[CheckoutUserName]
+              ,[CashierUserId]
+              ,[CashierUserName]
+              ,[CashierDatetime]
+              ,[AmountPaid]
+              ,[AmountChange]
+              ,[AmountSubtotal]
+              ,[AmountServiceCharge]
+              ,[AmountDiscount]
+              ,[AmountTotal]
+              ,[AmountRounding]
+              ,[TxCompleted]
+              ,[TxChecked]
+              ,[CreatedDate]
+              ,[CreatedBy]
+              ,[ModifiedDate]
+              ,[ModifiedBy]
+              ,[IsTakeAway]
+              ,[TakeAwayRunningIndex]
+              ,[DisabledReasonId]
+              ,[DisabledReasonDesc]
+              ,[DisabledByUserId]
+              ,[DisabledByUserName]
+              ,[DisabledDateTime]
+              ,[WorkdayPeriodDetailId]
+              ,[WorkdayPeriodName]
+              ,[DiscountId]
+              ,[DiscountName]
+              ,[CashDrawerCode]
+              ,[ReceiptPrintCount]
+              ,[TxRevokeCount]
+              ,[ServiceChargeId]
+              ,[ServiceChargeName]
+              ,[AmountTips]
+              ,[IsTimeLimited]
+              ,[TimeLimitedMinutes]
+              ,[CusCount]
+              ,[DiscountByUserId]
+              ,[DiscountByUserName]
+              ,[AmountPointTotal]
+              ,[MemberPointRemain]
+              ,[TaxationId]
+              ,[TaxationName]
+              ,[AmountTaxation]
+              ,[AmountMinChargeOffset]
+              ,[IsMinChargeOffsetWaived]
+              ,[IsMinChargeTx]
+              ,[IsMinChargePerHead]
+              ,[MinChargeAmount]
+              ,[MinChargeMemberAmount]
+              ,[IsPrepaidRechargeTx]
+              ,[IsInvoicePrintPending]
+              ,[InvoiceNum]
+              ,[OrderNum]
+              ,[IsDepositTx]
+              ,[TotalDepositAmount]
+              ,[DepositRemark]
+              ,[IsDepositOutstanding]
+              ,[IsReturnTx]
+              ,[HasReturned]
+              ,[ReturnedDateTime]
+              ,[ReturnedTxSalesHeaderId]
+              ,[NewTxSalesHeaderIdForReturn]
+              ,[ApiGatewayRefId]
+              ,[ApiGatewayName]
+              ,[ApiGatewayRefRemark]
+              ,[TableRemark]
+              ,[TxSalesHeaderRemark]
+              ,[TotalPaymentMethodSurchargeAmount]
+              ,[IsNonSalesTx]
+              ,[IsNoOtherLoyaltyTx]
+              ,[StartWorkdayPeriodDetailId]
+              ,[StartWorkdayPeriodName]
+              ,[IsTxOnHold]
+              ,[IsOdoTx]
+              ,[OdoOrderToken]
+              ,[AmountOverpayment]
+              ,[TxStatusId]
+              ,[OverridedChecklistPrinterName]
+              ,[OrderSourceTypeId]
+              ,[OrderSourceRefId]
+              ,[OrderChannelId]
+              ,[OrderChannelCode]
+              ,[OrderChannelName]
+              ,[ApiGatewayRefCode]
+              ,[ApiGatewayResponseCode]
+            FROM [dbo].[TxSalesHeader]
+            WHERE TxSalesHeaderId = @TxSalesHeaderId AND AccountId = @AccountId AND ShopId = @ShopId";
+        var parameters = new
+        {
+            AccountId = accountId,
+            ShopId = shopId,
+            TxSalesHeaderId = txSalesHeaderId
+        };
+        if (db != null)
+            return await db.QuerySingleOrDefaultAsync<TxSalesHeader>(query, parameters).ConfigureAwait(false);
+        else
+            return null;
+    }
+    
+    /// <summary>
+    /// Returns a list of transactions for the given account, shop, and transaction date.
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="shopId"></param>
+    /// <param name="txDate"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<TxSalesHeader>?> GetTxListAsync(int accountId, int shopId, DateTime txDate, int page, int pageSize)
+    {
+        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        var offset = (page - 1) * pageSize;
+        var query = @"
+            SELECT [TxSalesHeaderId]
+                  ,[AccountId]
+                  ,[ShopId]
+                  ,[TxDate]
+                  ,[IsCurrentTx]
+                  ,[Enabled]
+                  ,[TableId]
+                  ,[TableCode]
+                  ,[CheckinDatetime]
+                  ,[CheckoutDatetime]
+                  ,[CheckinUserId]
+                  ,[CheckinUserName]
+                  ,[CheckoutUserId]
+                  ,[CheckoutUserName]
+                  ,[CashierUserId]
+                  ,[CashierUserName]
+                  ,[CashierDatetime]
+                  ,[AmountPaid]
+                  ,[AmountChange]
+                  ,[AmountSubtotal]
+                  ,[AmountServiceCharge]
+                  ,[AmountDiscount]
+                  ,[AmountTotal]
+                  ,[AmountRounding]
+                  ,[TxCompleted]
+                  ,[TxChecked]
+                  ,[IsTakeAway]
+                  ,[DisabledReasonId]
+                  ,[DisabledReasonDesc]
+                  ,[DisabledByUserId]
+                  ,[DisabledByUserName]
+                  ,[DisabledDateTime]
+                  ,[WorkdayPeriodDetailId]
+                  ,[WorkdayPeriodName]
+                  ,[DiscountId]
+                  ,[DiscountName]
+                  ,[CashDrawerCode]
+                  ,[ServiceChargeId]
+                  ,[ServiceChargeName]
+                  ,[AmountTips]
+                  ,[CusCount]
+                  ,[DiscountByUserId]
+                  ,[DiscountByUserName]
+                  ,[TaxationId]
+                  ,[TaxationName]
+                  ,[AmountTaxation]
+                  ,[AmountMinChargeOffset]
+                  ,[IsOdoTx]
+                  ,[AmountOverpayment]
+                  ,[TxStatusId]
+            FROM [dbo].[TxSalesHeader]
+            WHERE AccountId = @AccountId AND ShopId = @ShopId AND TxDate = @TxDate
+            ORDER BY TxSalesHeaderId
+            OFFSET @Offset ROWS 
+            FETCH NEXT @PageSize ROWS ONLY";
+        var parameters = new
+        {
+            AccountId = accountId,
+            ShopId = shopId,
+            TxDate = txDate,
+            Offset = offset,
+            PageSize = pageSize
+        };
+        if (db != null)
+            return await db.QueryAsync<TxSalesHeader>(query, parameters).ConfigureAwait(false);
+        else
+            return null;
+    }
 }
