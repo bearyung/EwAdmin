@@ -98,4 +98,32 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
                 return new List<ShopWorkdayDetail>();
         }
     }
+    
+    // UpdateShopWorkdayDetailAsync
+    // input: ShopWorkdayDetail
+    //          only OpenDatetime, CloseDatetime, IsClosed, Enabled, ModifiedBy  is being updated
+    //          ModifiedDate is updated automatically with current datetime
+    // output: updated ShopWorkdayDetail
+    public async Task<ShopWorkdayDetail?> UpdateShopWorkdayDetailAsync(ShopWorkdayDetail shopWorkdayDetail)
+    {
+        using var db = await GetPosDatabaseConnection(shopWorkdayDetail.AccountId, shopWorkdayDetail.ShopId)
+            .ConfigureAwait(false);
+        var query = @"
+        UPDATE [dbo].[ShopWorkdayDetail]
+        SET [OpenDatetime] = @OpenDatetime
+           ,[CloseDatetime] = @CloseDatetime
+           ,[IsClosed] = @IsClosed
+           ,[Enabled] = @Enabled
+           ,[ModifiedDate] = GETDATE()
+           ,[ModifiedBy] = @ModifiedBy
+        WHERE AccountId = @AccountId
+        AND ShopId = @ShopId
+        AND WorkdayDetailId = @WorkdayDetailId
+        ";
+
+        if (db != null)
+            await db.ExecuteAsync(query, shopWorkdayDetail).ConfigureAwait(false);
+
+        return shopWorkdayDetail;
+    }
 }

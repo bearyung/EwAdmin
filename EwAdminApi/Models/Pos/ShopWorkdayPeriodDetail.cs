@@ -11,8 +11,8 @@ public class ShopWorkdayPeriodDetail
     public DateTime StartDateTime { get; set; }
     public DateTime EndDateTime { get; set; }
     public bool Enabled { get; set; }
-    public DateTime ModifiedDate { get; set; }
-    public string ModifiedBy { get; set; }
+    public DateTime? ModifiedDate { get; set; }
+    public string? ModifiedBy { get; set; }
     
     // properties from ShopWorkdayPeriod table
     public string? PeriodName { get; set; }

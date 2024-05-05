@@ -10,4 +10,6 @@ public class ShopWorkdayDetail
  public DateTime CloseDatetime { get; set; }
  public bool IsClosed { get; set; }
  public bool Enabled { get; set; }
+ public DateTime? ModifiedDate { get; set; }
+ public string? ModifiedBy { get; set; }
 }

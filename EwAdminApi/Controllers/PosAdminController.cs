@@ -143,13 +143,17 @@ public class PosAdminController : ControllerBase
         return Ok(resultList);
     }
     
-    // API for UpdateShopWorkdayPeriodDetail
-    // input: ShopWorkdayPeriodDetail
-    // output: updated ShopWorkdayPeriodDetail
+    /// <summary>
+    /// Handles the POST request to update a shop workday period detail.
+    /// </summary>
+    /// <param name="shopWorkdayPeriodDetail">The shop workday period detail to be updated. Only startdatetime, enddatetime, and enabled fields are updated.</param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the shop workday period detail is updated successfully, it returns an HTTP 200 status code along with the updated shop workday period detail.
+    /// - If the user data is not found, it returns an HTTP 400 status code with a custom error message.
+    /// </returns>
     
-    // XML summary, indicate that only the start, end date and enabled fiend can be updated
-    
-    [HttpPost("updateshopworkdayperioddetail")]
+    [HttpPost("updateShopWorkdayPeriodDetail")]
     [ProducesResponseType(typeof(ShopWorkdayPeriodDetail), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]
@@ -173,6 +177,42 @@ public class PosAdminController : ControllerBase
         var updatedShopWorkdayPeriodDetail = 
             await _posShopWorkdayPeriodDetailRepository.UpdateShopWorkdayPeriodDetailAsync(shopWorkdayPeriodDetail).ConfigureAwait(false);
         
-        return Ok(mondayUserData);
+        return Ok(updatedShopWorkdayPeriodDetail);
+    }
+    
+    /// <summary>
+    /// Handles the POST request to update a shop workday detail.
+    /// </summary>
+    /// <param name="shopWorkdayDetail">The shop workday detail to be updated. Only opendatetime, closedatetime, isclosed, enabled, and modifiedby fields are updated.</param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the shop workday detail is updated successfully, it returns an HTTP 200 status code along with the updated shop workday detail.
+    /// - If the user data is not found, it returns an HTTP 400 status code with a custom error message.
+    /// </returns>
+    [HttpPost("updateShopWorkdayDetail")]
+    [ProducesResponseType(typeof(ShopWorkdayDetail), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> UpdateShopWorkdayDetail(
+        [FromBody] ShopWorkdayDetail shopWorkdayDetail)
+    {
+        // Get the Monday user data from the HttpContext
+        var mondayUserData = HttpContext.Items["MondayUserData"] as MondayUserResponse;
+
+        if (mondayUserData == null)
+        {
+            // Handle the case where the data is not found
+            return new CustomBadRequestResult("User data not found.");
+        }
+        
+        // override the modified by field with the user name from Monday
+        shopWorkdayDetail.ModifiedBy = mondayUserData.Data.Me.Name;
+        
+        // Implementation to update shop workday detail
+        var updatedShopWorkdayDetail = 
+            await _posShopWorkdayDetailRepository.UpdateShopWorkdayDetailAsync(shopWorkdayDetail).ConfigureAwait(false);
+        
+        return Ok(updatedShopWorkdayDetail);
     }
 }
