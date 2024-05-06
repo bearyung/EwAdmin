@@ -23,13 +23,13 @@ public record ItemsPage
 
 public record Item
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
+    public string? Id { get; set; }
+    public string? Name { get; set; }
     public List<ColumnValue>? ColumnValues { get; set; }
 }
 
 public record ColumnValue
 {
-    public string Id { get; set; }
-    public string Value { get; set; }
+    public string? Id { get; set; }
+    public string? Value { get; set; }
 }

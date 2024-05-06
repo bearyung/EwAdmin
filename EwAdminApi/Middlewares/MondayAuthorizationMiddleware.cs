@@ -72,7 +72,7 @@ public class MondayAuthorizationMiddleware
         logger.LogInformation("User data retrieved successfully, checking access rights...");
 
         string apiPath = context.Request.Path.ToString();
-        string userIdWithPrefix = $"person-{userData?.Data.Me.Id.ToString()}";
+        string userIdWithPrefix = $"person-{userData?.Data?.Me?.Id}";
 
         // Prepare the GraphQL query to check user access on the specific API path
         var checkAccessRightsQuery = new
@@ -124,7 +124,7 @@ public class MondayAuthorizationMiddleware
 
         if (!userHasAccess)
         {
-            logger.LogWarning($"Access denied for user {userData?.Data.Me.Id} to path {apiPath}");
+            logger.LogWarning($"Access denied for user {userData?.Data?.Me?.Id} to path {apiPath}");
             context.Response.StatusCode = 403; // Forbidden
             await context.Response.WriteAsJsonAsync(new {errorMessage = "Access Denied: You do not have rights to access this API."}).ConfigureAwait(false);
             return;
@@ -133,7 +133,7 @@ public class MondayAuthorizationMiddleware
         // Optionally, you might want to store this user data in the HttpContext for downstream use
         context.Items["MondayUserData"] = userData;
 
-        logger.LogInformation($"Access granted for user {userData?.Data.Me.Id} to path {apiPath}");
+        logger.LogInformation($"Access granted for user {userData?.Data?.Me?.Id} to path {apiPath}");
 
         await _next(context).ConfigureAwait(false);
     }

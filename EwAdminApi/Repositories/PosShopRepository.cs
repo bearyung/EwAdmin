@@ -49,6 +49,11 @@ public class PosShopRepository : PosRepositoryBase
             ShopId = shopId
         };
 
-        return await (db?.QuerySingleOrDefaultAsync<Shop?>(query, parameters)).ConfigureAwait(false);
+        if (db != null)
+        {
+            return await db.QuerySingleOrDefaultAsync<Shop?>(query, parameters).ConfigureAwait(false);   
+        }
+
+        return null;
     }
 }

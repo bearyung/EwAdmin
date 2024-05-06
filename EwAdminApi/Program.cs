@@ -24,7 +24,7 @@ builder.Services.AddScoped<WebAdminCompanyMasterRepository>();
 builder.Services.AddScoped<PosShopRepository>();
 builder.Services.AddScoped<PosShopWorkdayDetailRepository>();
 builder.Services.AddScoped<PosShopWorkdayPeriodDetailRepository>();
-builder.Services.AddScoped<PosTxRepository>();
+builder.Services.AddScoped<PosTxSalesRepository>();
 
 // builder.Services.TryAddMondayClient(options =>
 // {

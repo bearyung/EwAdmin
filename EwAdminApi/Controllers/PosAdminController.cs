@@ -14,18 +14,18 @@ public class PosAdminController : ControllerBase
     private readonly PosShopRepository _posShopRepository;
     private readonly PosShopWorkdayDetailRepository _posShopWorkdayDetailRepository;
     private readonly PosShopWorkdayPeriodDetailRepository _posShopWorkdayPeriodDetailRepository;
-    private readonly PosTxRepository _posTxRepository;
+    private readonly PosTxSalesRepository _posTxSalesRepository;
 
     public PosAdminController(
         PosShopRepository posShopRepository,
         PosShopWorkdayDetailRepository posShopWorkdayDetailRepository,
         PosShopWorkdayPeriodDetailRepository posShopWorkdayPeriodDetailRepository,
-        PosTxRepository posTxRepository)
+        PosTxSalesRepository posTxSalesRepository)
     {
         _posShopRepository = posShopRepository;
         _posShopWorkdayDetailRepository = posShopWorkdayDetailRepository;
         _posShopWorkdayPeriodDetailRepository = posShopWorkdayPeriodDetailRepository;
-        _posTxRepository = posTxRepository;
+        _posTxSalesRepository = posTxSalesRepository;
     }
     
     /// <summary>
@@ -74,7 +74,7 @@ public class PosAdminController : ControllerBase
     /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
     /// - If the pageSize is more than 100, it also returns an HTTP 400 status code with a custom error message.
     /// </returns>
-    [HttpGet("shopworkdaydetaillist")]
+    [HttpGet("shopWorkdayDetailList")]
     [ProducesResponseType(typeof(IEnumerable<ShopWorkdayDetail>), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]
@@ -119,7 +119,7 @@ public class PosAdminController : ControllerBase
     /// - If the pageSize is more than 100, it also returns an HTTP 400 status code with a custom error message.
     /// </returns>
     
-    [HttpGet("shopworkdayperioddetaillist")]
+    [HttpGet("shopWorkdayPeriodDetailList")]
     [ProducesResponseType(typeof(IEnumerable<ShopWorkdayPeriodDetail>), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]
@@ -180,7 +180,7 @@ public class PosAdminController : ControllerBase
         }
         
         // override the modified by field with the user name from Monday
-        shopWorkdayPeriodDetail.ModifiedBy = mondayUserData.Data.Me.Name;
+        shopWorkdayPeriodDetail.ModifiedBy = mondayUserData?.Data?.Me?.Name;
         
         // Implementation to update shop workday period detail
         var updatedShopWorkdayPeriodDetail = 
@@ -222,7 +222,7 @@ public class PosAdminController : ControllerBase
         }
         
         // override the modified by field with the user name from Monday
-        shopWorkdayDetail.ModifiedBy = mondayUserData.Data.Me.Name;
+        shopWorkdayDetail.ModifiedBy = mondayUserData?.Data?.Me?.Name;
         
         // Implementation to update shop workday detail
         var updatedShopWorkdayDetail = 
@@ -255,7 +255,7 @@ public class PosAdminController : ControllerBase
         
         // check if there are any transactions in the given workday detail id
         var txCount = 
-            await _posTxRepository.GetTxCountInWorkdayDetailIdAsync(shopWorkdayDetail.AccountId, shopWorkdayDetail.ShopId, shopWorkdayDetail.WorkdayDetailId).ConfigureAwait(false);
+            await _posTxSalesRepository.GetTxCountInWorkdayDetailIdAsync(shopWorkdayDetail.AccountId, shopWorkdayDetail.ShopId, shopWorkdayDetail.WorkdayDetailId).ConfigureAwait(false);
         
         // return error to user if there are transactions in the workday detail
         if (txCount > 0)
@@ -281,15 +281,15 @@ public class PosAdminController : ControllerBase
     /// - If the transaction header is found, it returns an HTTP 200 status code along with the transaction header details.
     /// - If the transaction header is not found, it returns an HTTP 404 status code with a custom error message.
     /// </returns>
-    [HttpGet("txheader")]
+    [HttpGet("txSalesHeader")]
     [ProducesResponseType(typeof(TxSalesHeader), 200)]
     [Produces("application/json")]
     [Consumes("application/json")]
-    public async Task<IActionResult> GetTxHeader(
+    public async Task<IActionResult> GetTxSalesHeader(
         [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] int txSalesHeaderId)
     {
         // Implementation to fetch transaction header
-        var txHeader = await _posTxRepository.GetTxDetailsAsync(accountId, shopId, txSalesHeaderId).ConfigureAwait(false);
+        var txHeader = await _posTxSalesRepository.GetTxSalesHeaderAsync(accountId, shopId, txSalesHeaderId).ConfigureAwait(false);
         
         // If the transaction header is not found, return a custom 404 Not Found response with a custom error message.
         if (txHeader == null)
@@ -298,5 +298,47 @@ public class PosAdminController : ControllerBase
         }
         return Ok(txHeader);
     }
+    
+    
+    /// <summary>
+    /// Handles the GET request to fetch the list of transaction headers.
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="shopId"></param>
+    /// <param name="txDate"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the transaction headers are found, it returns an HTTP 200 status code along with the transaction header details.
+    /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
+    /// </returns>
+    [HttpGet("txSalesHeaderList")]
+    [ProducesResponseType(typeof(IEnumerable<TxSalesHeader>), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetTxSalesHeaderList(
+        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] DateTime txDate,
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        // Implementation to fetch transaction header list
+        if (page <= 0 || pageSize <= 0)
+        {
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
+        }
+
+        if (pageSize > 100)
+        {
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
+        }
+        
+        // get the transaction header list from PosTxRepository
+        var resultList = 
+            await _posTxSalesRepository.GetTxSalesHeaderListAsync(accountId, shopId, txDate, page, pageSize).ConfigureAwait(false);
+        
+        return Ok(resultList);
+    }
+    
     
 }

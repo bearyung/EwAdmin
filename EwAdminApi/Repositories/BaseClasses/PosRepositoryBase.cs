@@ -30,12 +30,14 @@ public class PosRepositoryBase
             BrandId = brandId
         };
 
-        var result = await db.QuerySingleOrDefaultAsync<RegionMaster>(query, parameters).ConfigureAwait(false);
-
-        if (result != null)
+        if (db != null)
         {
-            return _connectionService.GetConnection(result.DBServer, result.DBName, result.DBUsername,
-                result.DBPassword);
+            var result = await db.QuerySingleOrDefaultAsync<RegionMaster>(query, parameters).ConfigureAwait(false);
+
+            if (result is { DbServer: not null, DbName: not null, DbUsername: not null, DbPassword: not null })
+                return _connectionService.GetConnection(result.DbServer, result.DbName,
+                    result.DbUsername,
+                    result.DbPassword);
         }
 
         return null;
