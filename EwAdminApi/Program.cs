@@ -25,6 +25,7 @@ builder.Services.AddScoped<PosShopRepository>();
 builder.Services.AddScoped<PosShopWorkdayDetailRepository>();
 builder.Services.AddScoped<PosShopWorkdayPeriodDetailRepository>();
 builder.Services.AddScoped<PosTxSalesRepository>();
+builder.Services.AddScoped<PosPaymentMethodRepository>();
 
 // builder.Services.TryAddMondayClient(options =>
 // {

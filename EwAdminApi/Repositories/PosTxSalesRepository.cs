@@ -285,7 +285,6 @@ public class PosTxSalesRepository : PosRepositoryBase
             ON a.AccountId = b.AccountId and a.PaymentMethodId = b.PaymentMethodId
             WHERE a.AccountId = @AccountId AND a.ShopId = @ShopId AND a.TxSalesHeaderId = @TxSalesHeaderId
             ORDER BY TxPaymentId DESC
-            ORDER BY TxPaymentId DESC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
         var parameters = new
         {

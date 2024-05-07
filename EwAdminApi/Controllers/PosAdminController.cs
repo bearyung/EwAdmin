@@ -15,17 +15,20 @@ public class PosAdminController : ControllerBase
     private readonly PosShopWorkdayDetailRepository _posShopWorkdayDetailRepository;
     private readonly PosShopWorkdayPeriodDetailRepository _posShopWorkdayPeriodDetailRepository;
     private readonly PosTxSalesRepository _posTxSalesRepository;
+    private readonly PosPaymentMethodRepository _posPaymentMethodRepository;
 
     public PosAdminController(
         PosShopRepository posShopRepository,
         PosShopWorkdayDetailRepository posShopWorkdayDetailRepository,
         PosShopWorkdayPeriodDetailRepository posShopWorkdayPeriodDetailRepository,
-        PosTxSalesRepository posTxSalesRepository)
+        PosTxSalesRepository posTxSalesRepository,
+        PosPaymentMethodRepository posPaymentMethodRepository)
     {
         _posShopRepository = posShopRepository;
         _posShopWorkdayDetailRepository = posShopWorkdayDetailRepository;
         _posShopWorkdayPeriodDetailRepository = posShopWorkdayPeriodDetailRepository;
         _posTxSalesRepository = posTxSalesRepository;
+        _posPaymentMethodRepository = posPaymentMethodRepository;
     }
     
     /// <summary>
@@ -469,5 +472,47 @@ public class PosAdminController : ControllerBase
         }
         
         return Ok(updatedTxPayment);
+    }
+    
+    // add method for getting the list of payment methods
+    // input: accountId, shopId, page, pageSize
+    // output: list of PaymentMethod
+    // reference the PosPaymentMethodRepository
+    /// <summary>
+    /// Handles the GET request to fetch the list of payment methods.
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="shopId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the payment methods are found, it returns an HTTP 200 status code along with the payment method details.
+    /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
+    /// </returns>
+    [HttpGet("paymentMethodList")]
+    [ProducesResponseType(typeof(IEnumerable<PaymentMethod>), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetPaymentMethodList(
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        // Implementation to fetch payment method list
+        if (page <= 0 || pageSize <= 0)
+        {
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
+        }
+
+        if (pageSize > 100)
+        {
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
+        }
+        
+        // get the payment method list from PosPaymentMethodRepository
+        var resultList = 
+            await _posPaymentMethodRepository.GetPaymentMethodListAsync(accountId, shopId, page, pageSize).ConfigureAwait(false);
+        
+        return Ok(resultList);
     }
 }
