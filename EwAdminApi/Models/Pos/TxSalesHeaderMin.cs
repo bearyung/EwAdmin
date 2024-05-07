@@ -67,4 +67,6 @@ public class TxSalesHeaderMin
     public string? DisabledByUserName { get; set; }
 
     public DateTime? DisabledDateTime { get; set; }
+    
+    public bool? IsOdoTx { get; set; }
 }

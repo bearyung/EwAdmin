@@ -125,8 +125,6 @@ public class TxSalesHeader : TxSalesHeaderMin
 
     public bool? IsTxOnHold { get; set; }
 
-    public bool? IsOdoTx { get; set; }
-
     public Guid? OdoOrderToken { get; set; }
 
     public decimal? AmountOverpayment { get; set; }

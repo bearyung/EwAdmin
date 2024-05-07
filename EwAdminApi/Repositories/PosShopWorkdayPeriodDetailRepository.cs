@@ -86,19 +86,17 @@ public class PosShopWorkdayPeriodDetailRepository : PosRepositoryBase
 
         if (db != null)
         {
-            await db.ExecuteAsync(query, shopWorkdayPeriodDetail).ConfigureAwait(false);
-
-            // get the updated shop workday period detail from DB and return that to user
-            var updatedShopWorkdayPeriodDetail =
-                await GetShopWorkdayPeriodDetailAsync(shopWorkdayPeriodDetail.AccountId, shopWorkdayPeriodDetail.ShopId,
-                    shopWorkdayPeriodDetail.WorkdayPeriodDetailId).ConfigureAwait(false);
-
-            return updatedShopWorkdayPeriodDetail;
+            // if the update is successful, get the updated shop workday period detail from DB and return that to user
+            // otherwise, return null
+            var result = await db.ExecuteAsync(query, shopWorkdayPeriodDetail).ConfigureAwait(false);
+            if (result > 0)
+            {
+                return await GetShopWorkdayPeriodDetailAsync(shopWorkdayPeriodDetail.AccountId,
+                    shopWorkdayPeriodDetail.ShopId, shopWorkdayPeriodDetail.WorkdayPeriodDetailId).ConfigureAwait(false);
+            }
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     private async Task<ShopWorkdayPeriodDetail?> GetShopWorkdayPeriodDetailAsync(int accountId, int shopId,

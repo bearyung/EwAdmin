@@ -186,6 +186,13 @@ public class PosAdminController : ControllerBase
         var updatedShopWorkdayPeriodDetail = 
             await _posShopWorkdayPeriodDetailRepository.UpdateShopWorkdayPeriodDetailAsync(shopWorkdayPeriodDetail).ConfigureAwait(false);
         
+        // If the shop workday period detail is not updated successfully, return a custom 400 Bad Request response with a custom error message.
+        // otherwise, return an HTTP 200 OK response with the updated shop workday period detail.
+        if (updatedShopWorkdayPeriodDetail == null)
+        {
+            return new CustomBadRequestResult("Failed to update shop workday period detail.");   
+        }
+        
         return Ok(updatedShopWorkdayPeriodDetail);
     }
     
@@ -227,6 +234,13 @@ public class PosAdminController : ControllerBase
         // Implementation to update shop workday detail
         var updatedShopWorkdayDetail = 
             await _posShopWorkdayDetailRepository.UpdateShopWorkdayDetailAsync(shopWorkdayDetail).ConfigureAwait(false);
+        
+        // If the shop workday detail is not updated successfully, return a custom 400 Bad Request response with a custom error message.
+        // Otherwise, return an HTTP 200 OK response with the updated shop workday detail.
+        if (updatedShopWorkdayDetail == null)
+        {
+            return new CustomBadRequestResult("Failed to update shop workday detail.");   
+        }
         
         return Ok(updatedShopWorkdayDetail);
     }
@@ -340,5 +354,120 @@ public class PosAdminController : ControllerBase
         return Ok(resultList);
     }
     
+    /// <summary>
+    /// Handles the GET request to fetch the list of transaction payments for a specific transaction header.
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="shopId"></param>
+    /// <param name="txSalesHeaderId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the transaction payments are found, it returns an HTTP 200 status code along with the transaction payment details.
+    /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
+    /// </returns>
+    [HttpGet("txPaymentList")]
+    [ProducesResponseType(typeof(IEnumerable<TxPayment>), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetTxPaymentList(
+        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] int txSalesHeaderId,
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        // Implementation to fetch transaction payment list
+        if (page <= 0 || pageSize <= 0)
+        {
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
+        }
+
+        if (pageSize > 100)
+        {
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
+        }
+        
+        // get the transaction payment list from PosTxRepository
+        var resultList = 
+            await _posTxSalesRepository.GetTxPaymentListAsync(accountId, shopId, txSalesHeaderId, page, pageSize).ConfigureAwait(false);
+        
+        return Ok(resultList);
+    }
     
+    /// <summary>
+    /// Handles the GET request to fetch the details of a specific transaction payment.
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="shopId"></param>
+    /// <param name="txPaymentId"></param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the transaction payment is found, it returns an HTTP 200 status code along with the transaction payment details.
+    /// - If the transaction payment is not found, it returns an HTTP 404 status code with a custom error message.
+    /// </returns>
+    [HttpGet("txPayment")]
+    [ProducesResponseType(typeof(TxPayment), 200)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetTxPayment(
+        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] int txPaymentId)
+    {
+        // Implementation to fetch transaction payment
+        var txPayment = await _posTxSalesRepository.GetTxPaymentAsync(accountId, shopId, txPaymentId).ConfigureAwait(false);
+        
+        // If the transaction payment is not found, return a custom 404 Not Found response with a custom error message.
+        if (txPayment == null)
+        {
+            return new CustomNotFoundRequestResult("Transaction payment not found.");
+        }
+        return Ok(txPayment);
+    }
+    
+    /// <summary>
+    /// Handles the PATCH request to update a transaction payment.
+    /// </summary>
+    /// <param name="txPayment"></param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the transaction payment is updated successfully, it returns an HTTP 200 status code along with the updated transaction payment details.
+    /// </returns>
+    [HttpPatch("updateTxPayment")]
+    [ProducesResponseType(typeof(TxPayment), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> UpdateTxPayment(
+        [FromBody] TxPayment txPayment)
+    {
+        // Validate the ID fields
+        if (txPayment.AccountId == 0 || txPayment.ShopId == 0 || txPayment.TxPaymentId == 0)
+        {
+            return new CustomBadRequestResult("AccountId, ShopId and TxPaymentId must be greater than zero.");
+        }
+
+        // Get the Monday user data from the HttpContext
+        var mondayUserData = HttpContext.Items["MondayUserData"] as MondayUserResponse;
+
+        if (mondayUserData == null)
+        {
+            // Handle the case where the data is not found
+            return new CustomBadRequestResult("User data not found.");
+        }
+        
+        // override the modified by field with the user name from Monday
+        txPayment.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        
+        // Implementation to update transaction payment
+        var updatedTxPayment = 
+            await _posTxSalesRepository.UpdateTxPaymentAsync(txPayment).ConfigureAwait(false);
+        
+        // If the transaction payment is not updated successfully, return a custom 400 Bad Request response with a custom error message.
+        // Otherwise, return an HTTP 200 OK response with the updated transaction payment details.
+        if (updatedTxPayment == null)
+        {
+            return new CustomBadRequestResult("Failed to update transaction payment.");   
+        }
+        
+        return Ok(updatedTxPayment);
+    }
 }
