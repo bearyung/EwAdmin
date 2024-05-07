@@ -44,7 +44,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetShopDetail(
-        [FromQuery] int accountId, [FromQuery] int shopId)
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId)
     {
         // Fetches the shop details using the provided account ID and shop ID.
         var shop = await _posShopRepository.GetShopDetailAsync(accountId, shopId);
@@ -80,7 +80,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetShopWorkdayDetailList(
-        [FromQuery] int accountId, [FromQuery] int shopId, 
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, 
         [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
@@ -162,7 +162,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> UpdateShopWorkdayPeriodDetail(
-        [FromBody] ShopWorkdayPeriodDetail shopWorkdayPeriodDetail)
+        [FromBody, Required] ShopWorkdayPeriodDetail shopWorkdayPeriodDetail)
     {
         // Validate the identify fields
         if (shopWorkdayPeriodDetail.AccountId == 0 || shopWorkdayPeriodDetail.ShopId == 0 || shopWorkdayPeriodDetail.WorkdayPeriodDetailId == 0)
@@ -211,7 +211,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> UpdateShopWorkdayDetail(
-        [FromBody] ShopWorkdayDetail shopWorkdayDetail)
+        [FromBody, Required] ShopWorkdayDetail shopWorkdayDetail)
     {
         // Validate the ID fields
         if (shopWorkdayDetail.AccountId == 0 || shopWorkdayDetail.ShopId == 0 || shopWorkdayDetail.WorkdayDetailId == 0)
@@ -259,7 +259,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> DeleteShopWorkdayDetail(
-        [FromBody] ShopWorkdayDetail shopWorkdayDetail)
+        [FromBody, Required] ShopWorkdayDetail shopWorkdayDetail)
     {
         // Validate the ID fields
         if (shopWorkdayDetail.AccountId == 0 || shopWorkdayDetail.ShopId == 0 || shopWorkdayDetail.WorkdayDetailId == 0)
@@ -300,7 +300,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxSalesHeader(
-        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] int txSalesHeaderId)
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] int txSalesHeaderId)
     {
         // Implementation to fetch transaction header
         var txHeader = await _posTxSalesRepository.GetTxSalesHeaderAsync(accountId, shopId, txSalesHeaderId).ConfigureAwait(false);
@@ -327,13 +327,13 @@ public class PosAdminController : ControllerBase
     /// - If the transaction headers are found, it returns an HTTP 200 status code along with the transaction header details.
     /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
     /// </returns>
-    [HttpGet("txSalesHeaderList")]
+    [HttpGet("txSalesHeaderList/{txDate:datetime}")]
     [ProducesResponseType(typeof(IEnumerable<TxSalesHeader>), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxSalesHeaderList(
-        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] DateTime txDate,
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] DateTime txDate,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         // Implementation to fetch transaction header list
@@ -373,7 +373,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxPaymentList(
-        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] int txSalesHeaderId,
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] int txSalesHeaderId,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         // Implementation to fetch transaction payment list
@@ -410,7 +410,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxPayment(
-        [FromQuery] int accountId, [FromQuery] int shopId, [FromQuery] int txPaymentId)
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery,Required] int txPaymentId)
     {
         // Implementation to fetch transaction payment
         var txPayment = await _posTxSalesRepository.GetTxPaymentAsync(accountId, shopId, txPaymentId).ConfigureAwait(false);
@@ -437,7 +437,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> UpdateTxPayment(
-        [FromBody] TxPayment txPayment)
+        [FromBody, Required] TxPayment txPayment)
     {
         // Validate the ID fields
         if (txPayment.AccountId == 0 || txPayment.ShopId == 0 || txPayment.TxPaymentId == 0)
