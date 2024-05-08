@@ -1,6 +1,6 @@
 using System.Data;
 using Dapper;
-using EwAdminApi.Models.WebAdmin;
+using EwAdmin.Common.Models.WebAdmin;
 using EwAdminApi.Services;
 
 namespace EwAdminApi.Repositories.BaseClasses;

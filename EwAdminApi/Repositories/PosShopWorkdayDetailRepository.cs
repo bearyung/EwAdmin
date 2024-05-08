@@ -1,5 +1,5 @@
 using Dapper;
-using EwAdminApi.Models.Pos;
+using EwAdmin.Common.Models.Pos;
 using EwAdminApi.Repositories.BaseClasses;
 using EwAdminApi.Services;
 

@@ -1,5 +1,6 @@
+using EwAdmin.Common.Models.WebAdmin;
 using EwAdminApi.Extensions;
-using EwAdminApi.Models.WebAdmin;
+using EwAdminApi.Models.Monday;
 using EwAdminApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,5 +50,28 @@ public class WebAdminController : ControllerBase
 
         // Return the fetched list of companies.
         return Ok(resultList);
+    }
+    
+    // add an API endpoint (hello) to return the HttpContext.Items["MondayUserData"] if it exists
+    // code here
+    /// <summary>
+    /// Handle the request to get current user data from HttpContext.Items.
+    /// </summary>
+    /// <returns>
+    /// Returns the MondayUserData from HttpContext.Items if it exists, otherwise returns a BadRequest.
+    /// </returns>
+    [HttpGet("hello")]
+    [ProducesResponseType(typeof(MondayUserData), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public IActionResult GetMondayUserData()
+    {
+        if (HttpContext.Items.ContainsKey("MondayUserData"))
+        {
+            return Ok(HttpContext.Items["MondayUserData"]);
+        }
+
+        return new CustomBadRequestResult("MondayUserData not found in HttpContext.Items.");
     }
 }

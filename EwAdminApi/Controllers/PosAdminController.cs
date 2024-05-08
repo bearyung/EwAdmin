@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using EwAdmin.Common.Models.Pos;
 using EwAdminApi.Extensions;
 using EwAdminApi.Models.Monday;
-using EwAdminApi.Models.Pos;
 using EwAdminApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -474,10 +474,6 @@ public class PosAdminController : ControllerBase
         return Ok(updatedTxPayment);
     }
     
-    // add method for getting the list of payment methods
-    // input: accountId, shopId, page, pageSize
-    // output: list of PaymentMethod
-    // reference the PosPaymentMethodRepository
     /// <summary>
     /// Handles the GET request to fetch the list of payment methods.
     /// </summary>

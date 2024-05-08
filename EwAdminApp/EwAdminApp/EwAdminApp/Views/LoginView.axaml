@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+    <StackPanel Orientation="Vertical"
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Center"
+                Spacing="12">
+        <TextBlock Width="480" TextWrapping="Wrap" xml:space="preserve">
+Welcome to Everyware Admin App!&#x0a;
+To get started, you need to input your Everyware API key.&#x0a;
+Please input the API key in the text box below.
+        </TextBlock>
+        <TextBox Name="ApiKeyTextInput" 
+                 Height="100"
+                 Text="{Binding ApiKey}"/>
+        <Panel HorizontalAlignment="Right">
+            <Button Focusable="False" 
+                    Content="Submit"/>
+        </Panel>
+    </StackPanel>
+</UserControl>
