@@ -9,18 +9,21 @@
     <StackPanel Orientation="Vertical"
                 VerticalAlignment="Center" 
                 HorizontalAlignment="Center"
+                Width="480"
                 Spacing="12">
-        <TextBlock Width="480" TextWrapping="Wrap" xml:space="preserve">
+        <TextBlock TextWrapping="Wrap" xml:space="preserve">
 Welcome to Everyware Admin App!&#x0a;
 To get started, you need to input your Everyware API key.&#x0a;
 Please input the API key in the text box below.
         </TextBlock>
-        <TextBox Name="ApiKeyTextInput" 
+        <TextBox Name="ApiKeyTextInput"
                  Height="100"
+                 TextWrapping="Wrap"
                  Text="{Binding ApiKey}"/>
         <Panel HorizontalAlignment="Right">
             <Button Focusable="False" 
-                    Content="Submit"/>
+                    Content="Submit"
+                    Command="{Binding SaveApiKeyCommand}"/>
         </Panel>
     </StackPanel>
 </UserControl>

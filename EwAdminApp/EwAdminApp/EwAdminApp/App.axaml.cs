@@ -1,6 +1,8 @@
+using System.Net.Http;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using EwAdminApp.Events;
 using EwAdminApp.ViewModels;
 using EwAdminApp.Views;
 using Splat;
@@ -17,9 +19,8 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         // register a HttpClient
-        // this will be used to make HTTP requests throughout the whole app and will be injected into the view models
-        // this is a singleton service
-        Locator.CurrentMutable.RegisterConstant(new System.Net.Http.HttpClient(), typeof(System.Net.Http.HttpClient));
+        Locator.CurrentMutable.RegisterConstant(new HttpClient(), typeof(HttpClient));
+        Locator.CurrentMutable.RegisterConstant(new EventAggregator(), typeof(IEventAggregator));
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
