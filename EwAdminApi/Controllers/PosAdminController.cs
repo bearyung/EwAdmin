@@ -31,6 +31,46 @@ public class PosAdminController : ControllerBase
         _posPaymentMethodRepository = posPaymentMethodRepository;
     }
     
+    // add an API endpoint shopList to return the list of shops
+    // code here
+    /// <summary>
+    /// Handles the GET request to fetch the list of shops.
+    /// </summary>
+    /// <param name="accountId">The account ID from the query string.</param>
+    /// <param name="page">The page number for pagination. Defaults to 1 if not provided.</param>
+    /// <param name="pageSize">The number of records per page. Defaults to 20 if not provided.</param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the shops are found, it returns an HTTP 200 status code along with the shop details.
+    /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
+    /// - If the pageSize is more than 100, it also returns an HTTP 400 status code with a custom error message.
+    /// </returns>
+    [HttpGet("shopList")]
+    [ProducesResponseType(typeof(IEnumerable<Shop>), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetShopList(
+        [FromQuery, Required] int accountId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
+        if (page <= 0 || pageSize <= 0)
+        {
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
+        }
+
+        // Check if pageSize is more than 100. If so, return a BadRequest.
+        if (pageSize > 100)
+        {
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
+        }
+        
+        // get the shop list from PosShopRepository
+        var resultList = await _posShopRepository.GetShopListAsync(accountId, page, pageSize).ConfigureAwait(false);
+        
+        return Ok(resultList);
+    }
+    
     /// <summary>
     /// Handles the GET request to fetch the details of a specific shop.
     /// </summary>
@@ -50,7 +90,7 @@ public class PosAdminController : ControllerBase
         [FromQuery, Required] int accountId, [FromQuery, Required] int shopId)
     {
         // Fetches the shop details using the provided account ID and shop ID.
-        var shop = await _posShopRepository.GetShopDetailAsync(accountId, shopId);
+        var shop = await _posShopRepository.GetShopDetailAsync(accountId, shopId).ConfigureAwait(false);
 
         // If the shop is not found, returns a custom 404 Not Found response with a custom error message.
         if (shop == null)

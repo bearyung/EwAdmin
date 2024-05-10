@@ -14,7 +14,7 @@ public class PosRepositoryBase
         _connectionService = connectionService;
     }
 
-    protected async Task<IDbConnection?> GetPosDatabaseConnection(int brandId, int shopId)
+    protected async Task<IDbConnection?> GetPosDatabaseConnection(int brandId)
     {
         using var db = _connectionService.GetConnection();
         var query = @"

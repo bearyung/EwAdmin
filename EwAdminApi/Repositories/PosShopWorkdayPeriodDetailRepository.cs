@@ -19,7 +19,7 @@ public class PosShopWorkdayPeriodDetailRepository : PosRepositoryBase
     public async Task<IEnumerable<ShopWorkdayPeriodDetail>?> GetShopWorkdayPeriodDetailListAsync(
         int accountId, int shopId, int workdayDetailId, int page, int pageSize)
     {
-        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
         var query = @"
     SELECT 
@@ -68,7 +68,7 @@ public class PosShopWorkdayPeriodDetailRepository : PosRepositoryBase
     public async Task<ShopWorkdayPeriodDetail?> UpdateShopWorkdayPeriodDetailAsync(
         ShopWorkdayPeriodDetail shopWorkdayPeriodDetail)
     {
-        using var db = await GetPosDatabaseConnection(shopWorkdayPeriodDetail.AccountId, shopWorkdayPeriodDetail.ShopId)
+        using var db = await GetPosDatabaseConnection(shopWorkdayPeriodDetail.AccountId)
             .ConfigureAwait(false);
         var query = @"
         UPDATE [dbo].[ShopWorkdayPeriodDetail]
@@ -102,7 +102,7 @@ public class PosShopWorkdayPeriodDetailRepository : PosRepositoryBase
     private async Task<ShopWorkdayPeriodDetail?> GetShopWorkdayPeriodDetailAsync(int accountId, int shopId,
         int workdayPeriodDetailId)
     {
-        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var query = @"
         SELECT 
            a.[WorkdayPeriodDetailId]

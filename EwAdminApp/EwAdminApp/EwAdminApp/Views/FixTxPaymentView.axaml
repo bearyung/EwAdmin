@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels"
+             xmlns:componentViews="clr-namespace:EwAdminApp.Views.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             x:Class="EwAdminApp.Views.FixTxPaymentView"
+             x:DataType="vm:FixTxPaymentViewModel">
+    <Grid ColumnDefinitions="360, *, 200"
+          RowDefinitions="200, *, 200">
+        <!--<componentViews:ShopListView
+            Shop="{Binding AnotherSelectedShop, Mode=TwoWay}"
+            Grid.Row="0" Grid.Column="0"/>-->
+        <ContentControl Grid.Row="0" Grid.Column="0"
+                        Content="{Binding ShopSelectorPanel}"/>
+        <ContentControl Grid.Row="0" Grid.Column="1"/>
+        <componentViews:TxPaymentDetailView
+            Grid.Row="0" Grid.Column="2"/>
+        
+        <componentViews:TxSalesHeaderListView
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <componentViews:TxPaymentEditView
+            Grid.Row="1" Grid.Column="2"/>
+        
+        <componentViews:TxPaymentListView
+            Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <componentViews:TxPaymentDetailView
+            Grid.Row="2" Grid.Column="2"/>
+    </Grid>
+</UserControl>

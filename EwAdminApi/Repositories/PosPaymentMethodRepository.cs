@@ -19,7 +19,7 @@ public class PosPaymentMethodRepository : PosRepositoryBase
     public async Task<IEnumerable<PaymentMethod>?> GetPaymentMethodListAsync(int accountId, int shopId, int page,
         int pageSize)
     {
-        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
         var query = @"
             SELECT 

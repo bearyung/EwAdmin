@@ -24,7 +24,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// <returns>An integer representing the count of transactions for the given workday detail id, or -1 if there is an error.</returns>
     public async Task<int> GetTxCountInWorkdayDetailIdAsync(int accountId, int shopId, int workdayDetailId)
     {
-        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var query = @"
             select count(1) from TxSalesHeader a 
             where a.accountid = @AccountId and a.shopid = @ShopId
@@ -57,7 +57,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// </returns>
     public async Task<TxSalesHeader?> GetTxSalesHeaderAsync(int accountId, int shopId, int txSalesHeaderId)
     {
-        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var query = @"
             SELECT 
                 [TxSalesHeaderId]
@@ -194,7 +194,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     public async Task<IEnumerable<TxSalesHeaderMin>?> GetTxSalesHeaderListAsync(int accountId, int shopId,
         DateTime txDate, int page, int pageSize)
     {
-        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
         var query = @"
             SELECT 
@@ -266,7 +266,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// </returns>
     public async Task<IEnumerable<TxPaymentMin>?> GetTxPaymentListAsync(int accountId, int shopId, int txSalesHeaderId, int page, int pageSize)
     {
-        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
         var query = @"
             SELECT 
@@ -319,7 +319,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// </returns>
     public async Task<TxPayment?> GetTxPaymentAsync(int accountId, int shopId, int txPaymentId)
     {
-        using var db = await GetPosDatabaseConnection(accountId, shopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var query = @"
             SELECT 
                 a.[TxPaymentId]
@@ -413,7 +413,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// </returns>
     public async Task<TxPayment?> UpdateTxPaymentAsync(TxPayment txPayment)
     {
-        using var db = await GetPosDatabaseConnection(txPayment.AccountId, txPayment.ShopId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnection(txPayment.AccountId).ConfigureAwait(false);
         var query = @"
             UPDATE [dbo].[TxPayment]
             SET PaymentMethodId = @PaymentMethodId, ModifiedBy = @ModifiedBy, ModifiedDate = GETDATE()

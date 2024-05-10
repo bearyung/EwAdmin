@@ -69,6 +69,15 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// cross-origin resource sharing with specific origins (https://localhost:5001)
+app.UseCors(builder =>
+{
+    builder.WithOrigins("https://localhost:5001")
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+});
+
+
 app.UseMiddleware<MondayAuthorizationMiddleware>();
 
 app.UseStatusCodePages(context =>
