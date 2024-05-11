@@ -6,9 +6,46 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EwAdminApp.Views.Components.ShopWorkdayListView"
              x:DataType="vm:ShopWorkdayListViewModel">
-    <StackPanel>
-        <TextBlock Text="{Binding Title}"/>
-        <TextBox></TextBox>
-        <Button Command="{Binding ConfirmSelectionCommand}">SAVE</Button>
-    </StackPanel>
+    <Border
+        Name="WorkdaySelectorPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,38, *">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">Workday List</Label>
+            </Border>
+            <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
+                <Grid ColumnDefinitions="*, 70">
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="0" Watermark="(yyyy-MM-dd)"
+                             Text="{Binding SearchText}"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchTextBox_OnKeyDown" />
+                    <Button Grid.Column="1" Content="Search"
+                            Command="{Binding SearchCommand}"
+                            Margin="0 0 0 0" />
+                </Grid>
+            </Border>
+            <DataGrid Name="ShopListDataGrid"
+                      Grid.Row="2" IsReadOnly="True"
+                      SelectionMode="Single"
+                      GridLinesVisibility="All"
+                      ItemsSource="{Binding ShopWorkdayDetailList}"
+                      SelectedItem="{Binding SelectedShopWorkdayDetail}"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="OpenDatetime"
+                                        Binding="{Binding OpenDatetime}" />
+                    <DataGridTextColumn Header="CloseDatetime"
+                                        Binding="{Binding CloseDatetime}" />
+                    <DataGridTextColumn Header="IsClosed"
+                                        Binding="{Binding IsClosed}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Border>
 </UserControl>

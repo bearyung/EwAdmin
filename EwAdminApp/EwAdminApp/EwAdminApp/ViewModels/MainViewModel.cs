@@ -21,10 +21,11 @@ public class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         ContentViewModel = new LoginViewModel();
-
-        var messageEventAggregator = Locator.Current.GetService<IEventAggregator>();
-
-        messageEventAggregator?.GetEvent<LoginEvent>().Subscribe(OnLoginEventReceived);
+        
+        // replace the above messageEventAggregator code with ReactiveUI message bus
+        // code here
+        MessageBus.Current.Listen<LoginEvent>()
+            .Subscribe(OnLoginEventReceived);
         
         // initialize the logout command
         LogoutCommand = ReactiveCommand.Create(Logout);

@@ -54,9 +54,8 @@ public class LoginViewModel : ViewModelBase
                 // save the LoginSettings to DI container (splat)
                 Locator.CurrentMutable.RegisterConstant(result.settings, typeof(LoginSettings));
                 
-                // emit a message event to the parent view model
-                var messageEventAggregator = Locator.Current.GetService<IEventAggregator>();
-                messageEventAggregator?.Publish(new LoginEvent(result.settings));
+                // emit a message event using MessageBus.Current.SendMessage
+                MessageBus.Current.SendMessage(new LoginEvent(result.settings));
             }
         });
         // if SaveApiKeyAsync fails, pop up a message to the user

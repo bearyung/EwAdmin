@@ -20,7 +20,6 @@ public partial class App : Application
     {
         // register a HttpClient
         Locator.CurrentMutable.RegisterConstant(new HttpClient(), typeof(HttpClient));
-        Locator.CurrentMutable.RegisterConstant(new EventAggregator(), typeof(IEventAggregator));
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

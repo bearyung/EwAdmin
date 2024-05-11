@@ -370,7 +370,7 @@ public class PosAdminController : ControllerBase
     /// - If the transaction headers are found, it returns an HTTP 200 status code along with the transaction header details.
     /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
     /// </returns>
-    [HttpGet("txSalesHeaderList/{txDate:datetime}")]
+    [HttpGet("txSalesHeaderList")]
     [ProducesResponseType(typeof(IEnumerable<TxSalesHeader>), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]

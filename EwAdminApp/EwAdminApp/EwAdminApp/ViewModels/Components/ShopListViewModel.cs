@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
+using EwAdminApp.Events;
 using EwAdminApp.Models;
 using ReactiveUI;
 using Splat;
@@ -58,11 +59,13 @@ public class ShopListViewModel : ViewModelBase
         SearchCommand = ReactiveCommand.CreateFromTask(DoSearch);
         
         this.WhenAnyValue(x => x.SelectedShop)
-            .Where(shop => shop != null)
             .Subscribe(shop =>
             {
                 Console.WriteLine("Checkpoint 1: SelectedShop changed: " + shop?.Name);
+                
                 // Any other logic needed when a shop is selected
+                // emit the ShopEvent using the ReactiveUI MessageBus
+                MessageBus.Current.SendMessage(new ShopEvent(shop));
             });
 
         // set the IsBusy property to True when the SearchCommand is executing, False when it is completed
@@ -84,7 +87,7 @@ public class ShopListViewModel : ViewModelBase
         try
         {
             // Clear the ShopList property
-            ShopList?.Clear();
+            RxApp.MainThreadScheduler.Schedule(() => ShopList?.Clear());
         
             // Perform the search operation
             // Use the SearchText property as the accountId parameter to search for shops
@@ -105,17 +108,20 @@ public class ShopListViewModel : ViewModelBase
             if (!response.IsSuccessStatusCode) return;
         
             var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var shopList = JsonSerializer.Deserialize<List<Shop>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
+            var resultShopList = JsonSerializer.Deserialize<List<Shop>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
 
-            // Add the search results to the ShopList property
-            foreach (var shop in shopList)
+            // Add the shop to the ShopList property in the UI thread using RxApp.MainThreadScheduler
+            RxApp.MainThreadScheduler.Schedule(() =>
             {
-                // Add the shop to the ShopList property in the UI thread using RxApp.MainThreadScheduler
-                RxApp.MainThreadScheduler.Schedule(() => ShopList?.Add(shop));
-            }
-            
-            // add the first shop in the list to the SelectedShop property
-            SelectedShop = ShopList?.FirstOrDefault();
+                foreach (var shop in resultShopList)
+                {
+                    // Add the search results to the ShopList property
+                    ShopList?.Add(shop);
+                    
+                    // add the first shop in the list to the SelectedShop property
+                    SelectedShop = ShopList?.FirstOrDefault();
+                }
+            });
         }
         catch (Exception e)
         {

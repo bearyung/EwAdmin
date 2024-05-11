@@ -46,7 +46,7 @@ public partial class ShopListView : UserControl
         // if this is a down arrow key, focus the data grid
         if (e.Key == Key.Down)
         {
-            if (sender is TextBox textBox)
+            if (sender is TextBox)
             {
                 ShopListDataGrid.Focus();
             }

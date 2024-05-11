@@ -2,7 +2,41 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="EwAdminApp.Views.Components.TxPaymentListView">
-    <TextBlock>TxPaymentListView</TextBlock>
+             x:Class="EwAdminApp.Views.Components.TxPaymentListView"
+             x:DataType="vm:TxPaymentListViewModel">
+    <Border
+        Name="TxSalesHeaderSelectorPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,38, *">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">TxPayment
+                    List</Label>
+            </Border>
+            <DataGrid Name="ShopListDataGrid"
+                      Grid.Row="2" IsReadOnly="True"
+                      SelectionMode="Single"
+                      GridLinesVisibility="All"
+                      ItemsSource="{Binding TxPaymentList}"
+                      SelectedItem="{Binding SelectedTxPayment}"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="TxPaymentId"
+                                        Binding="{Binding TxPaymentId}" />
+                    <DataGridTextColumn Header="PaymentMethodCode"
+                                        Binding="{Binding PaymentMethodCode}" />
+                    <DataGridTextColumn Header="PaymentMethodName"
+                                        Binding="{Binding PaymentMethodName}" />
+                    <DataGridTextColumn Header="TotalAmount"
+                                        Binding="{Binding TotalAmount}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Border>
 </UserControl>

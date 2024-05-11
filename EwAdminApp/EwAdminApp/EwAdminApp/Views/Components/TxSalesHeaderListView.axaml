@@ -2,7 +2,50 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="EwAdminApp.Views.Components.TxSalesHeaderListView">
-    <TextBlock>TxSalesHeaderListView</TextBlock>
+             x:Class="EwAdminApp.Views.Components.TxSalesHeaderListView"
+             x:DataType="vm:TxSalesHeaderListViewModel">
+    <Border
+        Name="TxSalesHeaderSelectorPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,38, *">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">TxSalesHeader List</Label>
+            </Border>
+            <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
+                <Grid ColumnDefinitions="*, 70">
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="0" Watermark="(yyyy-MM-dd)"
+                             Text="{Binding SearchText}"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchTextBox_OnKeyDown" />
+                    <Button Grid.Column="1" Content="Search"
+                            Command="{Binding SearchCommand}"
+                            Margin="0 0 0 0" />
+                </Grid>
+            </Border>
+            <DataGrid Name="ShopListDataGrid"
+                      Grid.Row="2" IsReadOnly="True"
+                      SelectionMode="Single"
+                      GridLinesVisibility="All"
+                      ItemsSource="{Binding TxSalesHeaderList}"
+                      SelectedItem="{Binding SelectedTxSalesHeader}"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="TxSalesHeaderId"
+                                        Binding="{Binding TxSalesHeaderId}" />
+                    <DataGridTextColumn Header="AmountTotal"
+                                        Binding="{Binding AmountTotal}" />
+                    <DataGridTextColumn Header="CheckinUserName"
+                                        Binding="{Binding CheckinUserName}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Border>
 </UserControl>

@@ -10,8 +10,9 @@
     <!-- provide a seach box for user to input the account id as the search field -->
     <Border
         Name="ShopSelectorPanel"
-        BorderBrush="DimGray" 
+        BorderBrush="DimGray"
         BorderThickness="1"
+        Margin="1"
         IsEnabled="{Binding IsBusy, Converter={x:Static BoolConverters.Not}}">
         <Grid RowDefinitions="16,38, *">
             <Border Background="DimGray"
@@ -20,15 +21,15 @@
             </Border>
             <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
                 <Grid ColumnDefinitions="*, 70">
-                    <TextBox BorderBrush="Transparent" 
-                             Grid.Column="0" Watermark="Account Id" 
-                             Text="{Binding SearchText}" 
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="0" Watermark="Account Id"
+                             Text="{Binding SearchText}"
                              Margin="0 0 0 0"
-                             KeyDown="SearchShopTextBox_OnKeyDown"/>
-                    <Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" Margin="0 0 0 0"/>
+                             KeyDown="SearchShopTextBox_OnKeyDown" />
+                    <Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" Margin="0 0 0 0" />
                 </Grid>
             </Border>
-            <DataGrid Name="ShopListDataGrid" 
+            <DataGrid Name="ShopListDataGrid"
                       Grid.Row="2" IsReadOnly="True"
                       SelectionMode="Single"
                       GridLinesVisibility="All"
@@ -36,9 +37,9 @@
                       SelectedItem="{Binding SelectedShop}"
                       AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Account ID" Binding="{Binding AccountId}"/>
-                    <DataGridTextColumn Header="Shop ID" Binding="{Binding ShopId}"/>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                    <DataGridTextColumn Header="Account ID" Binding="{Binding AccountId}" />
+                    <DataGridTextColumn Header="Shop ID" Binding="{Binding ShopId}" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
