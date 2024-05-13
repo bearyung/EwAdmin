@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -28,7 +28,6 @@
       <AdditionalFiles Include="Views\Components\ShopListView.axaml" />
       <AdditionalFiles Include="Views\Components\ShopWorkdayListView.axaml" />
       <AdditionalFiles Include="Views\Components\TxPaymentDetailView.axaml" />
-      <AdditionalFiles Include="Views\Components\TxPaymentEditView.axaml" />
       <AdditionalFiles Include="Views\Components\TxPaymentListView.axaml" />
       <AdditionalFiles Include="Views\Components\TxSalesHeaderListView.axaml" />
     </ItemGroup>

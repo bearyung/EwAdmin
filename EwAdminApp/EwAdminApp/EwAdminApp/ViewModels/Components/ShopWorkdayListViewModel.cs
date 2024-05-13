@@ -100,7 +100,7 @@ public class ShopWorkdayListViewModel : ViewModelBase
         // set isBusy to true when the SearchCommand is executing, false when it is completed
         SearchCommand.IsExecuting
             .Subscribe(isExecuting => { IsBusy = isExecuting; });
-        
+
         // subscribe to the SelectedShopWorkdayDetail property
         // emit the ShopWorkdayDetailEvent using the ReactiveUI MessageBus when the SelectedShopWorkdayDetail property changes
         this.WhenAnyValue(x => x.SelectedShopWorkdayDetail)
@@ -116,10 +116,10 @@ public class ShopWorkdayListViewModel : ViewModelBase
             {
                 // console log the event received from the ShopEvent in this ViewModel
                 // need to include the viewmodel name, and the shop name
-                Console.WriteLine("ShopWorkdayListViewModel: ShopEvent received: " + shopEvent.Shop?.Name);
+                Console.WriteLine("ShopWorkdayListViewModel: ShopEvent received: " + shopEvent.ShopMessage?.Name);
 
                 // set the SelectedShop property to the Shop property in the ShopEvent
-                SelectedShop = shopEvent.Shop;
+                SelectedShop = shopEvent.ShopMessage;
 
                 // clear the searchText property
                 SearchText = string.Empty;
@@ -170,6 +170,8 @@ public class ShopWorkdayListViewModel : ViewModelBase
             // Add the search results to the ShopList property
             RxApp.MainThreadScheduler.Schedule(() =>
             {
+                ShopWorkdayDetailList?.Clear();
+                
                 foreach (var shopWorkdayDetail in resultShopWorkdayDetailList)
                 {
                     // Add the shop to the ShopList property in the UI thread using RxApp.MainThreadScheduler

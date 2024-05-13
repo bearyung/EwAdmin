@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.TxPaymentDetailEditView"
+             x:DataType="vm:TxPaymentDetailEditViewModel">
+    <Border
+        Name="TxPaymentDetailPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,*,38">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    TxPayment Detail
+                </Label>
+            </Border>
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Margin="8">
+                    <Label>TxPaymentId</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.TxPaymentId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Payment Method</Label>
+                    <ComboBox 
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding AvailablePaymentMethodList, 
+                        FallbackValue=null,
+                        TargetNullValue=null}"
+                        SelectedItem="{Binding SelectedPaymentMethod,
+                        FallbackValue=null,
+                        TargetNullValue=null}"
+                        DisplayMemberBinding="{Binding PaymentMethodName,
+                        FallbackValue='',
+                        TargetNullValue=''}"/>
+                    <Label>Enabled</Label>
+                    <CheckBox 
+                        IsChecked="{Binding SelectedTxPayment.Enabled,
+                        FallbackValue=false,
+                        TargetNullValue=false}"></CheckBox>
+                </StackPanel>
+            </ScrollViewer>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Save"
+                        Background="Green"
+                        Command="{Binding SaveCommand}" />
+                <Button Content="Cancel"
+                        Command="{Binding CancelCommand}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

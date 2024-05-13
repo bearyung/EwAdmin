@@ -1,6 +1,5 @@
 namespace EwAdminApp.Models;
 
-
 public record LoginSettings
 {
     public string? ApiKey { get; set; }

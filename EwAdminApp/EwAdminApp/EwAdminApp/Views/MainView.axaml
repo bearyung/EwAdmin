@@ -6,25 +6,25 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EwAdminApp.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
     <Panel>
         <DockPanel Background="#232323">
             <Border DockPanel.Dock="Bottom"
-                    BorderThickness="0,1,0,0" 
+                    BorderThickness="0,1,0,0"
                     BorderBrush="#000000"
                     Padding="8,4,8,4">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Left" Text="Home" Foreground="#9E9E9E" Margin="4"/>
-                    <TextBlock DockPanel.Dock="Left" Text=">" Foreground="#9E9E9E" Margin="4"/>
-                    <TextBlock DockPanel.Dock="Left" Text="Shop" Foreground="#9E9E9E" Margin="4"/>
-                    <TextBlock DockPanel.Dock="Left" Text=">" Foreground="#9E9E9E" Margin="4"/>
-                    <TextBlock DockPanel.Dock="Left" Text="TxSalesHeader" Foreground="#9E9E9E" Margin="4"/>
-                    <TextBlock DockPanel.Dock="Left" Text=">" Foreground="#9E9E9E" Margin="4"/>
-                    <TextBlock DockPanel.Dock="Left" Text="TxPayment" Foreground="#9E9E9E" Margin="4"/>
+                    <TextBlock DockPanel.Dock="Left" Text="Home" Foreground="#9E9E9E" Margin="4" />
+                    <TextBlock DockPanel.Dock="Left" Text=">" Foreground="#9E9E9E" Margin="4" />
+                    <TextBlock DockPanel.Dock="Left" Text="Shop" Foreground="#9E9E9E" Margin="4" />
+                    <TextBlock DockPanel.Dock="Left" Text=">" Foreground="#9E9E9E" Margin="4" />
+                    <TextBlock DockPanel.Dock="Left" Text="TxSalesHeader" Foreground="#9E9E9E" Margin="4" />
+                    <TextBlock DockPanel.Dock="Left" Text=">" Foreground="#9E9E9E" Margin="4" />
+                    <TextBlock DockPanel.Dock="Left" Text="TxPayment" Foreground="#9E9E9E" Margin="4" />
                 </DockPanel>
             </Border>
             <Border DockPanel.Dock="Left"
@@ -38,28 +38,30 @@
                     Height="40"
                     Padding="8,4,8,4">
                 <DockPanel>
-                    <Button 
-                        DockPanel.Dock="Right" 
+                    <Button
+                        DockPanel.Dock="Right"
                         VerticalAlignment="Center"
-                        Foreground="White" 
+                        Foreground="White"
                         Background="Brown"
                         IsVisible="{Binding IsLoggedIn}"
                         Command="{Binding LogoutCommand}"
-                        Focusable="False">Logout</Button>
-                    <TextBlock 
-                        DockPanel.Dock="Right" 
-                        Text="{Binding UserName}" 
-                        Foreground="#9E9E9E" 
+                        Focusable="False">
+                        Logout
+                    </Button>
+                    <TextBlock
+                        DockPanel.Dock="Right"
+                        Text="{Binding UserName}"
+                        Foreground="#9E9E9E"
                         Margin="4"
-                        VerticalAlignment="Center"/>
+                        VerticalAlignment="Center" />
                     <TextBlock></TextBlock>
                 </DockPanel>
             </Border>
-            <ContentControl Content="{Binding ContentViewModel}"/>
+            <ContentControl Content="{Binding ContentViewModel}" />
         </DockPanel>
         <Grid HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                IsVisible="False">
+              VerticalAlignment="Stretch"
+              IsVisible="False">
             <Canvas Background="Black" Margin="0" Opacity="0.4"></Canvas>
             <DockPanel Width="300" Height="300" Background="White">
                 <TextBlock>Hello World</TextBlock>

@@ -10,9 +10,6 @@ public partial class LoginView : UserControl
     {
         InitializeComponent();
 
-        this.Loaded += (sender, args) =>
-        {
-            ApiKeyTextInput.Focus();
-        };
+        this.Loaded += (sender, args) => { ApiKeyTextInput.Focus(); };
     }
 }

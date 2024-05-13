@@ -2,7 +2,172 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="EwAdminApp.Views.Components.TxPaymentDetailView">
-    <TextBlock>TxPaymentDetailView</TextBlock>
+             x:Class="EwAdminApp.Views.Components.TxPaymentDetailView"
+             x:DataType="vm:TxPaymentDetailViewModel">
+    <!-- set the style of textboxes with no border -->
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="BorderThickness" Value="0.5"/>
+            <Setter Property="BorderBrush" Value="#343434"/>
+            <Setter Property="Background" Value="#232323"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+            <Setter Property="Margin" Value="0,0,0,8"></Setter>
+        </Style>
+        <Style Selector="Label">
+            <Setter Property="Foreground" Value="#787878"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <Border
+        Name="TxPaymentDetailPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,*">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    TxPayment Detail
+                </Label>
+            </Border>
+            <ScrollViewer Grid.Row="1" FontSize="12">
+                <StackPanel Margin="8">
+                    <Label>TxPaymentId</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.TxPaymentId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Payment Method ID</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.PaymentMethodId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Payment Method Code</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.PaymentMethodCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Payment Method Name</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.PaymentMethodName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Total Amount</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.TotalAmount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Paid Amount</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.PaidAmount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Enabled</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.Enabled, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Non-Sales Payment</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.IsNonSalesTxPayment, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Overpaid Amount</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.OverpaymentAmount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Ocl Num</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.OclNum, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Ocl Device Num</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.OclDeviceNum, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Ocl Remaining Value</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedTxPayment.OclRemainValue, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 1</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark1, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 2</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark2, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 3</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark3, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 4</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark4, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 5</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark5, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 6</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark6, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 7</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark7, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 8</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark8, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 9</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark9, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Remark 10</Label>
+                    <TextBox IsReadOnly="True"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxPayment.Remark10, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
 </UserControl>

@@ -13,38 +13,10 @@ public class FixTxPaymentViewModel : ViewModelBase
     private Shop? _selectedShop;
     private ViewModelBase? _shopSelectorPanel;
     private ViewModelBase? _shopWorkdaySelectorPanel;
-    private ViewModelBase? _txSalesHeaderListPanel;
+    private ViewModelBase? _txPaymentDetailPanel;
     private ViewModelBase? _txPaymentListPanel;
-
-    public ViewModelBase? ShopSelectorPanel
-    {
-        get => _shopSelectorPanel;
-        set => this.RaiseAndSetIfChanged(ref _shopSelectorPanel, value);
-    }
-    
-    public ViewModelBase? ShopWorkdaySelectorPanel
-    {
-        get => _shopWorkdaySelectorPanel;
-        set => this.RaiseAndSetIfChanged(ref _shopWorkdaySelectorPanel, value);
-    }
-    
-    public ViewModelBase? TxSalesHeaderListPanel
-    {
-        get => _txSalesHeaderListPanel;
-        set => this.RaiseAndSetIfChanged(ref _txSalesHeaderListPanel, value);
-    }
-    
-    public ViewModelBase? TxPaymentListPanel
-    {
-        get => _txPaymentListPanel;
-        set => this.RaiseAndSetIfChanged(ref _txPaymentListPanel, value);
-    }
-
-    public Shop? SelectedShop
-    {
-        get => _selectedShop;
-        set => this.RaiseAndSetIfChanged(ref _selectedShop, value);
-    }
+    private ViewModelBase? _txSalesHeaderListPanel;
+    private ViewModelBase? _txPaymentDetailEditPanel;
 
     // add a constructor
     // when the SelectedShop property changes, console log the shop name
@@ -66,22 +38,74 @@ public class FixTxPaymentViewModel : ViewModelBase
         //             Console.WriteLine($"Checkpoint 2: SelectedShop changed in viewmodel: {shop.Name}");
         //         }
         //     });
-        
+
         ShopSelectorPanel = shopSelectorPanelViewModel;
-        
+
         // add a new instance of ShopWorkdayListViewModel to the ShopWorkdaySelectorPanel property
         // code here
         var shopWorkdaySelectorPanelViewModel = new ShopWorkdayListViewModel();
         ShopWorkdaySelectorPanel = shopWorkdaySelectorPanelViewModel;
-        
+
         // add a new instance of TxSalesHeaderListViewModel to the TxSalesHeaderListPanel property
         // code here
         var txSalesHeaderListPanelViewModel = new TxSalesHeaderListViewModel();
         TxSalesHeaderListPanel = txSalesHeaderListPanelViewModel;
-        
+
         // add a new instance of TxPaymentListViewModel to the TxPaymentListPanel property
         // code here
         var txPaymentListPanelViewModel = new TxPaymentListViewModel();
         TxPaymentListPanel = txPaymentListPanelViewModel;
+        
+        // add a new instance of TxPaymentDetailViewModel to the TxPaymentDetailPanel property
+        // code here
+        var txPaymentDetailPanelViewModel = new TxPaymentDetailViewModel();
+        TxPaymentDetailPanel = txPaymentDetailPanelViewModel;
+        
+        // add a new instance of TxPaymentDetailEditViewModel to the TxPaymentDetailEditPanel property
+        // code here
+        var txPaymentDetailEditPanelViewModel = new TxPaymentDetailEditViewModel();
+        TxPaymentDetailEditPanel = txPaymentDetailEditPanelViewModel;
+    }
+
+    public ViewModelBase? ShopSelectorPanel
+    {
+        get => _shopSelectorPanel;
+        set => this.RaiseAndSetIfChanged(ref _shopSelectorPanel, value);
+    }
+
+    public ViewModelBase? ShopWorkdaySelectorPanel
+    {
+        get => _shopWorkdaySelectorPanel;
+        set => this.RaiseAndSetIfChanged(ref _shopWorkdaySelectorPanel, value);
+    }
+
+    public ViewModelBase? TxSalesHeaderListPanel
+    {
+        get => _txSalesHeaderListPanel;
+        set => this.RaiseAndSetIfChanged(ref _txSalesHeaderListPanel, value);
+    }
+
+    public ViewModelBase? TxPaymentListPanel
+    {
+        get => _txPaymentListPanel;
+        set => this.RaiseAndSetIfChanged(ref _txPaymentListPanel, value);
+    }
+
+    public Shop? SelectedShop
+    {
+        get => _selectedShop;
+        set => this.RaiseAndSetIfChanged(ref _selectedShop, value);
+    }
+    
+    public ViewModelBase? TxPaymentDetailPanel
+    {
+        get => _txPaymentDetailPanel;
+        set => this.RaiseAndSetIfChanged(ref _txPaymentDetailPanel, value);
+    }
+    
+    public ViewModelBase? TxPaymentDetailEditPanel
+    {
+        get => _txPaymentDetailEditPanel;
+        set => this.RaiseAndSetIfChanged(ref _txPaymentDetailEditPanel, value);
     }
 }

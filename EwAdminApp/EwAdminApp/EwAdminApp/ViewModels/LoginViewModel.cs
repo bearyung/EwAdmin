@@ -23,10 +23,10 @@ public class LoginViewModel : ViewModelBase
         {
             // remove the API key from the DI container
             Locator.CurrentMutable.UnregisterCurrent(typeof(LoginSettings));
-            
+
             // set the API key to null
             ApiKey = null;
-            
+
             // delete the userSettings.json file
             var appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "EwAdminApp");
@@ -36,7 +36,7 @@ public class LoginViewModel : ViewModelBase
                 File.Delete(settingsFilePath);
             }
         }
-        
+
         // add a command to save the API key to a file
         SaveApiKeyCommand = ReactiveCommand.CreateFromTask(SaveApiKeyAsync);
         SaveApiKeyCommand.Subscribe(result =>
@@ -50,10 +50,10 @@ public class LoginViewModel : ViewModelBase
                 // code here
                 //var mainViewModel = new MainViewModel();
                 //Locator.Current.GetService<MainViewModel>().ContentViewModel = mainViewModel;
-                
+
                 // save the LoginSettings to DI container (splat)
                 Locator.CurrentMutable.RegisterConstant(result.settings, typeof(LoginSettings));
-                
+
                 // emit a message event using MessageBus.Current.SendMessage
                 MessageBus.Current.SendMessage(new LoginEvent(result.settings));
             }
@@ -66,7 +66,7 @@ public class LoginViewModel : ViewModelBase
             Console.WriteLine("Failed to save API key");
             Console.WriteLine(ex.Message);
         });
-        
+
         // add an async method to load the API key from a file
         // if the file exists, set the API key property
         // and call the CheckApiKeyAsync method to check if the API key is valid
@@ -86,7 +86,7 @@ public class LoginViewModel : ViewModelBase
         get => _apiKey;
         set => this.RaiseAndSetIfChanged(ref _apiKey, value);
     }
-    
+
     // add an ReactiveCommand property to save the API key to a file
     public ReactiveCommand<Unit, (bool success, LoginSettings? settings)> SaveApiKeyCommand { get; }
 
@@ -107,7 +107,8 @@ public class LoginViewModel : ViewModelBase
             var content = await response.Content.ReadAsStringAsync();
             // Deserialize the response content to LoginUserResponse, with options to case-insensitive
             // code here
-            return JsonSerializer.Deserialize<LoginUserResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<LoginUserResponse>(content,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
         catch (Exception ex)
         {
@@ -150,7 +151,7 @@ public class LoginViewModel : ViewModelBase
             throw;
         }
     }
-    
+
     // add an async method to load the API key from a file
     // if the file does not exist, return (false, null)
     // if the file exists, read the content and deserialize it to LoginSettings

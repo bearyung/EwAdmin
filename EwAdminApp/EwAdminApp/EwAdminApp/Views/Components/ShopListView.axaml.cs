@@ -20,7 +20,6 @@ public partial class ShopListView : UserControl
     {
         InitializeComponent();
         if (Design.IsDesignMode) return;
-        
     }
 
     private void SearchShopTextBox_OnKeyDown(object? sender, KeyEventArgs e)
@@ -31,7 +30,7 @@ public partial class ShopListView : UserControl
             {
                 // execute the SearchCommand when the Enter key is pressed
                 vm?.SearchCommand?.Execute().Subscribe();
-                
+
                 // check if the sender is a TextBox
                 if (sender is TextBox textBox)
                 {
@@ -42,7 +41,7 @@ public partial class ShopListView : UserControl
                 }
             }
         }
-        
+
         // if this is a down arrow key, focus the data grid
         if (e.Key == Key.Down)
         {

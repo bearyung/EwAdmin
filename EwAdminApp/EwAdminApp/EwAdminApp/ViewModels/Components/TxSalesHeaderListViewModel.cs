@@ -129,10 +129,10 @@ public class TxSalesHeaderListViewModel : ViewModelBase
             .Subscribe(x =>
             {
                 // console log the ShopEvent received from this component
-                Console.WriteLine("TxSalesHeaderListViewModel: ShopEvent received: " + x.Shop?.Name);
+                Console.WriteLine("TxSalesHeaderListViewModel: ShopEvent received: " + x.ShopMessage?.Name);
 
                 // Set the SelectedShop property to the Shop property of the ShopEvent
-                SelectedShop = x.Shop;
+                SelectedShop = x.ShopMessage;
             });
 
         // ReactiveUI messagebus listen for the ShopWorkdayDetailEvent
@@ -141,10 +141,10 @@ public class TxSalesHeaderListViewModel : ViewModelBase
             {
                 // console log the ShopWorkdayDetailEvent received from this component
                 Console.WriteLine("TxSalesHeaderListViewModel: ShopWorkdayDetailEvent received: " +
-                                  x.ShopWorkdayDetail?.WorkdayDetailId);
+                                  x.ShopWorkdayDetailMessage?.WorkdayDetailId);
 
                 // Set the SelectedShopWorkdayDetail property to the ShopWorkdayDetail property of the ShopWorkdayDetailEvent
-                SelectedShopWorkdayDetail = x.ShopWorkdayDetail;
+                SelectedShopWorkdayDetail = x.ShopWorkdayDetailMessage;
             });
 
         // ReactiveUI messagebus sendmessage if there any changes in the SelectedTxSalesHeader

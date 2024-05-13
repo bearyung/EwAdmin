@@ -2,7 +2,7 @@ using EwAdmin.Common.Models.Pos;
 
 namespace EwAdminApp.Events;
 
-public class TxSalesHeaderMinEvent(TxSalesHeaderMin? txSalesHeaderMin)
+public class TxSalesHeaderMinEvent(TxSalesHeaderMin? txSalesHeaderMinMessage)
 {
-    public TxSalesHeaderMin? TxSalesHeaderMin { get; } = txSalesHeaderMin;
+    public TxSalesHeaderMin? TxSalesHeaderMinMessage { get; } = txSalesHeaderMinMessage;
 }

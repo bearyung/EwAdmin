@@ -2,7 +2,8 @@ using EwAdmin.Common.Models.Pos;
 
 namespace EwAdminApp.Events;
 
-public class TxPaymentMinEvent (TxPaymentMin? txPaymentMin)
+public class TxPaymentMinEvent(TxPaymentMin? txPaymentMinMessage)
 {
-    public TxPaymentMin? TxPaymentMin { get; set; }
+    public TxPaymentMin? TxPaymentMinMessage { get; } = txPaymentMinMessage;
+
 }

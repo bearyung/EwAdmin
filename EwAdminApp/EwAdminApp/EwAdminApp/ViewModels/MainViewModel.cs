@@ -14,19 +14,19 @@ public class MainViewModel : ViewModelBase
     private ViewModelBase? _contentViewModel;
 
     private LoginSettings? _loginSettings;
-    
+
     // reactiveUI command for logout
     public ReactiveCommand<Unit, Unit> LogoutCommand { get; }
 
     public MainViewModel()
     {
         ContentViewModel = new LoginViewModel();
-        
+
         // replace the above messageEventAggregator code with ReactiveUI message bus
         // code here
         MessageBus.Current.Listen<LoginEvent>()
             .Subscribe(OnLoginEventReceived);
-        
+
         // initialize the logout command
         LogoutCommand = ReactiveCommand.Create(Logout);
     }
@@ -62,7 +62,7 @@ public class MainViewModel : ViewModelBase
 
         ContentViewModel = new DashboardViewModel();
     }
-    
+
     // add an async method to logout the user
     // pop up a message control to the user to confirm the logout before really logout
     // code here
@@ -70,9 +70,8 @@ public class MainViewModel : ViewModelBase
     {
         // clear the login user settings
         LoginSettings = null;
-        
+
         // navigate to the login page
-        ContentViewModel = new LoginViewModel(logout:true);
+        ContentViewModel = new LoginViewModel(logout: true);
     }
-    
 }

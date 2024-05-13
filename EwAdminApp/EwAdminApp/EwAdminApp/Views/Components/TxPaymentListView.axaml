@@ -13,14 +13,16 @@
         Margin="1"
         IsEnabled="{Binding IsBusy, 
             Converter={x:Static BoolConverters.Not}}">
-        <Grid RowDefinitions="16,38, *">
+        <Grid RowDefinitions="16,*">
             <Border Background="DimGray"
                     BorderThickness="0">
-                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">TxPayment
-                    List</Label>
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    TxPayment
+                    List
+                </Label>
             </Border>
             <DataGrid Name="ShopListDataGrid"
-                      Grid.Row="2" IsReadOnly="True"
+                      Grid.Row="1" IsReadOnly="True"
                       SelectionMode="Single"
                       GridLinesVisibility="All"
                       ItemsSource="{Binding TxPaymentList}"

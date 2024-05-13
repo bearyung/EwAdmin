@@ -13,11 +13,11 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding DisplayName}"
-                               TextWrapping="Wrap"/>
+                               TextWrapping="Wrap" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <ContentControl Grid.Column="1"
-                        Content="{Binding SelectedContentViewModel}"/>
+                        Content="{Binding SelectedContentViewModel}" />
     </Grid>
 </UserControl>

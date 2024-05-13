@@ -2,7 +2,7 @@ using EwAdmin.Common.Models.Pos;
 
 namespace EwAdminApp.Events;
 
-public class ShopEvent(Shop? shop)
+public class ShopEvent(Shop? shopMessage)
 {
-    public Shop? Shop { get; } = shop;
+    public Shop? ShopMessage { get; } = shopMessage;
 }

@@ -402,7 +402,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     
     // a new method to update the txpayment record
     // input: txPayment object
-    //        Only the PaymentMethodId and ModifiedBy can be updated, modifiedDate is updated automatically
+    //        Only the PaymentMethodId, Enabled and ModifiedBy can be updated, modifiedDate is updated automatically
     // output: boolean
     /// <summary>
     /// Update the txpayment record
@@ -416,7 +416,7 @@ public class PosTxSalesRepository : PosRepositoryBase
         using var db = await GetPosDatabaseConnection(txPayment.AccountId).ConfigureAwait(false);
         var query = @"
             UPDATE [dbo].[TxPayment]
-            SET PaymentMethodId = @PaymentMethodId, ModifiedBy = @ModifiedBy, ModifiedDate = GETDATE()
+            SET PaymentMethodId = @PaymentMethodId, Enabled = @Enabled, ModifiedBy = @ModifiedBy, ModifiedDate = GETDATE()
             WHERE AccountId = @AccountId AND ShopId = @ShopId AND TxPaymentId = @TxPaymentId";
         var parameters = new
         {
@@ -424,6 +424,7 @@ public class PosTxSalesRepository : PosRepositoryBase
             txPayment.ShopId,
             txPayment.TxPaymentId,
             txPayment.PaymentMethodId,
+            txPayment.Enabled,
             txPayment.ModifiedBy
         };
 

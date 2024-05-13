@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace EwAdminApp.Views.Components;
 
-public partial class TxPaymentEditView : UserControl
+public partial class TxPaymentDetailEditView : UserControl
 {
-    public TxPaymentEditView()
+    public TxPaymentDetailEditView()
     {
         InitializeComponent();
     }

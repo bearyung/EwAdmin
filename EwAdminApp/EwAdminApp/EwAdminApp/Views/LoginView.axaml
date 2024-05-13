@@ -7,7 +7,7 @@
              x:Class="EwAdminApp.Views.LoginView"
              x:DataType="vm:LoginViewModel">
     <StackPanel Orientation="Vertical"
-                VerticalAlignment="Center" 
+                VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Width="480"
                 Spacing="12">
@@ -19,11 +19,11 @@ Please input the API key in the text box below.
         <TextBox Name="ApiKeyTextInput"
                  Height="100"
                  TextWrapping="Wrap"
-                 Text="{Binding ApiKey}"/>
+                 Text="{Binding ApiKey}" />
         <Panel HorizontalAlignment="Right">
-            <Button Focusable="False" 
+            <Button Focusable="False"
                     Content="Submit"
-                    Command="{Binding SaveApiKeyCommand}"/>
+                    Command="{Binding SaveApiKeyCommand}" />
         </Panel>
     </StackPanel>
 </UserControl>
