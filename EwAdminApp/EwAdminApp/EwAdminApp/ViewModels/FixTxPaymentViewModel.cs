@@ -43,7 +43,7 @@ public class FixTxPaymentViewModel : ViewModelBase
 
         // add a new instance of ShopWorkdayListViewModel to the ShopWorkdaySelectorPanel property
         // code here
-        var shopWorkdaySelectorPanelViewModel = new ShopWorkdayListViewModel();
+        var shopWorkdaySelectorPanelViewModel = new ShopWorkdayDetailListViewModel();
         ShopWorkdaySelectorPanel = shopWorkdaySelectorPanelViewModel;
 
         // add a new instance of TxSalesHeaderListViewModel to the TxSalesHeaderListPanel property

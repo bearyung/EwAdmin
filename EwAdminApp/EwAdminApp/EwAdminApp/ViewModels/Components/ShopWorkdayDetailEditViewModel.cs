@@ -71,6 +71,9 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
 
         // Create the SaveCommand
         SaveCommand = ReactiveCommand.CreateFromTask(DoSave, canSave);
+        
+        // Create the CancelCommand
+        CancelCommand = ReactiveCommand.CreateFromTask(DoCancel, canCancel);
 
         // when the SaveCommand is executing, set the IsBusy property to true
         SaveCommand.IsExecuting.Subscribe(isExecuting => IsBusy = isExecuting);

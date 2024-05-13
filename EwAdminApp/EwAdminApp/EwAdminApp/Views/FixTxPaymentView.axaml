@@ -7,21 +7,22 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              x:Class="EwAdminApp.Views.FixTxPaymentView"
              x:DataType="vm:FixTxPaymentViewModel">
-    <Grid ColumnDefinitions="360, *, 200"
+    <Grid ColumnDefinitions="440, *, 200"
           RowDefinitions="200, *, 200">
         <ContentControl Grid.Row="0" Grid.Column="0"
                         Content="{Binding ShopSelectorPanel}" />
         <ContentControl Grid.Row="0" Grid.Column="1"
                         Content="{Binding  ShopWorkdaySelectorPanel}" />
-        <ContentControl Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                        Content="{Binding TxPaymentDetailPanel}"/>
-
         <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                         Content="{Binding TxSalesHeaderListPanel}" />
-        <ContentControl Grid.Row="2" Grid.Column="2"
-                        Content="{Binding TxPaymentDetailEditPanel}"/>
-
         <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                         Content="{Binding TxPaymentListPanel}" />
+        <Grid Grid.Row="0" Grid.Column="2" RowSpan="3"
+              RowDefinitions="*, 250">
+            <ContentControl Grid.Row="0" Grid.Column="0"
+                            Content="{Binding TxPaymentDetailPanel}"/>
+            <ContentControl Grid.Row="1" Grid.Column="0"
+                            Content="{Binding TxPaymentDetailEditPanel}"/>
+        </Grid>
     </Grid>
 </UserControl>

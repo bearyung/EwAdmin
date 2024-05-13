@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.ShopWorkdayPeriodDetailListView"
+             x:DataType="vm:ShopWorkdayPeriodDetailListViewModel">
+    <Border
+        Name="WorkdaySelectorPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16, *">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">Workday Period List</Label>
+            </Border>
+            <DataGrid Name="WorkdayPeriodDetailDataGrid"
+                      Grid.Row="1" IsReadOnly="True"
+                      SelectionMode="Single"
+                      GridLinesVisibility="All"
+                      ItemsSource="{Binding ShopWorkdayPeriodDetailList}"
+                      SelectedItem="{Binding SelectedWorkdayPeriodDetail}"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="OpenDatetime"
+                                        Binding="{Binding StartDateTime}" />
+                    <DataGridTextColumn Header="CloseDatetime"
+                                        Binding="{Binding EndDateTime}" />
+                    <DataGridTextColumn Header="PeriodName"
+                                        Binding="{Binding PeriodName}" />
+                    <DataGridTextColumn Header="Enabled"
+                                        Binding="{Binding Enabled}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Border>
+</UserControl>

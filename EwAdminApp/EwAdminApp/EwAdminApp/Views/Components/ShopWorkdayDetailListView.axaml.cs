@@ -8,9 +8,9 @@ using EwAdminApp.ViewModels.Components;
 
 namespace EwAdminApp.Views.Components;
 
-public partial class ShopWorkdayListView : UserControl
+public partial class ShopWorkdayDetailListView : UserControl
 {
-    public ShopWorkdayListView()
+    public ShopWorkdayDetailListView()
     {
         InitializeComponent();
     }
@@ -20,7 +20,7 @@ public partial class ShopWorkdayListView : UserControl
     {
         if (e.Key == Key.Enter)
         {
-            if (DataContext is ShopWorkdayListViewModel vm)
+            if (DataContext is ShopWorkdayDetailListViewModel vm)
             {
                 vm.SearchCommand.Execute().Subscribe();
             }

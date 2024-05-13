@@ -1,6 +1,5 @@
 using System;
 using System.Reactive.Linq;
-using EwAdmin.Common.Models.Pos;
 using EwAdminApp.ViewModels.Components;
 using ReactiveUI;
 
@@ -10,7 +9,6 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
 {
     // add a property named "SelectedShop" of type Shop
     // code here
-    private Shop? _selectedShop;
     private ViewModelBase? _shopSelectorPanel;
     private ViewModelBase? _shopWorkdaySelectorPanel;
     private ViewModelBase? _shopWorkdayDetailPanel;
@@ -29,7 +27,7 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
 
         // add a new instance of ShopWorkdayListViewModel to the ShopWorkdaySelectorPanel property
         // code here
-        var shopWorkdaySelectorPanelViewModel = new ShopWorkdayListViewModel();
+        var shopWorkdaySelectorPanelViewModel = new ShopWorkdayDetailListViewModel();
         ShopWorkdaySelectorPanel = shopWorkdaySelectorPanelViewModel;
         
         // add a new instance of ShopWorkdayDetailViewModel to the ShopWorkdayDetailPanel property
@@ -41,12 +39,6 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
         // code here
         var shopWorkdayDetailEditPanelViewModel = new ShopWorkdayDetailEditViewModel();
         ShopWorkdayDetailEditPanel = shopWorkdayDetailEditPanelViewModel;
-    }
-    
-    public Shop? SelectedShop
-    {
-        get => _selectedShop;
-        set => this.RaiseAndSetIfChanged(ref _selectedShop, value);
     }
 
     public ViewModelBase? ShopSelectorPanel

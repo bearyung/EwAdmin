@@ -27,7 +27,7 @@
 
     <ItemGroup>
       <AdditionalFiles Include="Views\Components\ShopListView.axaml" />
-      <AdditionalFiles Include="Views\Components\ShopWorkdayListView.axaml" />
+      <AdditionalFiles Include="Views\Components\ShopWorkdayDetailListView.axaml" />
       <AdditionalFiles Include="Views\Components\TxPaymentDetailView.axaml" />
       <AdditionalFiles Include="Views\Components\TxPaymentListView.axaml" />
       <AdditionalFiles Include="Views\Components\TxSalesHeaderListView.axaml" />

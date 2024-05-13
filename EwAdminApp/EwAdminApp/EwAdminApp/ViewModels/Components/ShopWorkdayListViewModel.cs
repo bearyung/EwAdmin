@@ -17,7 +17,7 @@ using Splat;
 
 namespace EwAdminApp.ViewModels.Components;
 
-public class ShopWorkdayListViewModel : ViewModelBase
+public class ShopWorkdayDetailListViewModel : ViewModelBase
 {
     // using ReactiveUI for all implementations
     // Add a properties which has referenced from ShopWorkdayListView.axaml
@@ -68,7 +68,7 @@ public class ShopWorkdayListViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedShopWorkdayDetail, value);
     }
 
-    public ShopWorkdayListViewModel()
+    public ShopWorkdayDetailListViewModel()
     {
         // Initialize the ShopWorkdayDetailList
         ShopWorkdayDetailList = new ObservableCollection<ShopWorkdayDetail>();

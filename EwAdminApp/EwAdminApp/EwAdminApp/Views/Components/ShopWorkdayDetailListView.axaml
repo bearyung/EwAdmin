@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="EwAdminApp.Views.Components.ShopWorkdayListView"
-             x:DataType="vm:ShopWorkdayListViewModel">
+             x:Class="EwAdminApp.Views.Components.ShopWorkdayDetailListView"
+             x:DataType="vm:ShopWorkdayDetailListViewModel">
     <Border
         Name="WorkdaySelectorPanel"
         BorderBrush="DimGray"
@@ -44,7 +44,7 @@
                                         Binding="{Binding CloseDatetime}" />
                     <DataGridTextColumn Header="IsClosed"
                                         Binding="{Binding IsClosed}" />
-                    <DataGridTextColumn Header="IsClosed"
+                    <DataGridTextColumn Header="Enabled"
                                         Binding="{Binding Enabled}" />
                 </DataGrid.Columns>
             </DataGrid>
