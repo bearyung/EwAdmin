@@ -229,12 +229,17 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
     // It will reset the SelectedTxPayment property
     private Task DoCancel()
     {
-        // update the SelectedTxPayment property using RxApp.MainThreadScheduler
+        // reset the SelectedTxPayment to the SelectedTxPaymentClone using RxApp.MainThreadScheduler
+        // serialize the SelectedTxPaymentClone to JSON and deserialize it back to SelectedTxPayment
+        // code here
+        if(SelectedTxPaymentClone == null) return Task.CompletedTask;
+        
+        var selectedTxPaymentCloneJson = JsonSerializer.Serialize(SelectedTxPaymentClone);
+        var selectedTxPaymentCloneObj = JsonSerializer.Deserialize<TxPayment>(selectedTxPaymentCloneJson);
+        
         RxApp.MainThreadScheduler.Schedule(() =>
         {
-            // Reset the SelectedTxPayment property by cloning the SelectedTxPaymentClone using JsonSerializer
-            var serializedSelectedTxPaymentClone = JsonSerializer.Serialize(SelectedTxPaymentClone);
-            SelectedTxPayment = JsonSerializer.Deserialize<TxPayment>(serializedSelectedTxPaymentClone);
+            SelectedTxPayment = selectedTxPaymentCloneObj;
         });
         
         return Task.CompletedTask;
@@ -266,7 +271,7 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             // check if SelectedTxPayment is null or if any of the required fields are null
             if(SelectedTxPayment == null) return;
             
-            var txPayment = new TxPayment
+            var requestTxPayment = new TxPayment
             {
                 AccountId = SelectedTxPayment!.AccountId,
                 ShopId = SelectedTxPayment!.ShopId,
@@ -277,7 +282,7 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             
             var request = new HttpRequestMessage(HttpMethod.Patch, "https://localhost:7045/api/PosAdmin/updateTxPayment")
             {
-                Content = new StringContent(JsonSerializer.Serialize(txPayment), System.Text.Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonSerializer.Serialize(requestTxPayment), System.Text.Encoding.UTF8, "application/json")
             };
             
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
@@ -300,6 +305,9 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                 SelectedTxPayment = resultTxPayment;
                 SelectedTxPaymentClone = resultTxPaymentClone;
             });
+            
+            // use the MessageBus to publish the TxPaymentEvent
+            MessageBus.Current.SendMessage(new TxPaymentEvent(resultTxPayment));
             
             // Log the success message
             Console.WriteLine("TxPayment saved successfully");

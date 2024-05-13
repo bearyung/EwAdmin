@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="EwAdminApp.Views.Components.TxPaymentDetailEditView"
-             x:DataType="vm:TxPaymentDetailEditViewModel">
+             x:Class="EwAdminApp.Views.Components.ShopWorkdayDetailEditView"
+             x:DataType="vm:ShopWorkdayDetailEditViewModel">
     <Border
-        Name="TxPaymentDetailPanel"
+        Name="ShopWorkdayDetailPanel"
         BorderBrush="DimGray"
         BorderThickness="1"
         Margin="1"
@@ -22,26 +22,28 @@
             </Border>
             <ScrollViewer Grid.Row="1">
                 <StackPanel Margin="8">
-                    <Label>TxPaymentId</Label>
+                    <Label>Workday Detail ID</Label>
                     <TextBox IsReadOnly="True"
-                             Text="{Binding SelectedTxPayment.TxPaymentId, 
+                             Focusable="False"
+                             Text="{Binding SelectedShopWorkdayDetail.WorkdayDetailId, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
-                    <Label>Payment Method</Label>
-                    <ComboBox 
-                        HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding AvailablePaymentMethodList, 
-                        FallbackValue=null,
-                        TargetNullValue=null}"
-                        SelectedItem="{Binding SelectedPaymentMethod,
-                        FallbackValue=null,
-                        TargetNullValue=null}"
-                        DisplayMemberBinding="{Binding PaymentMethodName,
-                        FallbackValue='',
-                        TargetNullValue=''}"/>
+                    <Label>Open Datetime</Label>
+                    <TextBox Text="{Binding SelectedShopWorkdayDetail.OpenDatetime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Close Datetime</Label>
+                    <TextBox Text="{Binding SelectedShopWorkdayDetail.CloseDatetime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Closed</Label>
+                    <CheckBox 
+                        IsChecked="{Binding SelectedShopWorkdayDetail.IsClosed,
+                        FallbackValue=false,
+                        TargetNullValue=false}"></CheckBox>
                     <Label>Enabled</Label>
                     <CheckBox 
-                        IsChecked="{Binding SelectedTxPayment.Enabled,
+                        IsChecked="{Binding SelectedShopWorkdayDetail.Enabled,
                         FallbackValue=false,
                         TargetNullValue=false}"></CheckBox>
                 </StackPanel>

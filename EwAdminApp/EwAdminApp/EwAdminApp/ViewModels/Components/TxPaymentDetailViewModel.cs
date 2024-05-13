@@ -93,6 +93,18 @@ public class TxPaymentDetailViewModel : ViewModelBase
                     .Subscribe();
             });
         
+        // use the MessageBus to subscribe to the TxPaymentEvent
+        MessageBus.Current.Listen<TxPaymentEvent>()
+            .Subscribe(txPaymentEvent =>
+            {
+                // console log the TxPaymentEvent
+                Console.WriteLine(
+                    $"TxPaymentDetailViewModel: TxPaymentEvent received: {txPaymentEvent.TxPaymentMessage?.TxPaymentId}");
+                
+                // set the SelectedTxPayment property to the TxPayment from the event
+                SelectedTxPayment = txPaymentEvent.TxPaymentMessage;
+            });
+        
         // when the SelectedTxPayment property changes, use ReactiveUI MessageBus to publish the TxPaymentEvent
         this.WhenAnyValue(x => x.SelectedTxPayment)
             .Subscribe(txPayment =>

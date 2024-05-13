@@ -44,6 +44,8 @@
                                         Binding="{Binding CloseDatetime}" />
                     <DataGridTextColumn Header="IsClosed"
                                         Binding="{Binding IsClosed}" />
+                    <DataGridTextColumn Header="IsClosed"
+                                        Binding="{Binding Enabled}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

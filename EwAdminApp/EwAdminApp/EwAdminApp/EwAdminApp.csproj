@@ -18,6 +18,7 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.1.0-beta2" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.0-beta2" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.8.0-avalonia11dot1-1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,5 +31,20 @@
       <AdditionalFiles Include="Views\Components\TxPaymentDetailView.axaml" />
       <AdditionalFiles Include="Views\Components\TxPaymentListView.axaml" />
       <AdditionalFiles Include="Views\Components\TxSalesHeaderListView.axaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\FixShopWorkdayDetailView.axaml.cs">
+        <DependentUpon>FixTxShopWorkdayDetailView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\Components\ShopWorkdayDetailEditView.axaml.cs">
+        <DependentUpon>ShopWorkdayDetailEditView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\Components\ShopWorkdayDetailView.axaml.cs">
+        <DependentUpon>ShopWorkdayDetailView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

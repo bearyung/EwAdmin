@@ -46,7 +46,7 @@ public class DashboardViewModel : ViewModelBase
         switch (function)
         {
             case UserFunctionEnum.FixWorkdayDetail:
-            //return new FixTxPaymentViewModel();
+                return new FixShopWorkdayDetailViewModel();
             case UserFunctionEnum.FixWorkdayPeriodDetail:
             //return new FixWorkdayPeriodDetailViewModel();
             case UserFunctionEnum.FixTxPayment:
