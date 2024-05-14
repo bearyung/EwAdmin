@@ -48,12 +48,12 @@ public class TxSalesHeaderListViewModel : ViewModelBase
     }
 
     // Add a property for SearchText
-    private string? _searchText;
+    private string? _searchTextTxSalesHeaderId;
 
-    public string? SearchText
+    public string? SearchTextTxSalesHeaderId
     {
-        get => _searchText;
-        set => this.RaiseAndSetIfChanged(ref _searchText, value);
+        get => _searchTextTxSalesHeaderId;
+        set => this.RaiseAndSetIfChanged(ref _searchTextTxSalesHeaderId, value);
     }
 
     // add a property for SelectedShop
@@ -121,7 +121,7 @@ public class TxSalesHeaderListViewModel : ViewModelBase
                 SelectedTxSalesHeader = null;
 
                 // clear the search text
-                SearchText = null;
+                SearchTextTxSalesHeaderId = null;
             });
 
         // ReactiveUI messagebus listen for the ShopEvent
@@ -186,7 +186,8 @@ public class TxSalesHeaderListViewModel : ViewModelBase
                 $"https://localhost:7045/api/PosAdmin/txSalesHeaderList?" +
                 $"accountid={SelectedShop?.AccountId}" +
                 $"&shopid={SelectedShop?.ShopId}" +
-                $"&txDate={SelectedShopWorkdayDetail?.OpenDatetime:yyyy-MM-dd}");
+                $"&txDate={SelectedShopWorkdayDetail?.OpenDatetime:yyyy-MM-dd}" +
+                $"&txSalesHeaderId={SearchTextTxSalesHeaderId}");
 
             // add the header bearer token
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");

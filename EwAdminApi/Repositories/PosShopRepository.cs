@@ -19,6 +19,9 @@ public class PosShopRepository : PosRepositoryBase
     public async Task<IEnumerable<Shop>> GetShopListAsync(int accountId, int page, int pageSize, int? shopId = null)
     {
         using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
+        
+        // write the query to get the shop list with pagination
+        // shopId is optional, if it is null, it should not be included in the query
         var query = @"
             SELECT [ShopId]
                   ,[AccountId]
@@ -42,40 +45,10 @@ public class PosShopRepository : PosRepositoryBase
                   ,[ShopCode]
               FROM [dbo].[Shop]
               where accountid = @AccountId
+              AND (@ShopId IS NULL OR shopid = @ShopId)
               ORDER BY ShopId
               OFFSET @Offset ROWS
               FETCH NEXT @PageSize ROWS ONLY";
-
-        // if shopId is not null, add the condition to the query
-        if (shopId.HasValue)
-        {
-            query = @"
-                SELECT [ShopId]
-                      ,[AccountId]
-                      ,[Name]
-                      ,[AltName]
-                      ,[Desc]
-                      ,[AltDesc]
-                      ,[AddressLine1]
-                      ,[AddressLine2]
-                      ,[AddressLine3]
-                      ,[AddressLine4]
-                      ,[AltAddressLine1]
-                      ,[AltAddressLine2]
-                      ,[AltAddressLine3]
-                      ,[AltAddressLine4]
-                      ,[Telephone]
-                      ,[Fax]
-                      ,[CurrencyCode]
-                      ,[CurrencySymbol]
-                      ,[Enabled]
-                      ,[ShopCode]
-                  FROM [dbo].[Shop]
-                  where accountid = @AccountId and shopid = @ShopId
-                  ORDER BY ShopId
-                  OFFSET @Offset ROWS
-                  FETCH NEXT @PageSize ROWS ONLY";
-        }
 
         // set the parameters, handle the case when shopId is null
         var parameters = new

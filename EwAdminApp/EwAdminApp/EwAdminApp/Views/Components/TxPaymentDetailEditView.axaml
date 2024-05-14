@@ -6,6 +6,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EwAdminApp.Views.Components.TxPaymentDetailEditView"
              x:DataType="vm:TxPaymentDetailEditViewModel">
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+    </UserControl.Styles>
     <Border
         Name="TxPaymentDetailPanel"
         BorderBrush="DimGray"

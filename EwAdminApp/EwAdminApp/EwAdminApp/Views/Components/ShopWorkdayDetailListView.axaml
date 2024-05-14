@@ -6,6 +6,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EwAdminApp.Views.Components.ShopWorkdayDetailListView"
              x:DataType="vm:ShopWorkdayDetailListViewModel">
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+    </UserControl.Styles>
     <Border
         Name="WorkdaySelectorPanel"
         BorderBrush="DimGray"
@@ -21,7 +27,7 @@
             <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
                 <Grid ColumnDefinitions="*, 70">
                     <TextBox BorderBrush="Transparent"
-                             Grid.Column="0" Watermark="(yyyy-MM-dd)"
+                             Grid.Column="0" Watermark="yyyy-MM-dd"
                              Text="{Binding SearchText}"
                              Margin="0 0 0 0"
                              KeyDown="SearchTextBox_OnKeyDown" />

@@ -188,7 +188,9 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             // Request header: Authorization with the token (Bearer token)
             // Request URL: https://localhost:7045/api/PosAdmin/paymentMethodList?accountid={accountId}&shopid={shopId}
             var request = new HttpRequestMessage(HttpMethod.Get,
-                $"https://localhost:7045/api/PosAdmin/paymentMethodList?accountid={SelectedShop.AccountId}&shopid={SelectedShop.ShopId}");
+                $"https://localhost:7045/api/PosAdmin/paymentMethodList?" +
+                $"accountid={SelectedShop.AccountId}&shopid={SelectedShop.ShopId}" +
+                $"&page=1&pageSize=100");
             
             // Add the Authorization header to the request
             request.Headers.Add("Authorization" , $"Bearer {currentLoginSettings.ApiKey}");

@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -23,6 +24,15 @@ public partial class ShopWorkdayDetailListView : UserControl
             if (DataContext is ShopWorkdayDetailListViewModel vm)
             {
                 vm.SearchCommand.Execute().Subscribe();
+                
+                // check if the sender is a TextBox
+                if (sender is TextBox textBox)
+                {
+                    // refocus the search box after SearchCommand is executed
+                    vm?.SearchCommand?.IsExecuting
+                        .Where(isExecuting => !isExecuting)
+                        .Subscribe(_ => (sender as TextBox)?.Focus());
+                }
             }
         }
     }

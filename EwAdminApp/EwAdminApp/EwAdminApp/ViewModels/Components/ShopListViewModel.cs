@@ -22,7 +22,8 @@ public class ShopListViewModel : ViewModelBase
     private ObservableCollection<Shop> _shopList = [];
     private Shop? _selectedShop;
     private bool _isBusy;
-    private string? _searchText;
+    private string? _searchTextAccountId;
+    private string? _searchTextShopId;
 
     public ObservableCollection<Shop> ShopList
     {
@@ -42,10 +43,16 @@ public class ShopListViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isBusy, value);
     }
 
-    public string? SearchText
+    public string? SearchTextAccountId
     {
-        get => _searchText;
-        set => this.RaiseAndSetIfChanged(ref _searchText, value);
+        get => _searchTextAccountId;
+        set => this.RaiseAndSetIfChanged(ref _searchTextAccountId, value);
+    }
+    
+    public string? SearchTextShopId
+    {
+        get => _searchTextShopId;
+        set => this.RaiseAndSetIfChanged(ref _searchTextShopId, value);
     }
 
     public ReactiveCommand<Unit, Unit>? SearchCommand { get; }
@@ -98,7 +105,8 @@ public class ShopListViewModel : ViewModelBase
 
             var request =
                 new HttpRequestMessage(HttpMethod.Get,
-                    $"https://localhost:7045/api/PosAdmin/shopList?accountid={SearchText}");
+                    $"https://localhost:7045/api/PosAdmin/shopList?" +
+                    $"accountid={SearchTextAccountId}&shopId={SearchTextShopId}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);

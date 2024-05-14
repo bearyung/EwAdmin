@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive;
@@ -42,7 +43,8 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
     }
 
     // add a string property SearchText
-    private string? _searchText;
+    private string? _searchText 
+        = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
     public string? SearchText
     {
@@ -122,7 +124,7 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
                 SelectedShop = shopEvent.ShopMessage;
 
                 // clear the searchText property
-                SearchText = string.Empty;
+                // SearchText = string.Empty;
 
                 // clear the ShopWorkdayDetailList property
                 ShopWorkdayDetailList?.Clear();

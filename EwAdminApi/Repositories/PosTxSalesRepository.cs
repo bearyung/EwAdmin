@@ -188,14 +188,17 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// <param name="txDate"></param>
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
+    /// <param name="txSalesHeaderid"></param>
     /// <returns>
     /// A list of transactions for the given account, shop, and transaction date.
     /// </returns>
     public async Task<IEnumerable<TxSalesHeaderMin>?> GetTxSalesHeaderListAsync(int accountId, int shopId,
-        DateTime txDate, int page, int pageSize)
+        DateTime txDate, int page, int pageSize, int? txSalesHeaderid = null)
     {
         using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
+        
+        // if txSalesHeaderid is not null, add it to the query
         var query = @"
             SELECT 
                 [TxSalesHeaderId]
@@ -234,13 +237,17 @@ public class PosTxSalesRepository : PosRepositoryBase
               ,[IsodoTx] 
             FROM [dbo].[TxSalesHeader]
             WHERE AccountId = @AccountId AND ShopId = @ShopId AND TxDate = @TxDate
+            AND (@TxSalesHeaderId IS NULL OR TxSalesHeaderId = @TxSalesHeaderId)
             ORDER BY TxSalesHeaderId DESC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+        
+        // parameters for the query
         var parameters = new
         {
             AccountId = accountId,
             ShopId = shopId,
             TxDate = txDate,
+            TxSalesHeaderId = txSalesHeaderid,
             Offset = offset,
             PageSize = pageSize
         };

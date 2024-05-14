@@ -364,6 +364,7 @@ public class PosAdminController : ControllerBase
     /// <param name="accountId"></param>
     /// <param name="shopId"></param>
     /// <param name="txDate"></param>
+    /// <param name="txSalesHeaderId"></param>
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
     /// <returns>
@@ -378,7 +379,8 @@ public class PosAdminController : ControllerBase
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxSalesHeaderList(
         [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] DateTime txDate,
-        [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
+        [FromQuery] int? txSalesHeaderId = null)
     {
         // Implementation to fetch transaction header list
         if (page <= 0 || pageSize <= 0)
@@ -393,7 +395,7 @@ public class PosAdminController : ControllerBase
         
         // get the transaction header list from PosTxRepository
         var resultList = 
-            await _posTxSalesRepository.GetTxSalesHeaderListAsync(accountId, shopId, txDate, page, pageSize).ConfigureAwait(false);
+            await _posTxSalesRepository.GetTxSalesHeaderListAsync(accountId, shopId, txDate, page, pageSize, txSalesHeaderId).ConfigureAwait(false);
         
         return Ok(resultList);
     }
