@@ -79,8 +79,6 @@ public class PosShopWorkdayPeriodDetailRepository : PosRepositoryBase
            ,[ModifiedBy] = @ModifiedBy
         WHERE AccountId = @AccountId
         AND ShopId = @ShopId
-        AND WorkdayDetailId = @WorkdayDetailId
-        AND WorkdayPeriodId = @WorkdayPeriodId
         AND WorkdayPeriodDetailId = @WorkdayPeriodDetailId
         ";
 

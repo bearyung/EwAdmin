@@ -89,7 +89,14 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         MessageBus.Current.Listen<ShopWorkdayDetailEvent>()
             .Subscribe(shopWorkdayDetailEvent =>
             {
-                SelectedShopWorkdayDetail = shopWorkdayDetailEvent.ShopWorkdayDetailMessage;
+                var serializedShopWorkdayDetail = JsonSerializer.Serialize(shopWorkdayDetailEvent.ShopWorkdayDetailMessage);
+                SelectedShopWorkdayDetailClone = JsonSerializer.Deserialize<ShopWorkdayDetail>(serializedShopWorkdayDetail);
+                
+                // set the SelectedShopWorkdayDetail property using RxApp.MainThreadScheduler
+                RxApp.MainThreadScheduler.Schedule(() =>
+                {
+                    SelectedShopWorkdayDetail = shopWorkdayDetailEvent.ShopWorkdayDetailMessage;
+                });
             });
     }
 
@@ -146,10 +153,10 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
                 });
             
             // update the SelectedShopWorkdayDetail with the resultShopWorkdayDetail using RxApp.MainThreadScheduler
-            RxApp.MainThreadScheduler.Schedule(() =>
-            {
-                SelectedShopWorkdayDetail = resultShopWorkdayDetail;
-            });
+            //RxApp.MainThreadScheduler.Schedule(() =>
+            //{
+            //    SelectedShopWorkdayDetail = resultShopWorkdayDetail;
+            //});
             
             // send a ShopWorkdayDetailSavedEvent using the MessageBus
             MessageBus.Current.SendMessage(new ShopWorkdayDetailEvent(resultShopWorkdayDetail));

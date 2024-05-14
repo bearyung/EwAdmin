@@ -6,5 +6,54 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EwAdminApp.Views.Components.ShopWorkdayPeriodDetailEditView"
              x:DataType="vm:ShopWorkdayPeriodDetailEditViewModel">
-    Welcome to Avalonia!
+    <Border
+        Name="ShopWorkdayDetailPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,*,46">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    TxPayment Detail
+                </Label>
+            </Border>
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Margin="8">
+                    <Label>Workday Detail ID</Label>
+                    <TextBox IsReadOnly="True"
+                             Focusable="False"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.WorkdayDetailId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Open Datetime</Label>
+                    <TextBox Text="{Binding SelectedShopWorkdayPeriodDetail.StartDateTime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Close Datetime</Label>
+                    <TextBox Text="{Binding SelectedShopWorkdayPeriodDetail.EndDateTime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Enabled</Label>
+                    <CheckBox 
+                        IsChecked="{Binding SelectedShopWorkdayPeriodDetail.Enabled,
+                        FallbackValue=false,
+                        TargetNullValue=false}"></CheckBox>
+                </StackPanel>
+            </ScrollViewer>
+            <StackPanel Grid.Row="2"
+                        Margin="8"
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right"
+                        Spacing="4">
+                <Button Content="Save"
+                        Background="Green"
+                        Command="{Binding SaveCommand}" />
+                <Button Content="Cancel"
+                        Command="{Binding CancelCommand}" />
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>

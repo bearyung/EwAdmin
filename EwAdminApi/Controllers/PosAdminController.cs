@@ -37,6 +37,7 @@ public class PosAdminController : ControllerBase
     /// Handles the GET request to fetch the list of shops.
     /// </summary>
     /// <param name="accountId">The account ID from the query string.</param>
+    /// <param name="shopId">The shop ID from the query string.</param>
     /// <param name="page">The page number for pagination. Defaults to 1 if not provided.</param>
     /// <param name="pageSize">The number of records per page. Defaults to 20 if not provided.</param>
     /// <returns>
@@ -51,7 +52,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetShopList(
-        [FromQuery, Required] int accountId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        [FromQuery, Required] int accountId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] int? shopId = null)
     {
         // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
         if (page <= 0 || pageSize <= 0)
@@ -66,7 +67,7 @@ public class PosAdminController : ControllerBase
         }
         
         // get the shop list from PosShopRepository
-        var resultList = await _posShopRepository.GetShopListAsync(accountId, page, pageSize).ConfigureAwait(false);
+        var resultList = await _posShopRepository.GetShopListAsync(accountId, page, pageSize, shopId).ConfigureAwait(false);
         
         return Ok(resultList);
     }

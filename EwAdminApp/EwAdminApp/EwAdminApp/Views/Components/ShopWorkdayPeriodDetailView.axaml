@@ -6,5 +6,76 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EwAdminApp.Views.Components.ShopWorkdayPeriodDetailView"
              x:DataType="vm:ShopWorkdayPeriodDetailViewModel">
-    Welcome to Avalonia!
+    <!-- set the style of textboxes with no border -->
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="BorderThickness" Value="0.5"/>
+            <Setter Property="BorderBrush" Value="#343434"/>
+            <Setter Property="Background" Value="#232323"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+            <Setter Property="Margin" Value="0,0,0,8"></Setter>
+        </Style>
+        <Style Selector="Label">
+            <Setter Property="Foreground" Value="#787878"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <Border
+        Name="TxPaymentDetailPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1">
+        <Grid RowDefinitions="16,*">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    TxPayment Detail
+                </Label>
+            </Border>
+            <ScrollViewer Grid.Row="1" FontSize="12">
+                <StackPanel Margin="8">
+                    <Label>Account ID</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.AccountId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Shop ID</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.ShopId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Shop Workday Detail ID</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.WorkdayDetailId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Shop Workday Period Detail ID</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.WorkdayPeriodDetailId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Period Name</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.PeriodName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Start Datetime</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.StartDateTime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>End Datetime</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.EndDateTime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Enabled</Label>
+                    <TextBox IsReadOnly="True"
+                             Text="{Binding SelectedShopWorkdayPeriodDetail.Enabled, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
 </UserControl>
