@@ -43,7 +43,7 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
     }
 
     // add a string property SearchText
-    private string? _searchText 
+    private string? _searchText
         = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
     public string? SearchText
@@ -76,13 +76,6 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
         ShopWorkdayDetailList = new ObservableCollection<ShopWorkdayDetail>();
 
         // Create an observable that evaluates whether SearchCommand can execute
-        //var canExecuteSearch = this.WhenAnyValue(
-        //    x => x.SelectedShop,
-        //    x => x.SearchText,
-        //    (shop, searchText) => shop != null && !string.IsNullOrWhiteSpace(searchText)
-        //);
-
-        // Create an observable that evaluates whether SearchCommand can execute
         var canExecuteSearch = this.WhenAnyValue(x => x.SelectedShop)
             .Select(x => x != null);
 
@@ -91,54 +84,93 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
             execute: DoSearch,
             canExecute: canExecuteSearch);
 
-        // handle the exception when the SearchCommand is executed
-        SearchCommand.ThrownExceptions
-            .Subscribe(ex =>
-            {
-                Console.WriteLine("Failed to search for shop workday detail");
-                Console.WriteLine(ex.Message);
-            });
 
-        // set isBusy to true when the SearchCommand is executing, false when it is completed
-        SearchCommand.IsExecuting
-            .Subscribe(isExecuting => { IsBusy = isExecuting; });
+        this.WhenActivated((CompositeDisposable disposables) =>
+        {
+            // console log when the ViewModel is activated
+            Console.WriteLine($"{GetType().Name} is now active.");
+            
+            // handle the exception when the SearchCommand is executed
+            SearchCommand.ThrownExceptions
+                .Subscribe(ex =>
+                {
+                    Console.WriteLine("Failed to search for shop workday detail");
+                    Console.WriteLine(ex.Message);
+                })
+                .DisposeWith(disposables);
 
-        // subscribe to the SelectedShopWorkdayDetail property
-        // emit the ShopWorkdayDetailEvent using the ReactiveUI MessageBus when the SelectedShopWorkdayDetail property changes
-        this.WhenAnyValue(x => x.SelectedShopWorkdayDetail)
-            .Subscribe(shopWorkdayDetail =>
-            {
-                // emit the ShopWorkdayDetailEvent using the ReactiveUI MessageBus
-                MessageBus.Current.SendMessage(new ShopWorkdayDetailEvent(shopWorkdayDetail));
-            });
+            // set isBusy to true when the SearchCommand is executing, false when it is completed
+            SearchCommand.IsExecuting
+                .Subscribe(isExecuting =>
+                {
+                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
 
-        // Subscribe to the ShopEvent to update the SelectedShop property
-        MessageBus.Current.Listen<ShopEvent>()
-            .Subscribe(shopEvent =>
-            {
-                // console log the event received from the ShopEvent in this ViewModel
-                // need to include the viewmodel name, and the shop name
-                Console.WriteLine("ShopWorkdayListViewModel: ShopEvent received: " + shopEvent.ShopMessage?.Name);
+                    // set the IsBusy property
+                    IsBusy = isExecuting;
 
-                // set the SelectedShop property to the Shop property in the ShopEvent
-                SelectedShop = shopEvent.ShopMessage;
+                    // increment or decrement the ExecutingCommandsCount property
+                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
 
-                // clear the searchText property
-                // SearchText = string.Empty;
+                    // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
+                    if (!isInitial)
+                    {
+                        MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                            new ActionStatus
+                            {
+                                ActionStatusEnum = isExecuting
+                                    ? ActionStatus.StatusEnum.Executing
+                                    : ActionStatus.StatusEnum.Completed,
+                                Message = isExecuting
+                                    ? "Searching for shop workday detail list..."
+                                    : "Shop workday detail list search completed"
+                            }));
+                    }
+                })
+                .DisposeWith(disposables);
 
-                // clear the ShopWorkdayDetailList property
-                ShopWorkdayDetailList?.Clear();
+            // subscribe to the SelectedShopWorkdayDetail property
+            // emit the ShopWorkdayDetailEvent using the ReactiveUI MessageBus when the SelectedShopWorkdayDetail property changes
+            this.WhenAnyValue(x => x.SelectedShopWorkdayDetail)
+                .Subscribe(shopWorkdayDetail =>
+                {
+                    // emit the ShopWorkdayDetailEvent using the ReactiveUI MessageBus
+                    MessageBus.Current.SendMessage(new ShopWorkdayDetailEvent(shopWorkdayDetail));
+                })
+                .DisposeWith(disposables);
 
-                // clear the SelectedShopWorkdayDetail property
-                SelectedShopWorkdayDetail = null;
-            });
+            // Subscribe to the ShopEvent to update the SelectedShop property
+            MessageBus.Current.Listen<ShopEvent>()
+                .Subscribe(shopEvent =>
+                {
+                    // console log the event received from the ShopEvent in this ViewModel
+                    // need to include the viewmodel name, and the shop name
+                    Console.WriteLine($"{GetType().Name}: ShopEvent received: " + shopEvent.ShopMessage?.Name);
+
+                    // set the SelectedShop property to the Shop property in the ShopEvent
+                    SelectedShop = shopEvent.ShopMessage;
+
+                    // clear the searchText property
+                    // SearchText = string.Empty;
+
+                    // clear the ShopWorkdayDetailList property
+                    ShopWorkdayDetailList?.Clear();
+
+                    // clear the SelectedShopWorkdayDetail property
+                    SelectedShopWorkdayDetail = null;
+                })
+                .DisposeWith(disposables);
+            
+            // console log when the ViewModel is deactivated
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
+        });
     }
 
     // Implement the async Search ShopWorkdayDetail method
     // This method will be called when the SearchCommand is executed
     // This method will search the ShopWorkdayDetail based on the SearchText and SelectedShop
     // The result will be assigned to the ShopWorkdayDetailList
-    // API Endpoint to use: https://localhost:7045/api/PosAdmin/shopworkdaydetaillist?accountid={accountId}&shopid={shopId}
+    // API Endpoint to use: /api/PosAdmin/shopworkdaydetaillist?accountid={accountId}&shopid={shopId}
     private async Task DoSearch()
     {
         try
@@ -148,7 +180,7 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
 
             // Perform the search operation
             // Use the HttpClient registered in the DI container to call the API:
-            // https://localhost:7045/api/PosAdmin/shopworkdaydetaillist?accountid={SelectedShop.AccountId}&shopid={SelectedShop.ShopId}&startDate={SearchText}
+            // /api/PosAdmin/shopworkdaydetaillist?accountid={SelectedShop.AccountId}&shopid={SelectedShop.ShopId}&startDate={SearchText}
             // Add the search results to the ShopWorkdayDetailList property
             var currentLoginSettings = Locator.Current.GetService<LoginSettings>();
             if (currentLoginSettings == null) return;
@@ -158,7 +190,7 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
 
             var request =
                 new HttpRequestMessage(HttpMethod.Get,
-                    $"https://localhost:7045/api/PosAdmin/shopworkdaydetaillist?accountid={SelectedShop?.AccountId}&shopid={SelectedShop?.ShopId}&startDate={SearchText}");
+                    $"/api/PosAdmin/shopworkdaydetaillist?accountid={SelectedShop?.AccountId}&shopid={SelectedShop?.ShopId}&startDate={SearchText}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
@@ -173,7 +205,7 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
             RxApp.MainThreadScheduler.Schedule(() =>
             {
                 ShopWorkdayDetailList?.Clear();
-                
+
                 foreach (var shopWorkdayDetail in resultShopWorkdayDetailList)
                 {
                     // Add the shop to the ShopList property in the UI thread using RxApp.MainThreadScheduler

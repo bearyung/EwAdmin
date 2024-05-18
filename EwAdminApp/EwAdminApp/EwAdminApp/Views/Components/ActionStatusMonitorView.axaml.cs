@@ -6,9 +6,9 @@ using EwAdminApp.ViewModels.Components;
 
 namespace EwAdminApp.Views.Components;
 
-public partial class ShopWorkdayPeriodDetailEditView : ReactiveUserControl<ShopWorkdayPeriodDetailEditViewModel>
+public partial class ActionStatusMonitorView : ReactiveUserControl<ActionStatusMonitorViewModel>
 {
-    public ShopWorkdayPeriodDetailEditView()
+    public ActionStatusMonitorView()
     {
         InitializeComponent();
     }

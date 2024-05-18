@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Disposables;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.Events;
 using ReactiveUI;
@@ -24,20 +25,32 @@ public class ShopWorkdayDetailViewModel : ViewModelBase
     // code here
     public ShopWorkdayDetailViewModel()
     {
-        this.WhenAnyValue(x => x.SelectedShopWorkdayDetail)
-            .Subscribe(shopWorkdayDetail =>
-            {
-                if (shopWorkdayDetail != null)
+        this.WhenActivated((disposables) =>
+        {
+            // console log when the viewmodel is activated
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            this.WhenAnyValue(x => x.SelectedShopWorkdayDetail)
+                .Subscribe(shopWorkdayDetail =>
                 {
-                    Console.WriteLine($"ShopWorkdayDetail: {shopWorkdayDetail}");
-                }
-            });
-        
-        // subscribe to the ShopWorkdayDetailEvent
-        MessageBus.Current.Listen<ShopWorkdayDetailEvent>()
-            .Subscribe(shopWorkdayDetailEvent =>
-            {
-                SelectedShopWorkdayDetail = shopWorkdayDetailEvent.ShopWorkdayDetailMessage;
-            });
+                    if (shopWorkdayDetail != null)
+                    {
+                        Console.WriteLine($"ShopWorkdayDetail: {shopWorkdayDetail.WorkdayDetailId}");
+                    }
+                })
+                .DisposeWith(disposables);
+
+            // subscribe to the ShopWorkdayDetailEvent
+            MessageBus.Current.Listen<ShopWorkdayDetailEvent>()
+                .Subscribe(shopWorkdayDetailEvent =>
+                {
+                    SelectedShopWorkdayDetail = shopWorkdayDetailEvent.ShopWorkdayDetailMessage;
+                })
+                .DisposeWith(disposables);
+            
+            // console log when the viewmodel is deactivated
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
+        });
     }
 }

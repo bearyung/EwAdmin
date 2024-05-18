@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.ActionStatusMonitorView"
+             x:DataType="vm:ActionStatusMonitorViewModel">
+    <UserControl.Styles>
+        <Style Selector="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <DockPanel>
+        <!--<ProgressBar DockPanel.Dock="Left"
+            IsIndeterminate="True" MaxWidth="200" />-->
+        <Label DockPanel.Dock="Left"
+               Content="This is a label" MaxWidth="500"/>
+        <Label>
+            Place holder for action status panel
+        </Label>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,90 @@
+using System.Collections.Concurrent;
+using EwAdminApp.Events;
+using EwAdminApp.Models;
+using ReactiveUI;
+using System;
+using System.Reactive.Disposables;
+
+namespace EwAdminApp.ViewModels.Components;
+
+public class ActionStatusMonitorViewModel : ViewModelBase
+{
+    // in this view model, we will have a thread-safe ConcurrentQueueof action status messages that will be displayed
+    // also a counter of thread-safe ExecutingCount to show how many actions are currently executing
+
+    // initialize the properties
+    private ConcurrentQueue<ActionStatus> _actionStatusMessages = new();
+
+    public ConcurrentQueue<ActionStatus> ActionStatusMessages
+    {
+        get => _actionStatusMessages;
+        set => this.RaiseAndSetIfChanged(ref _actionStatusMessages, value);
+    }
+
+    private int _executingCount;
+
+    public int ExecutingCount
+    {
+        get => _executingCount;
+        set => this.RaiseAndSetIfChanged(ref _executingCount, value);
+    }
+
+    private bool _isBusy;
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set => this.RaiseAndSetIfChanged(ref _isBusy, value);
+    }
+
+    // constructor
+    public ActionStatusMonitorViewModel()
+    {
+        // initialize the properties
+        ActionStatusMessages = new ConcurrentQueue<ActionStatus>();
+        ExecutingCount = 0;
+        IsBusy = false;
+
+        this.WhenActivated((disposable) =>
+        {
+            // log the activation of viewmodel
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            // subscribe to the MessageBus.Current.Listen<ActionStatusMessageEvent>()
+            // and update the properties accordingly
+            MessageBus.Current.Listen<ActionStatusMessageEvent>()
+                .Subscribe(actionStatusMessage =>
+                {
+                    // log the actionStatusMessage
+                    Console.WriteLine(
+                        $"{GetType().Name}: ActionStatusMessage: {actionStatusMessage.ActionStatusMessage.ActionStatusEnum} - {actionStatusMessage.ActionStatusMessage.Message}");
+
+                    // switch on the ActionStatusEnum of the actionStatusMessage
+                    switch (actionStatusMessage.ActionStatusMessage.ActionStatusEnum)
+                    {
+                        case ActionStatus.StatusEnum.Success:
+                        case ActionStatus.StatusEnum.Error:
+                        case ActionStatus.StatusEnum.Info:
+                            ActionStatusMessages.Enqueue(actionStatusMessage.ActionStatusMessage);
+                            break;
+                        case ActionStatus.StatusEnum.Executing:
+                            ActionStatusMessages.Enqueue(actionStatusMessage.ActionStatusMessage);
+                            ExecutingCount++;
+                            break;
+                        case ActionStatus.StatusEnum.Completed:
+                        case ActionStatus.StatusEnum.Interrupted:
+                            ActionStatusMessages.Enqueue(actionStatusMessage.ActionStatusMessage);
+                            ExecutingCount--;
+                            break;
+                    }
+
+                    IsBusy = ExecutingCount > 0;
+                })
+                .DisposeWith(disposable);
+            
+            // log the deactivation of viewmodel
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposable);
+        });
+    }
+}

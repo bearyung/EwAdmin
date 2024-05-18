@@ -21,6 +21,14 @@ public class MondayAuthorizationMiddleware
 
     public async Task InvokeAsync(HttpContext context, ILogger<MondayAuthorizationMiddleware> logger)
     {
+        // bypass the authorization check for the general based API
+        // Health Check Endpoint: api/general/*
+        if (context.Request.Path.StartsWithSegments("/api/general"))
+        {
+            await _next(context).ConfigureAwait(false);
+            return;
+        }
+        
         logger.LogInformation("Attempting to retrieve user data from Monday.com");
         string? apiKey = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
         if (string.IsNullOrEmpty(apiKey))

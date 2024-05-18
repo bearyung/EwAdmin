@@ -2,11 +2,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
 using DialogHostAvalonia;
+using EwAdminApp.ViewModels;
 
 namespace EwAdminApp.Views;
 
-public partial class TestDialogHostView : UserControl
+public partial class TestDialogHostView : ReactiveUserControl<TestDialogHostViewModel>
 {
     public TestDialogHostView()
     {

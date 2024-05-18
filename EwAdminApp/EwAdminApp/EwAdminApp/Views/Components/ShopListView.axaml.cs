@@ -5,13 +5,14 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.ViewModels.Components;
 using ReactiveUI;
 
 namespace EwAdminApp.Views.Components;
 
-public partial class ShopListView : UserControl
+public partial class ShopListView : ReactiveUserControl<ShopListViewModel>
 {
     // public static readonly StyledProperty<Shop?> ShopProperty = 
     //     AvaloniaProperty.Register<ShopListView, Shop?>(nameof(Shop));

@@ -8,7 +8,7 @@
              x:DataType="vm:ShopListViewModel">
     <UserControl.Styles>
         <Style Selector="TextBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
         </Style>
     </UserControl.Styles>
@@ -30,8 +30,9 @@
                     <TextBox BorderBrush="Transparent"
                              Grid.Column="0" Watermark="Account Id"
                              Text="{Binding SearchTextAccountId}"
+                             Classes="Numeric"
                              Margin="0 0 0 0"
-                             KeyDown="SearchShopTextBox_OnKeyDown" />
+                             KeyDown="SearchShopTextBox_OnKeyDown"/>
                     <TextBox BorderBrush="Transparent"
                              Grid.Column="1" Watermark="Shop Id"
                              Text="{Binding SearchTextShopId}"

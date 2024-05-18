@@ -5,6 +5,7 @@ using ReactiveUI;
 using System;
 using System.Net.Http;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Text.Json;
 using EwAdminApp.Events;
@@ -25,11 +26,11 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         get => _selectedShopWorkdayDetail;
         set => this.RaiseAndSetIfChanged(ref _selectedShopWorkdayDetail, value);
     }
-    
+
     // add a property named "SelectedShopWorkdayDetailClone" of type ShopWorkdayDetail
     // code here
     private ShopWorkdayDetail? _selectedShopWorkdayDetailClone;
-    
+
     public ShopWorkdayDetail? SelectedShopWorkdayDetailClone
     {
         get => _selectedShopWorkdayDetailClone;
@@ -39,7 +40,7 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
     // add a Reactive Command named "SaveCommand"
     // code here
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
-    
+
     // add a Reactive Command named "CancelCommand"
     // code here
     public ReactiveCommand<Unit, Unit> CancelCommand { get; }
@@ -64,40 +65,77 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
             x => x.SelectedShopWorkdayDetail,
             x => x.IsBusy,
             (selectedShopWorkdayPeriodDetail, isBusy) => selectedShopWorkdayPeriodDetail != null && !isBusy);
-        
+
         var canCancel = this.WhenAnyValue(
             x => x.IsBusy,
             isBusy => !isBusy);
 
         // Create the SaveCommand
         SaveCommand = ReactiveCommand.CreateFromTask(DoSave, canSave);
-        
+
         // Create the CancelCommand
         CancelCommand = ReactiveCommand.CreateFromTask(DoCancel, canCancel);
 
-        // when the SaveCommand is executing, set the IsBusy property to true
-        SaveCommand.IsExecuting.Subscribe(isExecuting => IsBusy = isExecuting);
-
-        // handle the exception when the SaveCommand is executed
-        SaveCommand.ThrownExceptions.Subscribe(exception =>
+        this.WhenActivated((disposables) =>
         {
-            Console.WriteLine($"An error occurred: {exception.Message}");
-        });
-
-        // listen to the Message Bus for ShopWorkdayDetailEvent
-        // when the event is received, set the SelectedShopWorkdayPeriodDetail property
-        MessageBus.Current.Listen<ShopWorkdayDetailEvent>()
-            .Subscribe(shopWorkdayDetailEvent =>
+            // console log when the viewmodel is activated
+            Console.WriteLine($"{GetType().Name}: Activated");
+            
+            // when the SaveCommand is executing, set the IsBusy property to true
+            SaveCommand.IsExecuting.Subscribe(isExecuting =>
             {
-                var serializedShopWorkdayDetail = JsonSerializer.Serialize(shopWorkdayDetailEvent.ShopWorkdayDetailMessage);
-                SelectedShopWorkdayDetailClone = JsonSerializer.Deserialize<ShopWorkdayDetail>(serializedShopWorkdayDetail);
-                
-                // set the SelectedShopWorkdayDetail property using RxApp.MainThreadScheduler
-                RxApp.MainThreadScheduler.Schedule(() =>
+                var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
+
+                // set the IsBusy property
+                IsBusy = isExecuting;
+
+                // increment or decrement the ExecutingCommandsCount property
+                ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
+
+                // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
+                if (!isInitial)
                 {
-                    SelectedShopWorkdayDetail = shopWorkdayDetailEvent.ShopWorkdayDetailMessage;
-                });
-            });
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = isExecuting
+                                ? ActionStatus.StatusEnum.Executing
+                                : ActionStatus.StatusEnum.Completed,
+                            Message = isExecuting ? "Saving ShopWorkdayDetail..." : "ShopWorkdayDetail saved"
+                        }));
+                }
+            })
+            .DisposeWith(disposables);
+
+            // handle the exception when the SaveCommand is executed
+            SaveCommand.ThrownExceptions.Subscribe(exception =>
+            {
+                Console.WriteLine($"An error occurred: {exception.Message}");
+            })
+            .DisposeWith(disposables);
+
+            // listen to the Message Bus for ShopWorkdayDetailEvent
+            // when the event is received, set the SelectedShopWorkdayPeriodDetail property
+            MessageBus.Current.Listen<ShopWorkdayDetailEvent>()
+                .Subscribe(shopWorkdayDetailEvent =>
+                {
+                    var serializedShopWorkdayDetail =
+                        JsonSerializer.Serialize(shopWorkdayDetailEvent.ShopWorkdayDetailMessage);
+                    SelectedShopWorkdayDetailClone =
+                        JsonSerializer.Deserialize<ShopWorkdayDetail>(serializedShopWorkdayDetail);
+
+                    // set the SelectedShopWorkdayDetail property using RxApp.MainThreadScheduler
+                    RxApp.MainThreadScheduler.Schedule(() =>
+                    {
+                        SelectedShopWorkdayDetail = shopWorkdayDetailEvent.ShopWorkdayDetailMessage;
+                    });
+                })
+                .DisposeWith(disposables);
+            
+            // console log when the viewmodel is deactivated
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
+        });
     }
 
     private async Task DoSave()
@@ -106,7 +144,7 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         {
             // Save the SelectedShopWorkdayDetail
             // HTTP PATCH request to the API to update the ShopWorkdayDetail
-            // API Endpoint: https://localhost:7045/api/PosAdmin/UpdateShopWorkdayDetail
+            // API Endpoint: /api/PosAdmin/UpdateShopWorkdayDetail
             // Request Body: SelectedShopWorkdayDetail
             // Request headers: Authorization Bearer Token
             // code here
@@ -132,7 +170,7 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
             };
 
             var request = new HttpRequestMessage(HttpMethod.Patch,
-                "https://localhost:7045/api/PosAdmin/UpdateShopWorkdayDetail")
+                "/api/PosAdmin/UpdateShopWorkdayDetail")
             {
                 Content = new StringContent(JsonSerializer.Serialize(requestShopWorkdayDetail), Encoding.UTF8,
                     "application/json")
@@ -151,16 +189,16 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
                 {
                     PropertyNameCaseInsensitive = true
                 });
-            
+
             // update the SelectedShopWorkdayDetail with the resultShopWorkdayDetail using RxApp.MainThreadScheduler
             //RxApp.MainThreadScheduler.Schedule(() =>
             //{
             //    SelectedShopWorkdayDetail = resultShopWorkdayDetail;
             //});
-            
+
             // send a ShopWorkdayDetailSavedEvent using the MessageBus
             MessageBus.Current.SendMessage(new ShopWorkdayDetailEvent(resultShopWorkdayDetail));
-            
+
             // log the success message
             Console.WriteLine("ShopWorkdayDetail saved successfully.");
         }
@@ -170,7 +208,7 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
             throw;
         }
     }
-    
+
     // add a method named "DoCancel"
     // code here
     private Task DoCancel()
@@ -179,15 +217,13 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         // serialize the SelectedShopWorkdayDetailClone to JSON and deserialize it back to ShopWorkdayDetail
         // code here
         if (SelectedShopWorkdayDetailClone == null) return Task.CompletedTask;
-        
+
         var selectedShopWorkdayDetailCloneJson = JsonSerializer.Serialize(SelectedShopWorkdayDetailClone);
-        var selectedShopWorkdayDetailCloneObj = JsonSerializer.Deserialize<ShopWorkdayDetail>(selectedShopWorkdayDetailCloneJson);
-        
-        RxApp.MainThreadScheduler.Schedule(() =>
-        {
-            SelectedShopWorkdayDetail = selectedShopWorkdayDetailCloneObj;
-        });
-        
+        var selectedShopWorkdayDetailCloneObj =
+            JsonSerializer.Deserialize<ShopWorkdayDetail>(selectedShopWorkdayDetailCloneJson);
+
+        RxApp.MainThreadScheduler.Schedule(() => { SelectedShopWorkdayDetail = selectedShopWorkdayDetailCloneObj; });
+
         return Task.CompletedTask;
     }
 }

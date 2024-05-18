@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using EwAdminApp.Events;
 using EwAdminApp.Models;
+using EwAdminApp.ViewModels.Components;
 using ReactiveUI;
 using Splat;
 
@@ -12,6 +14,8 @@ namespace EwAdminApp.ViewModels;
 public class MainViewModel : ViewModelBase
 {
     private ViewModelBase? _contentViewModel;
+
+    private ViewModelBase? _footerViewModel;
 
     private LoginSettings? _loginSettings;
 
@@ -22,19 +26,52 @@ public class MainViewModel : ViewModelBase
     {
         ContentViewModel = new LoginViewModel();
 
-        // replace the above messageEventAggregator code with ReactiveUI message bus
-        // code here
-        MessageBus.Current.Listen<LoginEvent>()
-            .Subscribe(OnLoginEventReceived);
-
         // initialize the logout command
         LogoutCommand = ReactiveCommand.Create(Logout);
+
+        this.WhenActivated((disposables) =>
+        {
+            // log the activation of viewmodel
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            // replace the above messageEventAggregator code with ReactiveUI message bus
+            // code here
+            MessageBus.Current.Listen<LoginEvent>()
+                .Subscribe(OnLoginEventReceived)
+                .DisposeWith(disposables);
+
+            // when the ExecutingCommandsCount property of the ContentViewModel and FooterViewModel changes,
+            // update the view model's ExecutingCommandsCount property by summing the ExecutingCommandsCount properties
+            this.WhenAnyValue(x => x.ContentViewModel!.ExecutingCommandsCount)
+                .CombineLatest(this.WhenAnyValue(x => x.FooterViewModel!.ExecutingCommandsCount))
+                .Subscribe(x =>
+                {
+                    var combinedCount = x.Item1 + x.Item2;
+
+                    // log the ExecutingCommandsCount properties
+                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {combinedCount}");
+
+                    // Update the ExecutingCommandsCount property
+                    ExecutingCommandsCount = combinedCount;
+                })
+                .DisposeWith(disposables);
+            
+            // log the deactivation of viewmodel
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
+        });
     }
 
     public ViewModelBase? ContentViewModel
     {
         get => _contentViewModel;
         set => this.RaiseAndSetIfChanged(ref _contentViewModel, value);
+    }
+
+    public ViewModelBase? FooterViewModel
+    {
+        get => _footerViewModel;
+        set => this.RaiseAndSetIfChanged(ref _footerViewModel, value);
     }
 
     public LoginSettings? LoginSettings
@@ -61,6 +98,8 @@ public class MainViewModel : ViewModelBase
         LoginSettings = loginEvent.LoginSettings;
 
         ContentViewModel = new DashboardViewModel();
+
+        FooterViewModel = new ActionStatusMonitorViewModel();
     }
 
     // add an async method to logout the user

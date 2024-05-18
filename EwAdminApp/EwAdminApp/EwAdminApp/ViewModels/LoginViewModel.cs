@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Setting;
@@ -39,45 +40,60 @@ public class LoginViewModel : ViewModelBase
 
         // add a command to save the API key to a file
         SaveApiKeyCommand = ReactiveCommand.CreateFromTask(SaveApiKeyAsync);
-        SaveApiKeyCommand.Subscribe(result =>
-        {
-            // show a message to the user
-            Console.WriteLine(result.success ? "API key saved successfully" : "API key is invalid");
 
-            if (result.success)
+        this.WhenActivated((disposables) =>
+        {
+            // log the activation of viewmodel
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            SaveApiKeyCommand.Subscribe(result =>
             {
-                // navigate to the next page
-                // code here
-                //var mainViewModel = new MainViewModel();
-                //Locator.Current.GetService<MainViewModel>().ContentViewModel = mainViewModel;
+                // show a message to the user
+                Console.WriteLine(result.success ? "API key saved successfully" : "API key is invalid");
 
-                // save the LoginSettings to DI container (splat)
-                Locator.CurrentMutable.RegisterConstant(result.settings, typeof(LoginSettings));
+                if (result.success)
+                {
+                    // navigate to the next page
+                    // code here
+                    //var mainViewModel = new MainViewModel();
+                    //Locator.Current.GetService<MainViewModel>().ContentViewModel = mainViewModel;
 
-                // emit a message event using MessageBus.Current.SendMessage
-                MessageBus.Current.SendMessage(new LoginEvent(result.settings));
-            }
-        });
-        // if SaveApiKeyAsync fails, pop up a message to the user
-        // code here
-        SaveApiKeyCommand.ThrownExceptions.Subscribe(ex =>
-        {
-            // show a message to the user, with the exception message
-            Console.WriteLine("Failed to save API key");
-            Console.WriteLine(ex.Message);
-        });
+                    // save the LoginSettings to DI container (splat)
+                    Locator.CurrentMutable.RegisterConstant(result.settings, typeof(LoginSettings));
 
-        // add an async method to load the API key from a file
-        // if the file exists, set the API key property
-        // and call the CheckApiKeyAsync method to check if the API key is valid
-        // code here
-        LoadApiKeyAsync().ContinueWith(task =>
-        {
-            if (task.Result.success)
+                    // emit a message event using MessageBus.Current.SendMessage
+                    MessageBus.Current.SendMessage(new LoginEvent(result.settings));
+                }
+            })
+            .DisposeWith(disposables);
+            
+            // if SaveApiKeyAsync fails, pop up a message to the user
+            // code here
+            SaveApiKeyCommand.ThrownExceptions.Subscribe(ex =>
             {
-                ApiKey = task.Result.settings?.ApiKey;
-                SaveApiKeyCommand.Execute().Subscribe();
-            }
+                // show a message to the user, with the exception message
+                Console.WriteLine("Failed to save API key");
+                Console.WriteLine(ex.Message);
+            })
+            .DisposeWith(disposables);
+
+            // add an async method to load the API key from a file
+            // if the file exists, set the API key property
+            // and call the CheckApiKeyAsync method to check if the API key is valid
+            // code here
+            LoadApiKeyAsync().ContinueWith(task =>
+            {
+                if (task.Result.success)
+                {
+                    ApiKey = task.Result.settings?.ApiKey;
+                    SaveApiKeyCommand.Execute().Subscribe();
+                }
+            })
+            .DisposeWith(disposables);
+            
+            // log the deactivation of the viewmodel
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
         });
     }
 
@@ -90,7 +106,7 @@ public class LoginViewModel : ViewModelBase
     // add an ReactiveCommand property to save the API key to a file
     public ReactiveCommand<Unit, (bool success, LoginSettings? settings)> SaveApiKeyCommand { get; }
 
-    // make a method to check if the API key is valid by calling the API (https://localhost:7045/api/webAdmin/hello) using HttpClient registered in the DI container
+    // make a method to check if the API key is valid by calling the API (/api/webAdmin/hello) using HttpClient registered in the DI container
     // ApiKey should be passed as a bearer HEADER
     private async Task<LoginUserResponse?> CheckApiKeyAsync()
     {
@@ -98,7 +114,7 @@ public class LoginViewModel : ViewModelBase
         {
             var httpClient = Locator.Current.GetService<HttpClient>();
             var request =
-                new HttpRequestMessage(HttpMethod.Get, "https://localhost:7045/api/webAdmin/hello");
+                new HttpRequestMessage(HttpMethod.Get, "/api/webAdmin/hello");
             request.Headers.Add("Authorization", $"Bearer {ApiKey}");
             if (httpClient == null) return null;
             var response = await httpClient.SendAsync(request);

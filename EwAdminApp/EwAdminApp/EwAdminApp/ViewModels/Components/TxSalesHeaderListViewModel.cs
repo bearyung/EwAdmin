@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
+using System.Reactive.Disposables;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
@@ -97,72 +96,113 @@ public class TxSalesHeaderListViewModel : ViewModelBase
             execute: DoSearch,
             canExecute: canExecuteSearch);
 
-        // set the IsBusy property to true when the SearchCommand is executing
-        SearchCommand.IsExecuting.Subscribe(isExecuting => { IsBusy = isExecuting; });
-
-        // handle the exception when the SearchCommand is executed
-        SearchCommand.ThrownExceptions.Subscribe(ex =>
+        this.WhenActivated((disposables) =>
         {
-            Console.WriteLine("Failed to search for shop workday detail");
-            Console.WriteLine(ex.Message);
+            // log the activation of the ViewModel
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            // set the IsBusy property to true when the SearchCommand is executing
+            SearchCommand.IsExecuting.Subscribe(isExecuting =>
+                {
+                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
+
+                    // set the IsBusy property
+                    IsBusy = isExecuting;
+
+                    // increment or decrement the ExecutingCommandsCount property
+                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
+
+                    // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
+                    if (!isInitial)
+                    {
+                        MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                            new ActionStatus
+                            {
+                                ActionStatusEnum = isExecuting
+                                    ? ActionStatus.StatusEnum.Executing
+                                    : ActionStatus.StatusEnum.Completed,
+                                Message = isExecuting
+                                    ? "Searching for TxSalesHeader list..."
+                                    : "TxSalesHeader list search completed"
+                            }));
+                    }
+                })
+                .DisposeWith(disposables);
+
+            // handle the exception when the SearchCommand is executed
+            SearchCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    Console.WriteLine("Failed to search for shop workday detail");
+                    Console.WriteLine(ex.Message);
+                })
+                .DisposeWith(disposables);
+
+            // when SelectedShop or SelectedShopWorkdayDetail is changed, execute some code
+            this.WhenAnyValue(
+                    x => x.SelectedShop,
+                    x => x.SelectedShopWorkdayDetail,
+                    (shop, shopWorkdayDetail) => new { shop, shopWorkdayDetail })
+                .Subscribe(_ =>
+                {
+                    // clear the TxSalesHeaderList property
+                    RxApp.MainThreadScheduler.Schedule(() => TxSalesHeaderList?.Clear());
+
+                    // clear the selected TxSalesHeader
+                    SelectedTxSalesHeader = null;
+
+                    // clear the search text
+                    SearchTextTxSalesHeaderId = null;
+                })
+                .DisposeWith(disposables);
+
+            // ReactiveUI messagebus listen for the ShopEvent
+            MessageBus.Current.Listen<ShopEvent>()
+                .Subscribe(x =>
+                {
+                    // console log the ShopEvent received from this component
+                    Console.WriteLine($"{GetType().Name}: ShopEvent received: " + x.ShopMessage?.Name);
+
+                    // Set the SelectedShop property to the Shop property of the ShopEvent
+                    SelectedShop = x.ShopMessage;
+                })
+                .DisposeWith(disposables);
+
+            // ReactiveUI messagebus listen for the ShopWorkdayDetailEvent
+            MessageBus.Current.Listen<ShopWorkdayDetailEvent>()
+                .Subscribe(x =>
+                {
+                    // console log the ShopWorkdayDetailEvent received from this component
+                    Console.WriteLine($"{GetType().Name}: ShopWorkdayDetailEvent received: " +
+                                      x.ShopWorkdayDetailMessage?.WorkdayDetailId);
+
+                    // Set the SelectedShopWorkdayDetail property to the ShopWorkdayDetail property of the ShopWorkdayDetailEvent
+                    SelectedShopWorkdayDetail = x.ShopWorkdayDetailMessage;
+                })
+                .DisposeWith(disposables);
+
+            // ReactiveUI messagebus sendmessage if there is any changes in the SelectedTxSalesHeader
+            this.WhenAnyValue(x => x.SelectedTxSalesHeader)
+                .Subscribe(x =>
+                {
+                    // console log the SelectedTxSalesHeader
+                    Console.WriteLine(
+                        $"{GetType().Name}: SelectedTxSalesHeader changed: " + x?.TxSalesHeaderId);
+
+                    // send the SelectedTxSalesHeader to the TxPaymentListViewModel
+                    MessageBus.Current.SendMessage(new TxSalesHeaderMinEvent(SelectedTxSalesHeader));
+                })
+                .DisposeWith(disposables);
+            
+            // console log when the ViewModel is deactivated
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
         });
-
-        // when SelectedShop or SelectedShopWorkdayDetail is changed, execute some code
-        this.WhenAnyValue(
-                x => x.SelectedShop,
-                x => x.SelectedShopWorkdayDetail,
-                (shop, shopWorkdayDetail) => new { shop, shopWorkdayDetail })
-            .Subscribe(x =>
-            {
-                // clear the TxSalesHeaderList property
-                RxApp.MainThreadScheduler.Schedule(() => TxSalesHeaderList?.Clear());
-
-                // clear the selected TxSalesHeader
-                SelectedTxSalesHeader = null;
-
-                // clear the search text
-                SearchTextTxSalesHeaderId = null;
-            });
-
-        // ReactiveUI messagebus listen for the ShopEvent
-        MessageBus.Current.Listen<ShopEvent>()
-            .Subscribe(x =>
-            {
-                // console log the ShopEvent received from this component
-                Console.WriteLine("TxSalesHeaderListViewModel: ShopEvent received: " + x.ShopMessage?.Name);
-
-                // Set the SelectedShop property to the Shop property of the ShopEvent
-                SelectedShop = x.ShopMessage;
-            });
-
-        // ReactiveUI messagebus listen for the ShopWorkdayDetailEvent
-        MessageBus.Current.Listen<ShopWorkdayDetailEvent>()
-            .Subscribe(x =>
-            {
-                // console log the ShopWorkdayDetailEvent received from this component
-                Console.WriteLine("TxSalesHeaderListViewModel: ShopWorkdayDetailEvent received: " +
-                                  x.ShopWorkdayDetailMessage?.WorkdayDetailId);
-
-                // Set the SelectedShopWorkdayDetail property to the ShopWorkdayDetail property of the ShopWorkdayDetailEvent
-                SelectedShopWorkdayDetail = x.ShopWorkdayDetailMessage;
-            });
-
-        // ReactiveUI messagebus sendmessage if there any changes in the SelectedTxSalesHeader
-        this.WhenAnyValue(x => x.SelectedTxSalesHeader)
-            .Subscribe(x =>
-            {
-                // console log the SelectedTxSalesHeader
-                Console.WriteLine("TxSalesHeaderListViewModel: SelectedTxSalesHeader changed: " + x?.TxSalesHeaderId);
-
-                // send the SelectedTxSalesHeader to the TxPaymentListViewModel
-                MessageBus.Current.SendMessage(new TxSalesHeaderMinEvent(SelectedTxSalesHeader));
-            });
     }
 
     // Implement the DoSearch method
     // This method is called when the SearchCommand is executed
     // It sends a request to the server to get the TxSalesHeader list
-    // The request is sent to the https://localhost:7045/api/PosAdmin/txSalesHeader?accountid=11377&shopid=5311&txDate=2023-08-14
+    // The request is sent to the /api/PosAdmin/txSalesHeader?accountid=11377&shopid=5311&txDate=2023-08-14
     // The response is deserialized into a list of TxSalesHeader objects
     // The list is added to the TxSalesHeaderList property
     // code here
@@ -183,7 +223,7 @@ public class TxSalesHeaderListViewModel : ViewModelBase
             if (httpClient == null) return;
 
             var request = new HttpRequestMessage(HttpMethod.Get,
-                $"https://localhost:7045/api/PosAdmin/txSalesHeaderList?" +
+                $"/api/PosAdmin/txSalesHeaderList?" +
                 $"accountid={SelectedShop?.AccountId}" +
                 $"&shopid={SelectedShop?.ShopId}" +
                 $"&txDate={SelectedShopWorkdayDetail?.OpenDatetime:yyyy-MM-dd}" +

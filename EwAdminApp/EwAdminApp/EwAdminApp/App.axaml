@@ -13,6 +13,8 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <!-- include the GlobalStyles.axaml file fom EwAdmin.Common -->
+        <StyleInclude Source="avares://EwAdmin.Common/Assets/GlobalStyles.axaml" />            
         <dialogHostAvalonia:DialogHostStyles />
     </Application.Styles>
 </Application>

@@ -4,12 +4,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.ViewModels.Components;
 
 namespace EwAdminApp.Views.Components;
 
-public partial class ShopWorkdayDetailListView : UserControl
+public partial class ShopWorkdayDetailListView : ReactiveUserControl<ShopWorkdayDetailListViewModel>
 {
     public ShopWorkdayDetailListView()
     {

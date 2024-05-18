@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -69,58 +70,99 @@ public class TxPaymentListViewModel : ViewModelBase
         var canExecuteSearch = this.WhenAnyValue(
             x => x.SelectedTxSalesHeader,
             x => x.IsBusy,
-            (selectedTxSalesHeader, isBusy) => selectedTxSalesHeader != null && !isBusy);   
+            (selectedTxSalesHeader, isBusy) => selectedTxSalesHeader != null && !isBusy);
 
         // implement the SearchCommand
         SearchCommand = ReactiveCommand.CreateFromTask(
             execute: DoSearch,
             canExecute: canExecuteSearch);
 
-        // handle the exception when the SearchCommand is executed
-        SearchCommand.ThrownExceptions
-            .Subscribe(ex =>
-            {
-                Console.WriteLine("Failed to search for txpayment");
-                Console.WriteLine(ex.Message);
-            });
+        this.WhenActivated((disposables) =>
+        {
+            // log the activation of the ViewModel
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            // handle the exception when the SearchCommand is executed
+            SearchCommand.ThrownExceptions
+                .Subscribe(ex =>
+                {
+                    Console.WriteLine("Failed to search for txpayment");
+                    Console.WriteLine(ex.Message);
+                })
+                .DisposeWith(disposables);
 
-        // set the IsBusy property to true when the SearchCommand is executing
-        SearchCommand.IsExecuting
-            .Subscribe(isExecuting => { IsBusy = isExecuting; });
+            // set the IsBusy property to true when the SearchCommand is executing
+            SearchCommand.IsExecuting
+                .Subscribe(isExecuting =>
+                {
+                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
 
-        // use ReactiveUI MessageBus to subscribe to the TxSalesHeaderMinEvent
-        MessageBus.Current.Listen<TxSalesHeaderMinEvent>()
-            .Throttle(TimeSpan.FromMilliseconds(300))
-            .Subscribe(txSalesHeaderMinEvent =>
-            {
-                // console log the TxSalesHeaderMinEvent
-                Console.WriteLine(
-                    $"TxPaymentListViewModel: TxSalesHeaderMinEvent received: {txSalesHeaderMinEvent.TxSalesHeaderMinMessage?.TxSalesHeaderId}");
+                    // set the IsBusy property
+                    IsBusy = isExecuting;
 
-                // clear the TxPaymentList property
-                RxApp.MainThreadScheduler.Schedule(() => TxPaymentList?.Clear());
+                    // increment or decrement the ExecutingCommandsCount property
+                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
 
-                // set the SelectedTxSalesHeader property to the TxSalesHeaderMin property of the TxSalesHeaderMinEvent
-                SelectedTxSalesHeader = txSalesHeaderMinEvent.TxSalesHeaderMinMessage;
+                    // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
+                    if (!isInitial)
+                    {
+                        MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                            new ActionStatus
+                            {
+                                ActionStatusEnum = isExecuting
+                                    ? ActionStatus.StatusEnum.Executing
+                                    : ActionStatus.StatusEnum.Completed,
+                                Message = isExecuting
+                                    ? "Searching for TxPayment list..."
+                                    : "TxPayment list search completed"
+                            }));
+                    }
+                })
+                .DisposeWith(disposables);
 
-                // execute the SearchCommand
-                SearchCommand.Execute().Subscribe();
-            });
+            // use ReactiveUI MessageBus to subscribe to the TxSalesHeaderMinEvent
+            MessageBus.Current.Listen<TxSalesHeaderMinEvent>()
+                .Throttle(TimeSpan.FromMilliseconds(300))
+                .Subscribe(txSalesHeaderMinEvent =>
+                {
+                    // console log the TxSalesHeaderMinEvent
+                    Console.WriteLine(
+                        $"{GetType().Name}: TxSalesHeaderMinEvent received: {txSalesHeaderMinEvent.TxSalesHeaderMinMessage?.TxSalesHeaderId}");
 
-        // use ReactiveUI MessageBus to sendmessage when there's changes in the SelectedTxPayment property
-        this.WhenAnyValue(x => x.SelectedTxPayment)
-            .Subscribe(selectedTxPayment =>
-            {
-                // emit the TxPaymentMinEvent using the ReactiveUI MessageBus
-                MessageBus.Current.SendMessage(new TxPaymentMinEvent(selectedTxPayment));
-            });
+                    // clear the TxPaymentList property
+                    RxApp.MainThreadScheduler.Schedule(() => TxPaymentList?.Clear());
+
+                    // set the SelectedTxSalesHeader property to the TxSalesHeaderMin property of the TxSalesHeaderMinEvent
+                    SelectedTxSalesHeader = txSalesHeaderMinEvent.TxSalesHeaderMinMessage;
+
+                    // execute the SearchCommand
+                    if (SelectedTxSalesHeader != null)
+                    {
+                        SearchCommand.Execute().Subscribe();    
+                    }
+                })
+                .DisposeWith(disposables);
+
+            // use ReactiveUI MessageBus to sendmessage when there's changes in the SelectedTxPayment property
+            this.WhenAnyValue(x => x.SelectedTxPayment)
+                .Subscribe(selectedTxPayment =>
+                {
+                    // emit the TxPaymentMinEvent using the ReactiveUI MessageBus
+                    MessageBus.Current.SendMessage(new TxPaymentMinEvent(selectedTxPayment));
+                })
+                .DisposeWith(disposables);
+            
+            // log the deactivation of the ViewModel
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
+        });
     }
 
     // implement the async method DoSearch
     // this method will be called when the SearchCommand is executed
     // this method will search for the txpayment based on the selected txsalesheader
     // the result will be stored in the TxPaymentList property
-    // API endpoint to use: GET https://localhost:7045/api/PosAdmin/txPaymentList?accountid={accountId}&shopid={shopId}&txSalesHeaderId={txSalesHeaderId}
+    // API endpoint to use: GET /api/PosAdmin/txPaymentList?accountid={accountId}&shopid={shopId}&txSalesHeaderId={txSalesHeaderId}
     private async Task DoSearch()
     {
         try
@@ -138,7 +180,7 @@ public class TxPaymentListViewModel : ViewModelBase
 
             var request =
                 new HttpRequestMessage(HttpMethod.Get,
-                    $"https://localhost:7045/api/PosAdmin/txPaymentList?accountid={SelectedTxSalesHeader?.AccountId}&shopid={SelectedTxSalesHeader?.ShopId}&txSalesHeaderId={SelectedTxSalesHeader?.TxSalesHeaderId}");
+                    $"/api/PosAdmin/txPaymentList?accountid={SelectedTxSalesHeader?.AccountId}&shopid={SelectedTxSalesHeader?.ShopId}&txSalesHeaderId={SelectedTxSalesHeader?.TxSalesHeaderId}");
 
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
@@ -154,7 +196,7 @@ public class TxPaymentListViewModel : ViewModelBase
             RxApp.MainThreadScheduler.Schedule(() =>
             {
                 TxPaymentList?.Clear();
-                
+
                 foreach (var txPayment in resultTxPaymentList)
                 {
                     TxPaymentList?.Add(txPayment);

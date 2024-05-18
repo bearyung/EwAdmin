@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using EwAdminApp.ViewModels.Components;
 using ReactiveUI;
@@ -29,16 +30,47 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
         // code here
         var shopWorkdaySelectorPanelViewModel = new ShopWorkdayDetailListViewModel();
         ShopWorkdaySelectorPanel = shopWorkdaySelectorPanelViewModel;
-        
+
         // add a new instance of ShopWorkdayDetailViewModel to the ShopWorkdayDetailPanel property
         // code here
         var shopWorkdayDetailPanelViewModel = new ShopWorkdayDetailViewModel();
         ShopWorkdayDetailPanel = shopWorkdayDetailPanelViewModel;
-        
+
         // add a new instance of ShopWorkdayDetailEditViewModel to the ShopWorkdayDetailEditPanel property
         // code here
         var shopWorkdayDetailEditPanelViewModel = new ShopWorkdayDetailEditViewModel();
         ShopWorkdayDetailEditPanel = shopWorkdayDetailEditPanelViewModel;
+
+        this.WhenActivated((disposable) =>
+        {
+            // log when the viewmodel is activated
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            // when the ExecutingCommandsCount property of the
+            // ShopSelectorPanel, ShopWorkdaySelectorPanel, ShopWorkdayDetailPanel, and ShopWorkdayDetailEditPanel changes,
+            // use CombineLatest to get the sum of the ExecutingCommandsCount properties
+            // update the ExecutingCommandsCount property of this view model
+            // code here
+            this.WhenAnyValue(x => x.ShopSelectorPanel!.ExecutingCommandsCount)
+                .CombineLatest(this.WhenAnyValue(x => x.ShopWorkdaySelectorPanel!.ExecutingCommandsCount))
+                .CombineLatest(this.WhenAnyValue(x => x.ShopWorkdayDetailPanel!.ExecutingCommandsCount))
+                .CombineLatest(this.WhenAnyValue(x => x.ShopWorkdayDetailEditPanel!.ExecutingCommandsCount))
+                .Subscribe(x =>
+                {
+                    var combinedCount = x.Item1.Item1.Item1 + x.Item1.Item1.Item2 + x.Item1.Item2 + x.Item2;
+
+                    // log the ExecutingCommandsCount properties
+                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {combinedCount}");
+
+                    // Update the ExecutingCommandsCount property
+                    ExecutingCommandsCount = combinedCount;
+                })
+                .DisposeWith(disposable);
+            
+            // log when the viewmodel is deactivated
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposable);
+        });
     }
 
     public ViewModelBase? ShopSelectorPanel
@@ -52,17 +84,16 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
         get => _shopWorkdaySelectorPanel;
         set => this.RaiseAndSetIfChanged(ref _shopWorkdaySelectorPanel, value);
     }
-    
+
     public ViewModelBase? ShopWorkdayDetailPanel
     {
         get => _shopWorkdayDetailPanel;
         set => this.RaiseAndSetIfChanged(ref _shopWorkdayDetailPanel, value);
     }
-    
+
     public ViewModelBase? ShopWorkdayDetailEditPanel
     {
         get => _shopWorkdayDetailEditPanel;
         set => this.RaiseAndSetIfChanged(ref _shopWorkdayDetailEditPanel, value);
     }
-
 }

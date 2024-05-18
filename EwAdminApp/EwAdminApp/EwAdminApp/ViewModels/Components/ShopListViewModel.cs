@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -48,7 +49,7 @@ public class ShopListViewModel : ViewModelBase
         get => _searchTextAccountId;
         set => this.RaiseAndSetIfChanged(ref _searchTextAccountId, value);
     }
-    
+
     public string? SearchTextShopId
     {
         get => _searchTextShopId;
@@ -65,24 +66,64 @@ public class ShopListViewModel : ViewModelBase
         // Initialize the SearchCommand property
         SearchCommand = ReactiveCommand.CreateFromTask(DoSearch);
 
-        this.WhenAnyValue(x => x.SelectedShop)
-            .Subscribe(shop =>
-            {
-                Console.WriteLine("Checkpoint 1: SelectedShop changed: " + shop?.Name);
+        this.WhenActivated((disposables) =>
+        {
+            // console log when the viewmodel is activated
+            Console.WriteLine($"{GetType().Name}: Activated");
+            
+            this.WhenAnyValue(x => x.SelectedShop)
+                .Subscribe(shop =>
+                {
+                    Console.WriteLine($"{GetType().Name}: SelectedShop changed: " + shop?.Name);
 
-                // Any other logic needed when a shop is selected
-                // emit the ShopEvent using the ReactiveUI MessageBus
-                MessageBus.Current.SendMessage(new ShopEvent(shop));
+                    // Any other logic needed when a shop is selected
+                    // emit the ShopEvent using the ReactiveUI MessageBus
+                    MessageBus.Current.SendMessage(new ShopEvent(shop));
+                })
+                .DisposeWith(disposables);
+
+            // set the IsBusy property to True when the SearchCommand is executing, False when it is completed
+            SearchCommand.IsExecuting.Subscribe(isExecuting =>
+                {
+                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
+
+                    IsBusy = isExecuting;
+
+                    // increment or decrement the ExecutingCommandsCount property
+                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
+
+                    // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
+                    if (!isInitial)
+                    {
+                        MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                            new ActionStatus
+                            {
+                                ActionStatusEnum = isExecuting
+                                    ? ActionStatus.StatusEnum.Executing
+                                    : ActionStatus.StatusEnum.Completed,
+                                Message = isExecuting ? "Searching for shops..." : "Shops search completed"
+                            }));
+                    }
+                })
+                .DisposeWith(disposables);
+            ;
+
+            // Subscribe to the ThrownExceptions property of the SearchCommand property
+            SearchCommand.ThrownExceptions.Subscribe(ex =>
+            {
+                Console.WriteLine("Failed to search for shops");
+                Console.WriteLine(ex.Message);
             });
 
-        // set the IsBusy property to True when the SearchCommand is executing, False when it is completed
-        SearchCommand.IsExecuting.Subscribe(isExecuting => { IsBusy = isExecuting; });
-
-        // Subscribe to the ThrownExceptions property of the SearchCommand property
-        SearchCommand.ThrownExceptions.Subscribe(ex =>
-        {
-            Console.WriteLine("Failed to search for shops");
-            Console.WriteLine(ex.Message);
+            // Subscribe to the ExecutingCommandsCount property
+            this.WhenAnyValue(x => x.ExecutingCommandsCount)
+                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
+                .DisposeWith(disposables);
+            ;
+            
+            // console log when the viewmodel is deactivated
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
         });
     }
 
@@ -95,7 +136,7 @@ public class ShopListViewModel : ViewModelBase
 
             // Perform the search operation
             // Use the SearchText property as the accountId parameter to search for shops
-            // Use the HttpClient registered in the DI container to call the API (https://localhost:7045/api/PosAdmin/shopList?accountid={accountId}
+            // Use the HttpClient registered in the DI container to call the API (/api/PosAdmin/shopList?accountid={accountId}
             // Add the search results to the ShopList property
             var currentLoginSettings = Locator.Current.GetService<LoginSettings>();
             if (currentLoginSettings == null) return;
@@ -105,7 +146,7 @@ public class ShopListViewModel : ViewModelBase
 
             var request =
                 new HttpRequestMessage(HttpMethod.Get,
-                    $"https://localhost:7045/api/PosAdmin/shopList?" +
+                    $"/api/PosAdmin/shopList?" +
                     $"accountid={SearchTextAccountId}&shopId={SearchTextShopId}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
