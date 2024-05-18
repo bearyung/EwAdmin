@@ -41,7 +41,7 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
         var shopWorkdayDetailEditPanelViewModel = new ShopWorkdayDetailEditViewModel();
         ShopWorkdayDetailEditPanel = shopWorkdayDetailEditPanelViewModel;
 
-        this.WhenActivated((disposable) =>
+        this.WhenActivated((disposables) =>
         {
             // log when the viewmodel is activated
             Console.WriteLine($"{GetType().Name} activated");
@@ -65,11 +65,11 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
                     // Update the ExecutingCommandsCount property
                     ExecutingCommandsCount = combinedCount;
                 })
-                .DisposeWith(disposable);
+                .DisposeWith(disposables);
             
             // log when the viewmodel is deactivated
             Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
-                .DisposeWith(disposable);
+                .DisposeWith(disposables);
         });
     }
 

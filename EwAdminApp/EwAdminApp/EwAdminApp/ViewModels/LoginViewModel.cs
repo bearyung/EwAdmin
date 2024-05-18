@@ -16,6 +16,15 @@ namespace EwAdminApp.ViewModels;
 public class LoginViewModel : ViewModelBase
 {
     private string? _apiKey;
+    
+    // add a IsBusy property of type bool
+    // code here
+    private bool _isBusy;
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set => this.RaiseAndSetIfChanged(ref _isBusy, value);
+    }
 
     public LoginViewModel(bool logout = false)
     {
@@ -63,6 +72,31 @@ public class LoginViewModel : ViewModelBase
 
                     // emit a message event using MessageBus.Current.SendMessage
                     MessageBus.Current.SendMessage(new LoginEvent(result.settings));
+                }
+            })
+            .DisposeWith(disposables);
+            
+            // set the isBusy property to true when the SaveApiKeyCommand is executing
+            SaveApiKeyCommand.IsExecuting.Subscribe(isExecuting =>
+            {
+                var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
+                
+                IsBusy = isExecuting;
+                
+                // increment or decrement the ExecutingCommandsCount property
+                ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
+
+                // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
+                if (!isInitial)
+                {
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = isExecuting
+                                ? ActionStatus.StatusEnum.Executing
+                                : ActionStatus.StatusEnum.Completed,
+                            Message = isExecuting? "Saving API key..." : "API key saved"
+                        }));
                 }
             })
             .DisposeWith(disposables);

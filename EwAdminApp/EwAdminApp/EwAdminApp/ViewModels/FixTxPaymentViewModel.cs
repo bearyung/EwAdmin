@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.ViewModels.Components;
@@ -65,6 +66,39 @@ public class FixTxPaymentViewModel : ViewModelBase
         // code here
         var txPaymentDetailEditPanelViewModel = new TxPaymentDetailEditViewModel();
         TxPaymentDetailEditPanel = txPaymentDetailEditPanelViewModel;
+        
+        this.WhenActivated((disposables) =>
+        {
+            // log when the viewmodel is activated
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            // when the ExecutingCommandsCount property of the
+            // ShopSelectorPanel, ShopWorkdaySelectorPanel, TxSalesHeaderListPanel, TxPaymentListPanel, TxPaymentDetailPanel, and TxPaymentDetailEditPanel changes,
+            // use CombineLatest to get the sum of the ExecutingCommandsCount properties
+            // update the ExecutingCommandsCount property of this view model
+            // code here
+            this.WhenAnyValue(x => x.ShopSelectorPanel!.ExecutingCommandsCount)
+                .CombineLatest(this.WhenAnyValue(x => x.ShopWorkdaySelectorPanel!.ExecutingCommandsCount))
+                .CombineLatest(this.WhenAnyValue(x => x.TxSalesHeaderListPanel!.ExecutingCommandsCount))
+                .CombineLatest(this.WhenAnyValue(x => x.TxPaymentListPanel!.ExecutingCommandsCount))
+                .CombineLatest(this.WhenAnyValue(x => x.TxPaymentDetailPanel!.ExecutingCommandsCount))
+                .CombineLatest(this.WhenAnyValue(x => x.TxPaymentDetailEditPanel!.ExecutingCommandsCount))
+                .Subscribe(x =>
+                {
+                    var combinedCount = x.Item1.Item1.Item1.Item1.Item1 + x.Item1.Item1.Item1.Item1.Item2 + x.Item1.Item1.Item1.Item2 + x.Item1.Item1.Item2 + x.Item1.Item2 + x.Item2;
+
+                    // log the ExecutingCommandsCount properties
+                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {combinedCount}");
+
+                    // Update the ExecutingCommandsCount property
+                    ExecutingCommandsCount = combinedCount;
+                })
+                .DisposeWith(disposables);
+            
+            // log when the viewmodel is deactivated
+            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+                .DisposeWith(disposables);
+        });
     }
 
     public ViewModelBase? ShopSelectorPanel
