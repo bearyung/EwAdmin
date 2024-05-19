@@ -9,6 +9,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.Events;
@@ -69,6 +70,9 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
         get => _selectedShopWorkdayDetail;
         set => this.RaiseAndSetIfChanged(ref _selectedShopWorkdayDetail, value);
     }
+    
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     public ShopWorkdayDetailListViewModel()
     {
@@ -85,7 +89,7 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
             canExecute: canExecuteSearch);
 
 
-        this.WhenActivated((CompositeDisposable disposables) =>
+        this.WhenActivated(disposables =>
         {
             // console log when the ViewModel is activated
             Console.WriteLine($"{GetType().Name} is now active.");
@@ -161,7 +165,13 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
                 .DisposeWith(disposables);
             
             // console log when the ViewModel is deactivated
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+                    
+                    // cancel the CancellationTokenSource
+                    _cancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -175,6 +185,18 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
     {
         try
         {
+            // Cancel the previous search operation
+            await _cancellationTokenSource.CancelAsync()!;
+            
+            // Create a new CancellationTokenSource
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            // Get the CancellationToken from the CancellationTokenSource
+            var cancellationToken = _cancellationTokenSource.Token;
+            
+            // Throw OperationCanceledException if the operation is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+            
             // Clear the ShopWorkdayDetailList property
             RxApp.MainThreadScheduler.Schedule(() => ShopWorkdayDetailList?.Clear());
 
@@ -193,11 +215,13 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
                     $"/api/PosAdmin/shopworkdaydetaillist?accountid={SelectedShop?.AccountId}&shopid={SelectedShop?.ShopId}&startDate={SearchText}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient
+                .SendAsync(request, cancellationToken)
+                .ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode) return;
-
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            
+            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var resultShopWorkdayDetailList = JsonSerializer.Deserialize<List<ShopWorkdayDetail>>(content,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
 
@@ -215,6 +239,11 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
                     SelectedShopWorkdayDetail = resultShopWorkdayDetailList?.FirstOrDefault();
                 }
             });
+        }
+        catch(OperationCanceledException)
+        {
+            // log the operation cancelled
+            Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
         }
         catch (Exception e)
         {

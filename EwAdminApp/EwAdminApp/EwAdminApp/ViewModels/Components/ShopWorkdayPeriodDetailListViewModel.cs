@@ -7,6 +7,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.Events;
@@ -20,7 +21,6 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
 {
     // this viewmodel is used to display the list of ShopWorkdayPeriodDetails
     // add a property named "ShopWorkdayPeriodDetailList" of type ObservableCollection<ShopWorkdayPeriodDetail>
-    // code here
     private ObservableCollection<ShopWorkdayPeriodDetail> _shopWorkdayPeriodDetailList = [];
 
     public ObservableCollection<ShopWorkdayPeriodDetail> ShopWorkdayPeriodDetailList
@@ -30,7 +30,6 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
     }
 
     // add a SelectedWorkdayPeriodDetail property of type ShopWorkdayPeriodDetail
-    // code here
     private ShopWorkdayPeriodDetail? _selectedWorkdayPeriodDetail;
 
     public ShopWorkdayPeriodDetail? SelectedWorkdayPeriodDetail
@@ -40,7 +39,6 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
     }
 
     // add a SelectedWorkdayDetail property of type ShopWorkdayDetail
-    // code here
     private ShopWorkdayDetail? _selectedWorkdayDetail;
 
     public ShopWorkdayDetail? SelectedWorkdayDetail
@@ -50,11 +48,9 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
     }
 
     // add a SearchCommand property of type ReactiveCommand<Unit, Unit>
-    // code here
     public ReactiveCommand<Unit, Unit> SearchCommand { get; }
 
     // add a IsBusy property of type bool
-    // code here
     private bool _isBusy;
 
     public bool IsBusy
@@ -63,21 +59,20 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isBusy, value);
     }
 
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
+
     // add a Constructor
-    // code here
     public ShopWorkdayPeriodDetailListViewModel()
     {
         // initialize the ShopWorkdayPeriodDetailList
-        // code here
         ShopWorkdayPeriodDetailList = new ObservableCollection<ShopWorkdayPeriodDetail>();
 
         // Create an observable that evaluates whether SearchCommand can execute
-        // code here
         var canExecuteSearch = this.WhenAnyValue(x => x.SelectedWorkdayDetail)
             .Select(x => x != null);
 
         // add a SearchCommand
-        // code here
         SearchCommand = ReactiveCommand.CreateFromObservable(
             execute: () => Observable.FromAsync(DoSearch),
             canExecute: canExecuteSearch);
@@ -86,47 +81,45 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
         {
             // console log when the viewmodel is activated
             Console.WriteLine($"{GetType().Name}: Activated");
-            
+
             // handle the exception when the SearchCommand is executed
-            // code here
             SearchCommand.ThrownExceptions.Subscribe(ex =>
-            {
-                Console.WriteLine("Failed to search for shop workday period detail");
-                Console.WriteLine(ex.Message);
-            })
-            .DisposeWith(disposables);
+                {
+                    Console.WriteLine("Failed to search for shop workday period detail");
+                    Console.WriteLine(ex.Message);
+                })
+                .DisposeWith(disposables);
 
             // set the IsBusy property to true when the SearchCommand is executing
             // code here 
             SearchCommand.IsExecuting.Subscribe(isExecuting =>
-            {
-                var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
-                // set the IsBusy property
-                IsBusy = isExecuting;
-
-                // increment or decrement the ExecutingCommandsCount property
-                ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
-                // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                if (!isInitial)
                 {
-                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
-                        new ActionStatus
-                        {
-                            ActionStatusEnum = isExecuting
-                                ? ActionStatus.StatusEnum.Executing
-                                : ActionStatus.StatusEnum.Completed,
-                            Message = isExecuting
-                                ? "Searching for shop workday period detail list..."
-                                : "Shop workday period detail list search completed"
-                        }));
-                }
-            })
-            .DisposeWith(disposables);
+                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
+
+                    // set the IsBusy property
+                    IsBusy = isExecuting;
+
+                    // increment or decrement the ExecutingCommandsCount property
+                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
+
+                    // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
+                    if (!isInitial)
+                    {
+                        MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                            new ActionStatus
+                            {
+                                ActionStatusEnum = isExecuting
+                                    ? ActionStatus.StatusEnum.Executing
+                                    : ActionStatus.StatusEnum.Completed,
+                                Message = isExecuting
+                                    ? "Searching for shop workday period detail list..."
+                                    : "Shop workday period detail list search completed"
+                            }));
+                    }
+                })
+                .DisposeWith(disposables);
 
             // Listen to the ShopWorkdayDetailEvent
-            // code here
             MessageBus.Current.Listen<ShopWorkdayDetailEvent>()
                 .Subscribe(shopWorkdayDetailEvent =>
                 {
@@ -136,21 +129,19 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
 
             // when the SelectedWorkdayDetail property changes, call the DoSearch method
             // stop any previous search command if it is executing
-            // code here
             this.WhenAnyValue(x => x.SelectedWorkdayDetail)
                 .Throttle(TimeSpan.FromMilliseconds(500))
                 .Select(_ =>
                 {
                     // clear the ShopWorkdayPeriodDetailList with RxApp.MainThreadScheduler
-                    // code here
                     RxApp.MainThreadScheduler.Schedule(() => ShopWorkdayPeriodDetailList.Clear());
-                    
+
                     // execute the SearchCommand if selectedWorkdayDetail is not null
-                    // code here
                     if (SelectedWorkdayDetail != null)
                     {
                         return SearchCommand.Execute();
                     }
+
                     return Observable.Empty<Unit>();
                 })
                 .Switch()
@@ -158,16 +149,21 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
                 .DisposeWith(disposables);
 
             // when the SelectedWorkdayPeriodDetail property changes, emit the ShopWorkdayPeriodDetailEvent using the ReactiveUI MessageBus
-            // code here
             this.WhenAnyValue(x => x.SelectedWorkdayPeriodDetail)
                 .Subscribe(shopWorkdayPeriodDetail =>
                 {
                     MessageBus.Current.SendMessage(new ShopWorkdayPeriodDetailEvent(shopWorkdayPeriodDetail));
                 })
                 .DisposeWith(disposables);
-            
+
             // console log when the viewmodel is deactivated
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+
+                    // cancel the CancellationTokenSource
+                    _cancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -176,35 +172,41 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
     {
         try
         {
+            // Cancel the previous search operation
+            await _cancellationTokenSource.CancelAsync();
+
+            // Create a new CancellationTokenSource
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            // Get the CancellationToken from the CancellationTokenSource
+            var cancellationToken = _cancellationTokenSource.Token;
+            
+            // Throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+
             // get the currentLoginSettings from Locator
-            // code here
             var currentLoginSettings = Locator.Current.GetService<LoginSettings>();
 
             // get the HTTP client from Locator
-            // code here
             var httpClient = Locator.Current.GetService<HttpClient>();
 
             // if currentLoginSettings or httpClient is null, return
-            // code here
             if (currentLoginSettings == null || httpClient == null) return;
 
             // if the SelectedWorkdayDetail is null, return
-            // code here
             if (SelectedWorkdayDetail == null) return;
 
             // call the API to get the shop workday period details
             // Endpoint: /api/PosAdmin/shopworkdayperioddetaillist?accountid={accountId}&shopid={shopId}&workdaydetailid={workdayDetailId}
-            // code here
             var request = new HttpRequestMessage(HttpMethod.Get,
                 $"/api/PosAdmin/shopworkdayperioddetaillist?accountid={SelectedWorkdayDetail.AccountId}&shopid={SelectedWorkdayDetail.ShopId}&workdaydetailid={SelectedWorkdayDetail.WorkdayDetailId}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
-            var response = await httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request, cancellationToken);
             if (!response.IsSuccessStatusCode) return;
 
             // get the shop workday period details from the response
-            // code here
-            var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             var resultShopWorkdayPeriodDetailList = JsonSerializer.Deserialize<List<ShopWorkdayPeriodDetail>>(content,
                 new JsonSerializerOptions
                 {
@@ -212,7 +214,6 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
                 }) ?? [];
 
             // add the shop workday period details to the ShopWorkdayPeriodDetailList in UI thread
-            // code here
             RxApp.MainThreadScheduler.Schedule(() =>
             {
                 ShopWorkdayPeriodDetailList.Clear();
@@ -221,6 +222,11 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
                     ShopWorkdayPeriodDetailList.Add(shopWorkdayPeriodDetail);
                 }
             });
+        }
+        catch (OperationCanceledException)
+        {
+            // log the operation cancelled
+            Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
         }
         catch (Exception e)
         {

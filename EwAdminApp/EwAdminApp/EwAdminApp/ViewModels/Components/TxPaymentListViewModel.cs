@@ -8,6 +8,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.Events;
@@ -59,6 +60,9 @@ public class TxPaymentListViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedTxSalesHeader, value);
     }
 
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
+
     // Constructor
     public TxPaymentListViewModel()
     {
@@ -81,7 +85,7 @@ public class TxPaymentListViewModel : ViewModelBase
         {
             // log the activation of the ViewModel
             Console.WriteLine($"{GetType().Name} activated");
-            
+
             // handle the exception when the SearchCommand is executed
             SearchCommand.ThrownExceptions
                 .Subscribe(ex =>
@@ -138,7 +142,7 @@ public class TxPaymentListViewModel : ViewModelBase
                     // execute the SearchCommand
                     if (SelectedTxSalesHeader != null)
                     {
-                        SearchCommand.Execute().Subscribe();    
+                        SearchCommand.Execute().Subscribe();
                     }
                 })
                 .DisposeWith(disposables);
@@ -151,9 +155,15 @@ public class TxPaymentListViewModel : ViewModelBase
                     MessageBus.Current.SendMessage(new TxPaymentMinEvent(selectedTxPayment));
                 })
                 .DisposeWith(disposables);
-            
+
             // log the deactivation of the ViewModel
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+
+                    // cancel the CancellationTokenSource
+                    _cancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -167,6 +177,18 @@ public class TxPaymentListViewModel : ViewModelBase
     {
         try
         {
+            // cancel the previous search operation
+            await _cancellationTokenSource.CancelAsync();
+
+            // create a new CancellationTokenSource
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            // get the CancellationToken from the CancellationTokenSource
+            var cancellationToken = _cancellationTokenSource.Token;
+
+            // throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+
             // clear the TxPaymentList property
             RxApp.MainThreadScheduler.Schedule(() => TxPaymentList?.Clear());
 
@@ -184,11 +206,11 @@ public class TxPaymentListViewModel : ViewModelBase
 
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode) return;
 
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var resultTxPaymentList = JsonSerializer.Deserialize<List<TxPaymentMin>>(content,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
 
@@ -205,6 +227,10 @@ public class TxPaymentListViewModel : ViewModelBase
                 // add the first TxPayment in the list to the SelectedTxPayment property
                 SelectedTxPayment = TxPaymentList?.FirstOrDefault();
             });
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
         }
         catch (Exception e)
         {

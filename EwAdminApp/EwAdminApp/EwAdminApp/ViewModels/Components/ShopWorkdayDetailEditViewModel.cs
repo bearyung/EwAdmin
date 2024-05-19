@@ -8,6 +8,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using EwAdminApp.Events;
 using EwAdminApp.Models;
 using Splat;
@@ -54,6 +55,9 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         get => _isBusy;
         set => this.RaiseAndSetIfChanged(ref _isBusy, value);
     }
+    
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     // add a constructor
     // code here
@@ -133,7 +137,13 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
                 .DisposeWith(disposables);
             
             // console log when the viewmodel is deactivated
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+                    
+                    // cancel the CancellationTokenSource
+                    _cancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -142,6 +152,18 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
     {
         try
         {
+            // Cancel the previous save operation
+            await _cancellationTokenSource.CancelAsync();
+            
+            // Create a new CancellationTokenSource
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            // Get the CancellationToken from the CancellationTokenSource
+            var cancellationToken = _cancellationTokenSource.Token;
+            
+            // Throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+            
             // Save the SelectedShopWorkdayDetail
             // HTTP PATCH request to the API to update the ShopWorkdayDetail
             // API Endpoint: /api/PosAdmin/UpdateShopWorkdayDetail
@@ -179,11 +201,11 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
             request.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", currentLoginSettings.ApiKey);
 
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode) return;
 
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var resultShopWorkdayDetail = JsonSerializer.Deserialize<ShopWorkdayDetail>(content,
                 new JsonSerializerOptions
                 {
@@ -201,6 +223,11 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
 
             // log the success message
             Console.WriteLine("ShopWorkdayDetail saved successfully.");
+        }
+        catch (OperationCanceledException)
+        {
+            // log the operation cancelled
+            Console.WriteLine($"{nameof(DoSave)} operation cancelled.");
         }
         catch (Exception e)
         {

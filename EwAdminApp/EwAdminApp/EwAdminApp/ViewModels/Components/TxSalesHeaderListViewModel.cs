@@ -7,6 +7,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.Events;
@@ -75,6 +76,9 @@ public class TxSalesHeaderListViewModel : ViewModelBase
 
     // Add a property for SearchCommand
     public ReactiveCommand<Unit, Unit> SearchCommand { get; }
+    
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     // add the constructor
     public TxSalesHeaderListViewModel()
@@ -194,7 +198,13 @@ public class TxSalesHeaderListViewModel : ViewModelBase
                 .DisposeWith(disposables);
             
             // console log when the ViewModel is deactivated
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+                    
+                    // cancel the CancellationTokenSource
+                    _cancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -210,6 +220,18 @@ public class TxSalesHeaderListViewModel : ViewModelBase
     {
         try
         {
+            // Cancel the previous search operation
+            await _cancellationTokenSource.CancelAsync();
+            
+            // Create a new CancellationTokenSource
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            // get the CancellationToken from the CancellationTokenSource
+            var cancellationToken = _cancellationTokenSource.Token;
+            
+            // throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+            
             // Clear the TxSalesHeaderList property
             RxApp.MainThreadScheduler.Schedule(() => TxSalesHeaderList?.Clear());
 
@@ -232,11 +254,11 @@ public class TxSalesHeaderListViewModel : ViewModelBase
             // add the header bearer token
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
-            var response = await httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request, cancellationToken);
 
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync(cancellationToken);
                 var resultTxSalesHeaderList = JsonSerializer.Deserialize<List<TxSalesHeaderMin>>(content,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
 
@@ -252,6 +274,10 @@ public class TxSalesHeaderListViewModel : ViewModelBase
                     SelectedTxSalesHeader = TxSalesHeaderList?.FirstOrDefault();
                 });
             }
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
         }
         catch (Exception ex)
         {

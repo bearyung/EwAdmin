@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.Events;
@@ -58,6 +57,9 @@ public class ShopListViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit>? SearchCommand { get; }
 
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
+
     public ShopListViewModel()
     {
         // Initialize the ShopList property
@@ -70,7 +72,7 @@ public class ShopListViewModel : ViewModelBase
         {
             // console log when the viewmodel is activated
             Console.WriteLine($"{GetType().Name}: Activated");
-            
+
             this.WhenAnyValue(x => x.SelectedShop)
                 .Subscribe(shop =>
                 {
@@ -106,7 +108,6 @@ public class ShopListViewModel : ViewModelBase
                     }
                 })
                 .DisposeWith(disposables);
-            ;
 
             // Subscribe to the ThrownExceptions property of the SearchCommand property
             SearchCommand.ThrownExceptions.Subscribe(ex =>
@@ -119,10 +120,15 @@ public class ShopListViewModel : ViewModelBase
             this.WhenAnyValue(x => x.ExecutingCommandsCount)
                 .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
                 .DisposeWith(disposables);
-            ;
-            
+
             // console log when the viewmodel is deactivated
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+
+                    // cancel the CancellationTokenSource
+                    _cancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -131,8 +137,20 @@ public class ShopListViewModel : ViewModelBase
     {
         try
         {
+            // Cancel the previous search operation
+            await _cancellationTokenSource.CancelAsync();
+
+            // Create a new CancellationTokenSource
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            // Get the CancellationToken from the CancellationTokenSource
+            var cancellationToken = _cancellationTokenSource.Token;
+
+            // Throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+
             // Clear the ShopList property
-            RxApp.MainThreadScheduler.Schedule(() => ShopList?.Clear());
+            RxApp.MainThreadScheduler.Schedule(() => ShopList.Clear());
 
             // Perform the search operation
             // Use the SearchText property as the accountId parameter to search for shops
@@ -150,11 +168,11 @@ public class ShopListViewModel : ViewModelBase
                     $"accountid={SearchTextAccountId}&shopId={SearchTextShopId}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode) return;
 
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var resultShopList = JsonSerializer.Deserialize<List<Shop>>(content,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
 
@@ -170,6 +188,11 @@ public class ShopListViewModel : ViewModelBase
                     SelectedShop = ShopList?.FirstOrDefault();
                 }
             });
+        }
+        catch (OperationCanceledException)
+        {
+            // log the operation cancelled
+            Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
         }
         catch (Exception e)
         {

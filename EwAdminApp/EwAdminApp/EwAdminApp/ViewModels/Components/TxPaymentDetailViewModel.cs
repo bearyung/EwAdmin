@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.Events;
@@ -44,6 +45,9 @@ public class TxPaymentDetailViewModel : ViewModelBase
 
     // add a command for DoSearch
     public ReactiveCommand<Unit, Unit> SearchCommand { get; }
+    
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     // add a constructor
     public TxPaymentDetailViewModel()
@@ -143,7 +147,13 @@ public class TxPaymentDetailViewModel : ViewModelBase
                 .DisposeWith(disposables);
             
             // log the deactivation of the ViewModel
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+                    
+                    // cancel the CancellationTokenSource
+                    _cancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -160,6 +170,18 @@ public class TxPaymentDetailViewModel : ViewModelBase
     {
         try
         {
+            // Cancel the previous search operation
+            await _cancellationTokenSource.CancelAsync();
+            
+            // Create a new CancellationTokenSource
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            // Get the CancellationToken from the CancellationTokenSource
+            var cancellationToken = _cancellationTokenSource.Token;
+            
+            // Throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+            
             // perform the search for the detail of TxPayment
             var currentLoginSettings = Locator.Current.GetService<LoginSettings>();
             if (currentLoginSettings == null) return;
@@ -172,16 +194,20 @@ public class TxPaymentDetailViewModel : ViewModelBase
 
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode) return;
 
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var resultTxPayment = JsonSerializer.Deserialize<TxPayment>(content,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             // set the result to the SelectedTxPayment property
             SelectedTxPayment = resultTxPayment;
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
         }
         catch (Exception e)
         {

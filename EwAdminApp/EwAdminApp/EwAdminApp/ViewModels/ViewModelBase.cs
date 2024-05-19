@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Reactive.Disposables;
+using System.Threading;
 using ReactiveUI;
 
 namespace EwAdminApp.ViewModels;
 
-public class ViewModelBase : ReactiveObject, IActivatableViewModel
+public abstract class ViewModelBase : ReactiveObject, IActivatableViewModel
 {
     // Add common properties and methods here
     // add a property to store the number of current viewmodel's execting commands

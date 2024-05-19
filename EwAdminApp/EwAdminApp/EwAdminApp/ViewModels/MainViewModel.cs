@@ -53,6 +53,10 @@ public class MainViewModel : ViewModelBase
 
                     // Update the ExecutingCommandsCount property
                     ExecutingCommandsCount = combinedCount;
+                    
+                    // emit the ExecutingCommandsCount property to the message bus
+                    // code here
+                    MessageBus.Current.SendMessage(new ExecutingCommandsCountEvent(ExecutingCommandsCount));
                 })
                 .DisposeWith(disposables);
             

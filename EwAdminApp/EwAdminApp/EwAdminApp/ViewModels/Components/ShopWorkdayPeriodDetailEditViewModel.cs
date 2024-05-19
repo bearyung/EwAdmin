@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EwAdmin.Common.Models.Pos;
 using EwAdminApp.Events;
@@ -53,6 +54,9 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
         get => _isBusy;
         set => this.RaiseAndSetIfChanged(ref _isBusy, value);
     }
+    
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     // add a constructor
     // code here
@@ -134,7 +138,13 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
                 .DisposeWith(disposables);
             
             // console log when the viewmodel is deactivated
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+                    
+                    // cancel the CancellationTokenSource
+                    _cancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -145,6 +155,18 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
     {
         try
         {
+            // Cancel the previous search operation
+            await _cancellationTokenSource.CancelAsync();
+            
+            // Create a new CancellationTokenSource
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            // Get the CancellationToken from the CancellationTokenSource
+            var cancellationToken = _cancellationTokenSource.Token;
+            
+            // Throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+            
             // This method is used to save the changes made to the ShopWorkdayPeriodDetail
             // get the LoginSettings from Locator.Current.GetService<LoginSettings>()
             // get the HttpClient from Locator.Current.GetService<HttpClient>()
@@ -180,11 +202,11 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
 
             request.Headers.Add("Authorization", $"Bearer {loginSettings.ApiKey}");
 
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode) return;
 
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             var resultShopWorkdayPeriodDetail = JsonSerializer.Deserialize<ShopWorkdayPeriodDetail>(content,
                 new System.Text.Json.JsonSerializerOptions
@@ -197,6 +219,11 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
 
             // log the success message
             Console.WriteLine("ShopWorkdayPeriodDetail saved successfully");
+        }
+        catch (OperationCanceledException)
+        {
+            // log the operation cancelled
+            Console.WriteLine($"{nameof(DoSave)} operation cancelled");
         }
         catch (Exception e)
         {

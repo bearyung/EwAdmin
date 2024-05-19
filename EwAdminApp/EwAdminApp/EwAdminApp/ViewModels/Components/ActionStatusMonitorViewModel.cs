@@ -20,21 +20,27 @@ public class ActionStatusMonitorViewModel : ViewModelBase
         get => _actionStatusMessages;
         set => this.RaiseAndSetIfChanged(ref _actionStatusMessages, value);
     }
-
-    private int _executingCount;
-
-    public int ExecutingCount
-    {
-        get => _executingCount;
-        set => this.RaiseAndSetIfChanged(ref _executingCount, value);
-    }
-
     private bool _isBusy;
-
     public bool IsBusy
     {
         get => _isBusy;
         set => this.RaiseAndSetIfChanged(ref _isBusy, value);
+    }
+    
+    // init the property of TotalExecutingCommandCount
+    private int _totalExecutingCommandCount;
+    public int TotalExecutingCommandCount
+    {
+        get => _totalExecutingCommandCount;
+        set => this.RaiseAndSetIfChanged(ref _totalExecutingCommandCount, value);
+    }
+    
+    // init the property of IsBackgroundCommandExecuting
+    private bool _isBackgroundCommandExecuting;
+    public bool IsBackgroundCommandExecuting
+    {
+        get => _isBackgroundCommandExecuting;
+        set => this.RaiseAndSetIfChanged(ref _isBackgroundCommandExecuting, value);
     }
 
     // constructor
@@ -42,7 +48,6 @@ public class ActionStatusMonitorViewModel : ViewModelBase
     {
         // initialize the properties
         ActionStatusMessages = new ConcurrentQueue<ActionStatus>();
-        ExecutingCount = 0;
         IsBusy = false;
 
         this.WhenActivated((disposable) =>
@@ -65,20 +70,28 @@ public class ActionStatusMonitorViewModel : ViewModelBase
                         case ActionStatus.StatusEnum.Success:
                         case ActionStatus.StatusEnum.Error:
                         case ActionStatus.StatusEnum.Info:
-                            ActionStatusMessages.Enqueue(actionStatusMessage.ActionStatusMessage);
-                            break;
                         case ActionStatus.StatusEnum.Executing:
-                            ActionStatusMessages.Enqueue(actionStatusMessage.ActionStatusMessage);
-                            ExecutingCount++;
-                            break;
                         case ActionStatus.StatusEnum.Completed:
                         case ActionStatus.StatusEnum.Interrupted:
                             ActionStatusMessages.Enqueue(actionStatusMessage.ActionStatusMessage);
-                            ExecutingCount--;
                             break;
                     }
+                })
+                .DisposeWith(disposable);
+            
+            // subscribe to the MessageBus.Current.Listen<ExecutingCommandsCountEvent>()
+            // and update the TotalExecutingCommandCount property
+            MessageBus.Current.Listen<ExecutingCommandsCountEvent>()
+                .Subscribe(executingCommandsCountEvent =>
+                {
+                    // log the ExecutingCommandsCountEvent
+                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCountEvent: {executingCommandsCountEvent.ExecutingCommandsCount}");
 
-                    IsBusy = ExecutingCount > 0;
+                    // update the TotalExecutingCommandCount property
+                    TotalExecutingCommandCount = executingCommandsCountEvent.ExecutingCommandsCount;
+                    
+                    // update the IsBackgroundCommandExecuting property
+                    IsBackgroundCommandExecuting = TotalExecutingCommandCount > 0;
                 })
                 .DisposeWith(disposable);
             

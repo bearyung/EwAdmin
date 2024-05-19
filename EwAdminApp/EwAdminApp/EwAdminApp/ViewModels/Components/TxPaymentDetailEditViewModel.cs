@@ -11,6 +11,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using EwAdminApp.Models;
 using Splat;
@@ -81,6 +82,12 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
 
     // Add a Command for GetPaymentMethodList
     public ReactiveCommand<Unit, Unit> PaymentMethodListCommand { get; }
+    
+    // add a cancellationTokenSource property for GetPaymentMethodList
+    private CancellationTokenSource _getPaymentMethodListCancellationTokenSource = new();
+    
+    // add a cancellationTokenSource property for DoSave
+    private CancellationTokenSource _doSaveCancellationTokenSource = new();
 
     // Add a constructor
     public TxPaymentDetailEditViewModel()
@@ -205,7 +212,7 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             // Call the PaymentMethodListCommand when the SelectedShop property changes
             this.WhenAnyValue(x => x.SelectedShop)
                 .Where(shop => shop != null)
-                .Subscribe(shop =>
+                .Subscribe(_ =>
                 {
                     PaymentMethodListCommand
                         .Execute()
@@ -225,7 +232,14 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                 .DisposeWith(disposables);
             
             // log when the ViewModel is deactivated
-            Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+                    
+                    // cancel the CancellationTokenSource
+                    _getPaymentMethodListCancellationTokenSource.Cancel();
+                    _doSaveCancellationTokenSource.Cancel();
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -234,6 +248,18 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
     {
         try
         {
+            // Cancel the previous search operation
+            await _getPaymentMethodListCancellationTokenSource.CancelAsync();
+            
+            // Create a new CancellationTokenSource
+            _getPaymentMethodListCancellationTokenSource = new CancellationTokenSource();
+            
+            // Get the cancellation token from the CancellationTokenSource
+            var cancellationToken = _getPaymentMethodListCancellationTokenSource.Token;
+            
+            // Throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+            
             // Get the Header API Key from the LoginSettings from the Locator
             var currentLoginSettings = Locator.Current.GetService<LoginSettings>();
 
@@ -259,13 +285,13 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
             // Send the request and get the response
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             // Check if the response is successful
             if (!response.IsSuccessStatusCode) return;
 
             // Read the content of the response
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             // Deserialize the content to a list of PaymentMethod
             var resultPaymentMethodList = JsonSerializer.Deserialize<List<PaymentMethod>>(content,
@@ -280,6 +306,11 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                     AvailablePaymentMethodList?.Add(paymentMethod);
                 }
             });
+        }
+        catch(OperationCanceledException)
+        {
+            // log the operation cancelled
+            Console.WriteLine($"{nameof(GetPaymentMethodList)} operation cancelled");
         }
         catch (Exception e)
         {
@@ -316,8 +347,19 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
         // Add a try-catch block to handle exceptions
         try
         {
-            // Save the SelectedTxPayment by calling the API endpoint
-            // API endpoint: /api/PosAdmin/updateTxPayment
+            // Cancel the previous save operation
+            await _doSaveCancellationTokenSource.CancelAsync();
+            
+            // Create a new CancellationTokenSource
+            _doSaveCancellationTokenSource = new CancellationTokenSource();
+            
+            // Get the cancellation token from the CancellationTokenSource
+            var cancellationToken = _doSaveCancellationTokenSource.Token;
+            
+            // Throw an OperationCanceledException if the CancellationToken is cancelled
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            // Save the SelectedTxPayment by calling the API endpoint: /api/PosAdmin/updateTxPayment
             // Request method: PUT
             // Request header: Authorization with the token (Bearer token)
             // Request body: TxPayment with only the fields that need to be updated (accountid, shopid, txPaymentId, paymentMethodId, Enabled)
@@ -350,11 +392,11 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
 
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode) return;
 
-            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             var resultTxPayment = JsonSerializer.Deserialize<TxPayment>(content,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -374,6 +416,11 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
 
             // Log the success message
             Console.WriteLine("TxPayment saved successfully");
+        }
+        catch (OperationCanceledException)
+        {
+            // log the operation cancelled
+            Console.WriteLine($"{nameof(DoSave)} operation cancelled");
         }
         catch (Exception ex)
         {
