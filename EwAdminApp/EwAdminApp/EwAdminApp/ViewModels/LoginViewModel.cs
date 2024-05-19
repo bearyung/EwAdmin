@@ -232,7 +232,6 @@ public class LoginViewModel : ViewModelBase
     // code here
     public async Task<(bool success, LoginSettings? settings)> LoadApiKeyAsync()
     {
-        throw new Exception("Testing exception");
         var appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "EwAdminApp");
         if (!Directory.Exists(appDataFolder))
