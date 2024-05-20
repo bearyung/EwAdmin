@@ -29,7 +29,7 @@
             <ScrollViewer Grid.Row="1">
                 <StackPanel Margin="8">
                     <Label>Workday Detail ID</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Focusable="False"
                              Text="{Binding SelectedShopWorkdayDetail.WorkdayDetailId, 
                         FallbackValue='', 

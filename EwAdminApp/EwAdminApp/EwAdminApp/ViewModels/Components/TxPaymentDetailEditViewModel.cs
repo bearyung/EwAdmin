@@ -82,10 +82,10 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
 
     // Add a Command for GetPaymentMethodList
     public ReactiveCommand<Unit, Unit> PaymentMethodListCommand { get; }
-    
+
     // add a cancellationTokenSource property for GetPaymentMethodList
     private CancellationTokenSource _getPaymentMethodListCancellationTokenSource = new();
-    
+
     // add a cancellationTokenSource property for DoSave
     private CancellationTokenSource _doSaveCancellationTokenSource = new();
 
@@ -126,7 +126,7 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
         {
             // log when the ViewModel is activated
             Console.WriteLine($"{GetType().Name} activated");
-            
+
             // set the IsBusy property to true when the SaveCommand is executing
             SaveCommand.IsExecuting.Subscribe(isExecuting =>
                 {
@@ -223,19 +223,25 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
 
             // set the SelectedPaymentMethod property when the SelectedTxPayment property changes
             this.WhenAnyValue(x => x.SelectedTxPayment)
-                .Where(txPayment => txPayment != null)
                 .Subscribe(txPayment =>
                 {
-                    SelectedPaymentMethod = AvailablePaymentMethodList?.FirstOrDefault(paymentMethod =>
-                        paymentMethod.PaymentMethodId == txPayment?.PaymentMethodId);
+                    if (SelectedTxPayment == null)
+                    {
+                        SelectedPaymentMethod = null;
+                    }
+                    else
+                    {
+                        SelectedPaymentMethod = AvailablePaymentMethodList?.FirstOrDefault(paymentMethod =>
+                            paymentMethod.PaymentMethodId == txPayment?.PaymentMethodId);
+                    }
                 })
                 .DisposeWith(disposables);
-            
+
             // log when the ViewModel is deactivated
             Disposable.Create(() =>
                 {
                     Console.WriteLine($"{GetType().Name} is being deactivated.");
-                    
+
                     // cancel the CancellationTokenSource
                     _getPaymentMethodListCancellationTokenSource.Cancel();
                     _doSaveCancellationTokenSource.Cancel();
@@ -250,16 +256,16 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
         {
             // Cancel the previous search operation
             await _getPaymentMethodListCancellationTokenSource.CancelAsync();
-            
+
             // Create a new CancellationTokenSource
             _getPaymentMethodListCancellationTokenSource = new CancellationTokenSource();
-            
+    
             // Get the cancellation token from the CancellationTokenSource
             var cancellationToken = _getPaymentMethodListCancellationTokenSource.Token;
-            
+
             // Throw an OperationCanceledException if the CancellationToken is cancelled
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             // Get the Header API Key from the LoginSettings from the Locator
             var currentLoginSettings = Locator.Current.GetService<LoginSettings>();
 
@@ -307,7 +313,7 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                 }
             });
         }
-        catch(OperationCanceledException)
+        catch (OperationCanceledException)
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(GetPaymentMethodList)} operation cancelled");
@@ -349,16 +355,16 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
         {
             // Cancel the previous save operation
             await _doSaveCancellationTokenSource.CancelAsync();
-            
+
             // Create a new CancellationTokenSource
             _doSaveCancellationTokenSource = new CancellationTokenSource();
-            
+
             // Get the cancellation token from the CancellationTokenSource
             var cancellationToken = _doSaveCancellationTokenSource.Token;
-            
+
             // Throw an OperationCanceledException if the CancellationToken is cancelled
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             // Save the SelectedTxPayment by calling the API endpoint: /api/PosAdmin/updateTxPayment
             // Request method: PUT
             // Request header: Authorization with the token (Bearer token)

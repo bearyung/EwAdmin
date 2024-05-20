@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:EwAdminApp.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="EwAdminApp.Views.DashboardView"
-             x:DataType="vm:DashboardViewModel">
+             x:Class="EwAdminApp.Views.DashboardFixView"
+             x:DataType="vm:DashboardFixViewModel">
     <Grid ColumnDefinitions="200,*">
         <ListBox Grid.Column="0"
                  ItemsSource="{Binding AvailableUserFunctions}"

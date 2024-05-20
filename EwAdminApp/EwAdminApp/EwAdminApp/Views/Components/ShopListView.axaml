@@ -30,12 +30,13 @@
                     <TextBox BorderBrush="Transparent"
                              Grid.Column="0" Watermark="Account Id"
                              Text="{Binding SearchTextAccountId}"
-                             Classes="Numeric"
+                             Classes="Digits"
                              Margin="0 0 0 0"
                              KeyDown="SearchShopTextBox_OnKeyDown"/>
                     <TextBox BorderBrush="Transparent"
                              Grid.Column="1" Watermark="Shop Id"
                              Text="{Binding SearchTextShopId}"
+                             Classes="Digits"
                              Margin="0 0 0 0"
                              KeyDown="SearchShopTextBox_OnKeyDown" />
                     <Button Grid.Column="2" Content="Search" Command="{Binding SearchCommand}" Margin="0 0 0 0" />

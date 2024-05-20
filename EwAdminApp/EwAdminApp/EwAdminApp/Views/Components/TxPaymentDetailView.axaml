@@ -9,9 +9,6 @@
     <!-- set the style of textboxes with no border -->
     <UserControl.Styles>
         <Style Selector="TextBox">
-            <Setter Property="BorderThickness" Value="0.5"/>
-            <Setter Property="BorderBrush" Value="#343434"/>
-            <Setter Property="Background" Value="#232323"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
             <Setter Property="Margin" Value="0,0,0,8"></Setter>
@@ -37,130 +34,130 @@
             <ScrollViewer Grid.Row="1" FontSize="12">
                 <StackPanel Margin="8">
                     <Label>TxPaymentId</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.TxPaymentId, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Payment Method ID</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.PaymentMethodId, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Payment Method Code</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.PaymentMethodCode, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Payment Method Name</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.PaymentMethodName, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Total Amount</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.TotalAmount, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Paid Amount</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.PaidAmount, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Enabled</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.Enabled, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Is Non-Sales Payment</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.IsNonSalesTxPayment, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Overpaid Amount</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.OverpaymentAmount, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Ocl Num</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.OclNum, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Ocl Device Num</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.OclDeviceNum, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Ocl Remaining Value</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxPayment.OclRemainValue, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 1</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark1, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 2</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark2, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 3</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark3, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 4</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark4, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 5</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark5, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 6</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark6, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 7</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark7, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 8</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark8, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 9</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark9, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Remark 10</Label>
-                    <TextBox IsReadOnly="True"
+                    <TextBox Classes="Readonly"
                              MaxHeight="100"
                              TextWrapping="Wrap"
                              Text="{Binding SelectedTxPayment.Remark10, 

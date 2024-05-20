@@ -119,15 +119,22 @@ public class TxPaymentDetailViewModel : ViewModelBase
 
                     // set the SelectedTxPaymentMin property to the TxPaymentMin from the event
                     SelectedTxPaymentMin = txPaymentMinEvent.TxPaymentMinMessage;
-
-                    // execute the SearchCommand with a throttle of 300 milliseconds
-                    SearchCommand
-                        .Execute()
-                        .Throttle(TimeSpan.FromMilliseconds(300))
-                        .Subscribe();
                 })
                 .DisposeWith(disposables);
-
+            
+            // when the SelectedTxPaymentMin property changes, clear the SelectedTxPayment and
+            // execute the SearchCommand if it is not null
+            this.WhenAnyValue(x => x.SelectedTxPaymentMin)
+                .Subscribe(txPaymentMin =>
+                {
+                    SelectedTxPayment = null;
+                    if (txPaymentMin != null)
+                    {
+                        SearchCommand.Execute().Subscribe();
+                    }
+                })
+                .DisposeWith(disposables);
+            
             // use the MessageBus to subscribe to the TxPaymentEvent
             MessageBus.Current.Listen<TxPaymentEvent>()
                 .Subscribe(txPaymentEvent =>

@@ -1,6 +1,31 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Style Selector="TextBox.Numeric">
-        <Setter Property="TextInputOptions.ContentType" Value="Number" />
+    <Style Selector="TextBox.Digits">
+        <Setter Property="TextInputOptions.ContentType" Value="Digits" />
     </Style>
+    <Style Selector="TextBox.Readonly">
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="BorderBrush" Value="#343434" />
+        <Setter Property="Background" Value="#232323" />
+
+        <!-- PointerOver State-->
+        <Style Selector="^:pointerover">
+            <Style Selector="^ /template/ Border#PART_BorderElement">
+                <Setter Property="BorderThickness" Value="0.5" />
+                <Setter Property="BorderBrush" Value="#464646" />
+                <Setter Property="Background" Value="#232323" />
+            </Style>
+        </Style>
+
+        <!-- Focused State -->
+        <Style Selector="^:focus">
+            <Style Selector="^ /template/ Border#PART_BorderElement">
+                <Setter Property="BorderThickness" Value="0.5" />
+                <Setter Property="BorderBrush" Value="#787878" />
+                <Setter Property="Background" Value="#232323" />
+            </Style>
+        </Style>
+    </Style>
+
 </Styles>

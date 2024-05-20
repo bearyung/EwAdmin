@@ -9,7 +9,7 @@
     <UserControl.Styles>
         <Style Selector="Label">
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="FontSize" Value="10"/>
         </Style>
     </UserControl.Styles>
@@ -22,7 +22,7 @@
         <Label DockPanel.Dock="Left"
                VerticalAlignment="Center"
                Content="This is a label" MaxWidth="500"/>
-        <Label VerticalAlignment="Center">
+        <Label DockPanel.Dock="Right">
             Place holder for action status panel
         </Label>
     </DockPanel>

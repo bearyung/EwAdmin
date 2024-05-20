@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace EwAdminApp.ViewModels;
 
-public class DashboardViewModel : ViewModelBase
+public class DashboardFixViewModel : ViewModelBase
 {
     public ObservableCollection<FunctionItem> AvailableUserFunctions { get; set; } =
     [
@@ -34,7 +34,7 @@ public class DashboardViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedContentViewModel, value);
     }
 
-    public DashboardViewModel()
+    public DashboardFixViewModel()
     {
         this.WhenActivated((disposables) =>
         {

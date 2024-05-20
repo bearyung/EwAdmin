@@ -6,9 +6,9 @@ using EwAdminApp.ViewModels;
 
 namespace EwAdminApp.Views;
 
-public partial class DashboardView : ReactiveUserControl<DashboardViewModel>
+public partial class DashboardFixView : ReactiveUserControl<DashboardFixViewModel>
 {
-    public DashboardView()
+    public DashboardFixView()
     {
         InitializeComponent();
     }

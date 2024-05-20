@@ -36,12 +36,14 @@
                 <Border DockPanel.Dock="Left"
                         BorderThickness="0,0,1,0"
                         BorderBrush="#000000"
-                        Width="40">
+                        Width="52">
+                    <ContentControl Margin="0"
+                                    Content="{Binding LeftSidebarViewModel}"/>
                 </Border>
                 <Border DockPanel.Dock="Top"
                         BorderThickness="0,0,0,1"
                         BorderBrush="#000000"
-                        Height="40"
+                        Height="42"
                         Padding="8,4,8,4">
                     <DockPanel>
                         <Button

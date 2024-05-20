@@ -51,4 +51,9 @@
     <ItemGroup>
       <UpToDateCheckInput Remove="Styles\GlobalStyles.axaml" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ViewModels\UserControls\" />
+      <Folder Include="Views\UserControls\" />
+    </ItemGroup>
 </Project>

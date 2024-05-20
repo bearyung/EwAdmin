@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             xmlns:converters="clr-namespace:EwAdmin.Common.Converters;assembly=EwAdmin.Common"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.LeftSidebarView"
+             x:DataType="vm:LeftSidebarViewModel">
+    <UserControl.Resources>
+        <converters:PathIconConverter x:Key="ModuleIconConverter"/>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="ListBox.SidebarButton">
+            <Style Selector="^ ListBoxItem">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Margin" Value="6,4" />
+                <Style Selector="^:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="#464646" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="8" />
+                </Style>
+                <Style Selector="^:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="DodgerBlue" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="8" />
+                </Style>
+                <Style Selector="^ PathIcon">
+                    <Setter Property="Margin" Value="-2,-1,-2,-3" />
+                </Style>
+            </Style>
+        </Style>
+    </UserControl.Styles>
+    <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+             Classes="SidebarButton"
+             ItemsSource="{Binding ModuleItemList}"
+             SelectedItem="{Binding SelectedModuleItem}"
+             SelectionMode="AlwaysSelected">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <Border CornerRadius="8">
+                    <StackPanel Orientation="Horizontal">
+                        <PathIcon Data="{Binding IconResourceKey, Converter={StaticResource ModuleIconConverter}}"/>
+                    </StackPanel>
+                </Border>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>
