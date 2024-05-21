@@ -59,6 +59,9 @@ public class LoginViewModel : ViewModelBase
             {
                 File.Delete(settingsFilePath);
             }
+            
+            // emit a LoginEvent with null settings
+            MessageBus.Current.SendMessage(new LoginEvent(null));
         }
 
         // add a command to save the API key to a file
@@ -83,9 +86,27 @@ public class LoginViewModel : ViewModelBase
 
                         // save the LoginSettings to DI container (splat)
                         Locator.CurrentMutable.RegisterConstant(result.settings, typeof(LoginSettings));
+                        
+                        // emit a ActionStatusMessageEvent event using MessageBus.Current.SendMessage
+                        MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                            new ActionStatus
+                            {
+                                ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                                Message = "Login successful"
+                            }));
 
                         // emit a message event using MessageBus.Current.SendMessage
                         MessageBus.Current.SendMessage(new LoginEvent(result.settings));
+                    }
+                    else
+                    {
+                        // emit a ActionStatusMessageEvent event using MessageBus.Current.SendMessage
+                        MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                            new ActionStatus
+                            {
+                                ActionStatusEnum = ActionStatus.StatusEnum.Error,
+                                Message = "Login failed. Invalid API key."
+                            }));
                     }
                 })
                 .DisposeWith(disposables);

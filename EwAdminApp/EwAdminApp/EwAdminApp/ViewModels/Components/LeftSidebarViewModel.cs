@@ -10,20 +10,35 @@ namespace EwAdminApp.ViewModels.Components;
 
 public class LeftSidebarViewModel : ViewModelBase
 {
-    private ObservableCollection<ModuleItem> _moduleItemList = [];
+    private ObservableCollection<ModuleItem> _functionalModuleItemList = [];
 
-    public ObservableCollection<ModuleItem> ModuleItemList
+    public ObservableCollection<ModuleItem> FunctionalModuleItemList
     {
-        get => _moduleItemList;
-        set => this.RaiseAndSetIfChanged(ref _moduleItemList, value);
+        get => _functionalModuleItemList;
+        set => this.RaiseAndSetIfChanged(ref _functionalModuleItemList, value);
     }
 
-    private ModuleItem? _selectedModuleItem;
+    private ObservableCollection<ModuleItem> _generalModuleItemList = [];
 
-    public ModuleItem? SelectedModuleItem
+    public ObservableCollection<ModuleItem> GeneralModuleItemList
     {
-        get => _selectedModuleItem;
-        set => this.RaiseAndSetIfChanged(ref _selectedModuleItem, value);
+        get => _generalModuleItemList;
+        set => this.RaiseAndSetIfChanged(ref _generalModuleItemList, value);
+    }
+
+    private ModuleItem? _selectedFunctionalModuleItem;
+    private ModuleItem? _selectedGeneralModuleItem;
+
+    public ModuleItem? SelectedFunctionalModuleItem
+    {
+        get => _selectedFunctionalModuleItem;
+        set => this.RaiseAndSetIfChanged(ref _selectedFunctionalModuleItem, value);
+    }
+    
+    public ModuleItem? SelectedGeneralModuleItem
+    {
+        get => _selectedGeneralModuleItem;
+        set => this.RaiseAndSetIfChanged(ref _selectedGeneralModuleItem, value);
     }
 
     public LeftSidebarViewModel()
@@ -32,6 +47,21 @@ public class LeftSidebarViewModel : ViewModelBase
         {
             // console log when the viewmodel is activated
             Console.WriteLine($"{GetType().Name} activated");
+            
+            // initialize the FunctionalModuleItemList
+            InitGeneralModuleItemList();
+            
+            // listen to SelectedFunctionalModuleItem and SelectedGeneralModuleItem
+            // set either of them to null when the other is set
+            this.WhenAnyValue(x => x.SelectedFunctionalModuleItem)
+                .WhereNotNull()
+                .Subscribe(_ => SelectedGeneralModuleItem = null)
+                .DisposeWith(disposables);
+            
+            this.WhenAnyValue(x => x.SelectedGeneralModuleItem)
+                .WhereNotNull()
+                .Subscribe(_ => SelectedFunctionalModuleItem = null)
+                .DisposeWith(disposables);
 
             // listen to the MessageBus.Current.Listen<LoginEvent>()
             // and update the IsAccessible property of the ModuleItem accordingly
@@ -39,13 +69,26 @@ public class LeftSidebarViewModel : ViewModelBase
                 .Subscribe(OnLoginEventReceived)
                 .DisposeWith(disposables);
 
-            // emit the ModuleItemEvent when the SelectedModuleItem is changed
-            this.WhenAnyValue(x => x.SelectedModuleItem)
+            // emit the ModuleItemEvent when the SelectedFunctionalModuleItem is changed
+            this.WhenAnyValue(x => x.SelectedFunctionalModuleItem)
                 .WhereNotNull()
                 .Subscribe(moduleItem =>
                 {
                     //  console log the selected module item
-                    Console.WriteLine($"{GetType().Name}: Selected module item: {moduleItem.DisplayName}");
+                    Console.WriteLine($"{GetType().Name}: Selected functional module item: {moduleItem.DisplayName}");
+
+                    // emit the ModuleItemEvent
+                    MessageBus.Current.SendMessage(new ModuleItemEvent(moduleItem));
+                })
+                .DisposeWith(disposables);
+            
+            // emit the ModuleItemEvent when the SelectedGeneralModuleItem is changed
+            this.WhenAnyValue(x => x.SelectedGeneralModuleItem)
+                .WhereNotNull()
+                .Subscribe(moduleItem =>
+                {
+                    //  console log the selected module item
+                    Console.WriteLine($"{GetType().Name}: Selected general module item: {moduleItem.DisplayName}");
 
                     // emit the ModuleItemEvent
                     MessageBus.Current.SendMessage(new ModuleItemEvent(moduleItem));
@@ -60,28 +103,77 @@ public class LeftSidebarViewModel : ViewModelBase
 
     private void OnLoginEventReceived(LoginEvent loginEvent)
     {
-        ModuleItemList.Add(new ModuleItem
+        // clear the functional module item list if loginEvent.LoginSettings is null
+        if (loginEvent.LoginSettings == null)
         {
-            DisplayName = "Home", Module = UserModuleEnum.HomeModule, IconResourceKey = "IconHomeRegular",
-            IsAccessible = false
-        });
-        ModuleItemList.Add(new ModuleItem
+            FunctionalModuleItemList.Clear();
+            SelectedFunctionalModuleItem = null;
+            SelectedGeneralModuleItem = null;
+        }
+        else
         {
-            DisplayName = "Fix Data", Module = UserModuleEnum.FixModule, IconResourceKey = "IconFixDataRegular",
-            IsAccessible = false
-        });
-        ModuleItemList.Add(new ModuleItem
-        {
-            DisplayName = "View Data", Module = UserModuleEnum.ViewDataModule, IconResourceKey = "IconViewDataRegular",
-            IsAccessible = false
-        });
-        ModuleItemList.Add(new ModuleItem
-        {
-            DisplayName = "Toolbox", Module = UserModuleEnum.ToolBoxModule, IconResourceKey = "IconToolboxRegular",
-            IsAccessible = false
-        });
+            // initialize the FunctionalModuleItemList if loginEvent.LoginSettings is not null
+            InitFunctionalModuleItemList();
+        }
+    }
 
-        // assign the first item of the ModuleItemList to the SelectedModuleItem
-        SelectedModuleItem = ModuleItemList.FirstOrDefault();
+    private void InitFunctionalModuleItemList()
+    {
+        // add the ModuleItem to the ModuleItemList
+        // do this in one batch, not one by one
+        // code here
+
+        FunctionalModuleItemList = new ObservableCollection<ModuleItem>()
+        {
+            new()
+            {
+                DisplayName = "Home", Module = UserModuleEnum.HomeModule,
+                IconResourceKey = "IconHomeRegular",
+                IsAccessible = false
+            },
+            new()
+            {
+                DisplayName = "Fix Data", Module = UserModuleEnum.FixModule,
+                IconResourceKey = "IconWrenchRegular",
+                IsAccessible = false
+            },
+            new()
+            {
+                DisplayName = "View Data", Module = UserModuleEnum.ViewDataModule,
+                IconResourceKey = "IconDocumentSearchRegular",
+                IsAccessible = false
+            },
+            new()
+            {
+                DisplayName = "Toolbox", Module = UserModuleEnum.ToolBoxModule,
+                IconResourceKey = "IconToolboxRegular",
+                IsAccessible = false
+            }
+        };
+
+        SelectedFunctionalModuleItem = FunctionalModuleItemList.FirstOrDefault();
+    }
+
+    private void InitGeneralModuleItemList()
+    {
+        // add the ModuleItem to the ModuleItemList
+        // do this in one batch, not one by one
+        // code here
+
+        GeneralModuleItemList = new ObservableCollection<ModuleItem>()
+        {
+            new()
+            {
+                DisplayName = "Settings", Module = UserModuleEnum.SettingsModule,
+                IconResourceKey = "IconSettingsRegular",
+                IsAccessible = false
+            },
+            new()
+            {
+                DisplayName = "Help", Module = UserModuleEnum.HelpModule,
+                IconResourceKey = "IconQuestionCircleRegular",
+                IsAccessible = false
+            }
+        };
     }
 }

@@ -36,19 +36,38 @@
             </Style>
         </Style>
     </UserControl.Styles>
-    <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
-             Classes="SidebarButton"
-             ItemsSource="{Binding ModuleItemList}"
-             SelectedItem="{Binding SelectedModuleItem}"
-             SelectionMode="AlwaysSelected">
-        <ListBox.ItemTemplate>
-            <DataTemplate>
-                <Border CornerRadius="8">
-                    <StackPanel Orientation="Horizontal">
-                        <PathIcon Data="{Binding IconResourceKey, Converter={StaticResource ModuleIconConverter}}"/>
-                    </StackPanel>
-                </Border>
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+    <DockPanel>
+        <ListBox DockPanel.Dock="Top" 
+                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+                 Classes="SidebarButton"
+                 ItemsSource="{Binding FunctionalModuleItemList}"
+                 SelectedItem="{Binding SelectedFunctionalModuleItem}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="8">
+                        <StackPanel Orientation="Horizontal">
+                            <PathIcon Data="{Binding IconResourceKey, Converter={StaticResource ModuleIconConverter}}"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <ListBox DockPanel.Dock="Bottom" 
+                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+                 Classes="SidebarButton"
+                 ItemsSource="{Binding GeneralModuleItemList}"
+                 SelectedItem="{Binding SelectedGeneralModuleItem}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="8">
+                        <StackPanel Orientation="Horizontal">
+                            <PathIcon Data="{Binding IconResourceKey, Converter={StaticResource ModuleIconConverter}}"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <!-- placeholder for future use -->
+        <Border/>
+    </DockPanel>
 </UserControl>

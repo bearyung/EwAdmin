@@ -42,6 +42,15 @@ public class ActionStatusMonitorViewModel : ViewModelBase
         get => _isBackgroundCommandExecuting;
         set => this.RaiseAndSetIfChanged(ref _isBackgroundCommandExecuting, value);
     }
+    
+    // init the property of LastActionStatusMessage
+    private ActionStatus? _lastActionStatusMessage;
+    
+    public ActionStatus? LastActionStatusMessage
+    {
+        get => _lastActionStatusMessage;
+        set => this.RaiseAndSetIfChanged(ref _lastActionStatusMessage, value);
+    }
 
     // constructor
     public ActionStatusMonitorViewModel()
@@ -73,7 +82,11 @@ public class ActionStatusMonitorViewModel : ViewModelBase
                         case ActionStatus.StatusEnum.Executing:
                         case ActionStatus.StatusEnum.Completed:
                         case ActionStatus.StatusEnum.Interrupted:
+                            // add the actionStatusMessage to the ActionStatusMessages
                             ActionStatusMessages.Enqueue(actionStatusMessage.ActionStatusMessage);
+                            
+                            // update the LastActionStatusMessage property
+                            LastActionStatusMessage = actionStatusMessage.ActionStatusMessage;
                             break;
                     }
                 })

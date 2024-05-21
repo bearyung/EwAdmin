@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using EwAdminApp.Events;
 using EwAdminApp.Models;
 using EwAdminApp.ViewModels.Components;

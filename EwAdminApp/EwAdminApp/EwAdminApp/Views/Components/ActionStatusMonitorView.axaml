@@ -2,28 +2,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:EwAdmin.Common.Converters;assembly=EwAdmin.Common"
              xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EwAdminApp.Views.Components.ActionStatusMonitorView"
              x:DataType="vm:ActionStatusMonitorViewModel">
+    <UserControl.Resources>
+        <converters:PathIconConverter x:Key="ModuleIconConverter" />
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Label">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="10" />
         </Style>
     </UserControl.Styles>
     <DockPanel>
+        <Border DockPanel.Dock="Left"
+                Margin="0,0,4,0"
+                CornerRadius="6"
+                BorderThickness="0"
+                Background="{Binding LastActionStatusMessage.IconColor, FallbackValue=Transparent}"
+                Width="12"
+                Height="12">
+            <!-- the path icon is bound to the icon resource key, auto resize -->
+            <PathIcon HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      FontWeight="Heavy"
+                      Width="12"
+                      Height="12"
+                      Foreground="#232323"
+                      Data="{Binding LastActionStatusMessage.IconResourceKey, 
+            FallbackValue='', 
+            Converter={StaticResource ModuleIconConverter}}">
+            </PathIcon>
+        </Border>
         <ProgressBar DockPanel.Dock="Left"
                      VerticalAlignment="Center"
+                     Margin="0,0,4,0"
                      MaxWidth="200"
                      IsVisible="{Binding IsBackgroundCommandExecuting}"
-                     IsIndeterminate="True"/>
+                     IsIndeterminate="True" />
+        
         <Label DockPanel.Dock="Left"
                VerticalAlignment="Center"
-               Content="This is a label" MaxWidth="500"/>
-        <Label DockPanel.Dock="Right">
-            Place holder for action status panel
-        </Label>
+               MaxWidth="500"
+               Content="{Binding LastActionStatusMessage.Message, FallbackValue=''}" />
+        <!-- this is a placeholder for the canvas -->
+        <Canvas />
     </DockPanel>
 </UserControl>

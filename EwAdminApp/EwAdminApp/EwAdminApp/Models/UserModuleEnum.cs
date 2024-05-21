@@ -5,5 +5,7 @@ public enum UserModuleEnum
     HomeModule,
     FixModule,
     ViewDataModule,
-    ToolBoxModule
+    ToolBoxModule,
+    SettingsModule,
+    HelpModule
 }
