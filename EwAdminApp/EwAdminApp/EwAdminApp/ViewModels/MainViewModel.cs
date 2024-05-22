@@ -4,8 +4,10 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using EwAdminApp.Events;
 using EwAdminApp.Models;
+using EwAdminApp.Services;
 using EwAdminApp.ViewModels.Components;
 using ReactiveUI;
+using Splat;
 
 namespace EwAdminApp.ViewModels;
 
@@ -63,6 +65,11 @@ public class MainViewModel : ViewModelBase
             MessageBus.Current.Listen<LoginEvent>()
                 .Subscribe(OnLoginEventReceived)
                 .DisposeWith(disposables);
+            
+            // check for updates by DI the AppUpdateService using Locator
+            // code here
+            var appUpdateService = Locator.Current.GetService<IAppUpdateService>();
+            appUpdateService?.CheckForUpdates();
 
             // listen to the ModuleItemEvent and update the ContentViewModel property
             // SwitchContentViewModel method will throw an exception if the module is not supported
@@ -164,6 +171,7 @@ public class MainViewModel : ViewModelBase
                 UserModuleEnum.FixModule => new DashboardFixViewModel(),
                 UserModuleEnum.ViewDataModule => new DashboardViewDataViewModel(),
                 UserModuleEnum.ToolBoxModule => new DashboardToolBoxViewModel(),
+                UserModuleEnum.SettingsModule => new SettingsViewModel(),
                 _ => throw new NotSupportedException($"Module {moduleItem.Module} is not supported.")
             };
         }

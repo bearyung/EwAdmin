@@ -1,6 +1,9 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.ReactiveUI;
+using EwAdminApp.Desktop.Services;
+using EwAdminApp.Services;
+using Splat;
 using Velopack;
 
 namespace EwAdminApp.Desktop;
@@ -13,6 +16,11 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        // add the AppUpdateService to the Locator
+        // code here
+        Locator.CurrentMutable.RegisterConstant(new AppUpdateService(), typeof(IAppUpdateService));
+        
+        
         VelopackApp.Build().Run();
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }

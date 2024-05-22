@@ -27,5 +27,9 @@
             </Style>
         </Style>
     </Style>
+    
+    <Style Selector="Label.PropertyLabel">
+        <Setter Property="Foreground" Value="#787878"></Setter>
+    </Style>
 
 </Styles>

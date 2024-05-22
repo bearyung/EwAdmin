@@ -12,7 +12,13 @@ public enum UserFunctionEnum
     FixTxTableRemap,
     FixTxCashDrawerRemap,
     FixTxCustomerCount,
+    
     // view data module
+    ViewDayEndHistory,
+    ViewTxPaymentHistory,
+    ViewClockInOutHistory,
+    ViewAccountInformation,
+    ViewEwApiLog,
     
     // toolbox module
     ToolboxReleaseLicenseKey,
@@ -22,9 +28,7 @@ public enum UserFunctionEnum
     ToolboxCopyMenuToNewAccount,
     ToolboxTrimDataSyncTracking,
     ToolboxSuspendPosUserAccounts,
-    ViewDayEndHistory,
-    ViewTxPaymentHistory,
-    ViewClockInOutHistory,
-    ViewAccountInformation,
-    ViewEwApiLog
+    
+    // settings module
+    SettingsCheckForUpdates
 }

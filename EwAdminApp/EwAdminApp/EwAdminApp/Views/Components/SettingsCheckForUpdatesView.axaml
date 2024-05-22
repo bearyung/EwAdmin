@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             x:Class="EwAdminApp.Views.Components.SettingsCheckForUpdatesView"
+             x:DataType="vm:SettingsCheckForUpdatesViewModel"
+             HorizontalContentAlignment="Center"
+             VerticalContentAlignment="Center">
+    <StackPanel MaxWidth=" 500" MaxHeight="600" Spacing="12">
+        <StackPanel>
+            <Label>1.02</Label>
+            <Grid ColumnDefinitions="120,*">
+                <Label Grid.Column="0"
+                       HorizontalContentAlignment="Right"
+                       Classes="PropertyLabel">
+                    Updater Version
+                </Label>
+                <Label Grid.Column="1"
+                       Content="{Binding UpdaterVersion}" />
+            </Grid>
+            <Grid ColumnDefinitions="120,*">
+                <Label Grid.Column="0"
+                       HorizontalContentAlignment="Right"
+                       Classes="PropertyLabel">
+                    Current Version
+                </Label>
+                <Label Grid.Column="1"
+                       Content="{Binding CurrentVersion}" />
+            </Grid>
+        </StackPanel>
+        <Grid ColumnDefinitions="120,*">
+            <Button Grid.Column="1"
+                    Content="Check for Updates"
+                    Command="{Binding CheckForUpdatesCommand}" />
+        </Grid>
+        <Border Height="1" BorderThickness="0,1,0,0" BorderBrush="DimGray" 
+                IsVisible="{Binding HasUpdates}"/>
+        <StackPanel IsVisible="{Binding HasUpdates}">
+            <Label>New version is available, please check the details below:</Label>
+            <Grid ColumnDefinitions="120,*">
+                <Label Grid.Column="0"
+                       HorizontalContentAlignment="Right"
+                       Classes="PropertyLabel">
+                    New Version
+                </Label>
+                <Label Grid.Column="1"
+                       Content="{Binding LatestVersion}" />
+            </Grid>
+            <Grid ColumnDefinitions="120,*">
+                <Label Grid.Column="0"
+                       HorizontalContentAlignment="Right"
+                       Classes="PropertyLabel">
+                    File Size
+                </Label>
+                <Label Grid.Column="1"
+                       Content="{Binding FileSize}" />
+            </Grid>
+        </StackPanel>
+        <Grid ColumnDefinitions="120,*">
+            <Button Grid.Column="1"
+                    Content="Download"
+                    IsVisible="{Binding CanDownloadUpdates}"
+                    Command="{Binding DownloadUpdatesCommand}" />
+        </Grid>
+        <Grid ColumnDefinitions="120,*">
+            <ProgressBar Grid.Column="1" 
+                         Minimum="0" Maximum="100" Value="{Binding ProgressValue}"/>
+        </Grid>
+        <Grid ColumnDefinitions="120,*">
+            <Button Grid.Column="1"
+                    Content="Apply and restart"
+                    IsVisible="{Binding CanApplyUpdates}"
+                    Command="{Binding ApplyUpdatesCommand}" />
+        </Grid>
+    </StackPanel>
+</UserControl>
