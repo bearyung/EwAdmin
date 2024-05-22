@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -82,6 +83,13 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _progressValue, value);
     }
     
+    private string _deltaAssetListString;
+    public string DeltaAssetListString
+    {
+        get => _deltaAssetListString;
+        set => this.RaiseAndSetIfChanged(ref _deltaAssetListString, value);
+    }
+    
     // add a ReactiveCommand property of CheckForUpdatesCommand
     public ReactiveCommand<Unit, Unit>? CheckForUpdatesCommand { get; }
     
@@ -114,10 +122,7 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
             UpdaterVersion = VelopackRuntimeInfo.VelopackNugetVersion.ToString();
             
             // set the properties of HasUpdates, CanDownloadUpdates, CanApplyUpdates and FileSize
-            HasUpdates = appUpdateService.AppUpdate != null;
-            CanDownloadUpdates = appUpdateService is { AppUpdate: not null, AppUpdateManager.IsUpdatePendingRestart: false };
-            CanApplyUpdates = appUpdateService.AppUpdateManager.IsUpdatePendingRestart;
-            FileSize = Information.FromBytes(appUpdateService.AppUpdate?.TargetFullRelease.Size ?? 0).Mebibytes.ToString("0.00") + "MB";
+            UpdateStatus();
         }
         
         // init the CheckForUpdatesCommand
@@ -146,11 +151,6 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
                 .Scan(0, (acc, x) => acc + x)
                 .Select(x => x > 0)
                 .ToProperty(this, x => x.IsBusy)
-                .DisposeWith(disposables);
-            
-            // auto check for updates when the viewmodel is activated
-            CheckForUpdatesCommand.Execute()
-                .Subscribe()
                 .DisposeWith(disposables);
             
             // catch the exception when the CheckForUpdatesCommand is executed
@@ -190,11 +190,7 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
                     
                     if (appUpdateService.AppUpdate != null)
                     {
-                        LatestVersion = appUpdateService.AppUpdate?.TargetFullRelease.Version.ToString();
-                        
-                        // set the FileSize property (2 decimal places)
-                        // code here
-                        FileSize = Information.FromBytes(appUpdateService.AppUpdate?.TargetFullRelease.Size ?? 0).Mebibytes.ToString("0.00") + "MB";
+                        UpdateStatus();
                     }
                 })
                 .DisposeWith(disposables);
@@ -204,7 +200,7 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
             DownloadUpdatesCommand
                 .Subscribe(_ =>
                 {
-                    CanApplyUpdates = appUpdateService.AppUpdateManager.IsUpdatePendingRestart;
+                    UpdateStatus();
                 })
                 .DisposeWith(disposables);
             
@@ -214,12 +210,45 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
                 .Subscribe(x => ProgressValue = x)
                 .DisposeWith(disposables);
             
-            
-            
             // console log when the viewmodel is deactivated
             Disposable.Create(() => Console.WriteLine($"{GetType().Name} deactivated"))
                 .DisposeWith(disposables);
         });
         
+    }
+
+    private void UpdateStatus()
+    {
+        try
+        {
+            // get the AppUpdateService from Locator
+            var appUpdateService = Locator.Current.GetService<IAppUpdateService>();
+        
+            if(appUpdateService == null) return;
+
+            DeltaAssetListString = string.Empty;
+
+            HasUpdates = appUpdateService.AppUpdate != null;
+            CanDownloadUpdates = appUpdateService is { AppUpdate: not null, AppUpdateManager.IsUpdatePendingRestart: false };
+            CanApplyUpdates = appUpdateService.AppUpdateManager.IsUpdatePendingRestart;
+            FileSize = Information.FromBytes(appUpdateService.AppUpdate?.TargetFullRelease.Size ?? 0).Mebibytes.ToString("0.00") + "MB";
+            DeltaAssetListString += $"Base: {appUpdateService.AppUpdate?.BaseRelease?.Version.ToString()}";
+            LatestVersion = appUpdateService.AppUpdate?.TargetFullRelease.Version.ToString();
+
+            if (appUpdateService.AppUpdate != null)
+            {
+                foreach (var deltaAsset in appUpdateService.AppUpdate.DeltasToTarget)
+                {
+                    DeltaAssetListString += $"\n Delta: {deltaAsset.Version.ToString()}\t\t{Information.FromBytes(deltaAsset.Size).Mebibytes:0.00}MB";
+                }
+            }
+            
+            DeltaAssetListString += $"\nTarget: {appUpdateService.AppUpdate?.TargetFullRelease.Version.ToString()}";
+        }
+        catch (Exception )
+        {
+            Console.WriteLine();
+            throw;
+        }
     }
 }

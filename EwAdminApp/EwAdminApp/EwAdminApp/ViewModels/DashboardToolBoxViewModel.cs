@@ -12,7 +12,7 @@ public class DashboardToolBoxViewModel : ViewModelBase
 {
     public ObservableCollection<FunctionItem> AvailableUserFunctions { get; set; } =
     [
-        new FunctionItem
+        /*new FunctionItem
             { DisplayName = "Release POS License Key", Function = UserFunctionEnum.ToolboxReleaseLicenseKey },
         new FunctionItem
             { DisplayName = "Suspend DB Data Sync", Function = UserFunctionEnum.ToolboxSuspendDataSync },
@@ -27,7 +27,7 @@ public class DashboardToolBoxViewModel : ViewModelBase
         new FunctionItem
             { DisplayName = "Trim Data Sync Tracking", Function = UserFunctionEnum.ToolboxTrimDataSyncTracking },
         new FunctionItem
-            { DisplayName = "Suspend POS User Accounts", Function = UserFunctionEnum.ToolboxSuspendPosUserAccounts },
+            { DisplayName = "Suspend POS User Accounts", Function = UserFunctionEnum.ToolboxSuspendPosUserAccounts },*/
     ];
     
     private FunctionItem? _selectedUserFunction;

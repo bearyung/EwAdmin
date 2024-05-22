@@ -62,7 +62,17 @@
                             Foreground="#9E9E9E"
                             Margin="4"
                             VerticalAlignment="Center" />
-                        <TextBlock></TextBlock>
+                        <Button
+                            DockPanel.Dock="Right"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Background="DarkGreen"
+                            IsVisible="{Binding IsLoggedIn, Converter={x:Static BoolConverters.Not}}"
+                            Command="{Binding LogoutCommand}"
+                            Focusable="False">
+                            Login
+                        </Button>
+                        <TextBlock/>
                     </DockPanel>
                 </Border>
                 <ContentControl Content="{Binding ContentViewModel}" />

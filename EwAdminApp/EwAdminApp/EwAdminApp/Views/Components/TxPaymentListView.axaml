@@ -23,8 +23,7 @@
             <Border Background="DimGray"
                     BorderThickness="0">
                 <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
-                    TxPayment
-                    List
+                    TxPayment List
                 </Label>
             </Border>
             <DataGrid Name="ShopListDataGrid"

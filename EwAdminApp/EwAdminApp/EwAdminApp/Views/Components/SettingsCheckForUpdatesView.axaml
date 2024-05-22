@@ -10,7 +10,6 @@
              VerticalContentAlignment="Center">
     <StackPanel MaxWidth=" 500" MaxHeight="600" Spacing="12">
         <StackPanel>
-            <Label>1.03</Label>
             <Grid ColumnDefinitions="120,*">
                 <Label Grid.Column="0"
                        HorizontalContentAlignment="Right"
@@ -57,22 +56,33 @@
                 <Label Grid.Column="1"
                        Content="{Binding FileSize}" />
             </Grid>
+            <Grid ColumnDefinitions="120,*">
+                <Label Grid.Column="0"
+                       HorizontalContentAlignment="Right"
+                       Classes="PropertyLabel">
+                    Delta Updates
+                </Label>
+                <TextBox Grid.Column="1"
+                            IsReadOnly="True"
+                            Height="100"
+                            Text="{Binding DeltaAssetListString}" />
+            </Grid>
         </StackPanel>
-        <Grid ColumnDefinitions="120,*">
+        <Grid ColumnDefinitions="120,*"
+              IsVisible="{Binding CanDownloadUpdates}">
             <Button Grid.Column="1"
                     Content="Download"
-                    IsVisible="{Binding CanDownloadUpdates}"
                     Command="{Binding DownloadUpdatesCommand}" />
         </Grid>
-        <Grid ColumnDefinitions="120,*">
+        <Grid ColumnDefinitions="120,*"
+              IsVisible="{Binding CanDownloadUpdates}">
             <ProgressBar Grid.Column="1" 
-                         IsVisible="{Binding CanDownloadUpdates}"
                          Minimum="0" Maximum="100" Value="{Binding ProgressValue}"/>
         </Grid>
-        <Grid ColumnDefinitions="120,*">
+        <Grid ColumnDefinitions="120,*"
+              IsVisible="{Binding CanApplyUpdates}">
             <Button Grid.Column="1"
                     Content="Apply and restart"
-                    IsVisible="{Binding CanApplyUpdates}"
                     Command="{Binding ApplyUpdatesCommand}" />
         </Grid>
     </StackPanel>

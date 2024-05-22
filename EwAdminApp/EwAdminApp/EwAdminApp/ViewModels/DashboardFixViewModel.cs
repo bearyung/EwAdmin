@@ -17,18 +17,18 @@ public class DashboardFixViewModel : ViewModelBase
             { DisplayName = "Fix Workday Period Detail", Function = UserFunctionEnum.FixWorkdayPeriodDetail },
         new FunctionItem
             { DisplayName = "Fix Tx Payment", Function = UserFunctionEnum.FixTxPayment },
-        new FunctionItem
-            { DisplayName = "Fix Item Category", Function = UserFunctionEnum.FixItemCategory },
-        new FunctionItem
-            { DisplayName = "Fix Incorrect Day-end", Function = UserFunctionEnum.FixIncorrectDayEnd},
-        new FunctionItem
-            { DisplayName = "Fix Table Master", Function = UserFunctionEnum.FixTableMaster },
-        new FunctionItem
-            { DisplayName = "Remap Table to Tx", Function = UserFunctionEnum.FixTxTableRemap },
-        new FunctionItem
-            { DisplayName = "Remap Cash Drawer to Tx", Function = UserFunctionEnum.FixTxCashDrawerRemap },
-        new FunctionItem
-            { DisplayName = "Adjust Tx Cus Count", Function = UserFunctionEnum.FixTxCustomerCount },
+        // new FunctionItem
+        //     { DisplayName = "Fix Item Category", Function = UserFunctionEnum.FixItemCategory },
+        // new FunctionItem
+        //     { DisplayName = "Fix Incorrect Day-end", Function = UserFunctionEnum.FixIncorrectDayEnd},
+        // new FunctionItem
+        //     { DisplayName = "Fix Table Master", Function = UserFunctionEnum.FixTableMaster },
+        // new FunctionItem
+        //     { DisplayName = "Remap Table to Tx", Function = UserFunctionEnum.FixTxTableRemap },
+        // new FunctionItem
+        //     { DisplayName = "Remap Cash Drawer to Tx", Function = UserFunctionEnum.FixTxCashDrawerRemap },
+        // new FunctionItem
+        //     { DisplayName = "Adjust Tx Cus Count", Function = UserFunctionEnum.FixTxCustomerCount },
     ];
 
     private FunctionItem? _selectedUserFunction;

@@ -11,7 +11,7 @@ public class DashboardViewDataViewModel : ViewModelBase
 {
     public ObservableCollection<FunctionItem> AvailableUserFunctions { get; set; } =
     [
-        new FunctionItem
+        /*new FunctionItem
             { DisplayName = "View Day-end History", Function = UserFunctionEnum.ViewDayEndHistory },
         new FunctionItem
             { DisplayName = "View TxPayment History", Function = UserFunctionEnum.ViewTxPaymentHistory },
@@ -20,7 +20,7 @@ public class DashboardViewDataViewModel : ViewModelBase
         new FunctionItem
             { DisplayName = "View Account Information", Function = UserFunctionEnum.ViewAccountInformation },
         new FunctionItem
-            { DisplayName = "View EwAPI Log", Function = UserFunctionEnum.ViewEwApiLog },
+            { DisplayName = "View EwAPI Log", Function = UserFunctionEnum.ViewEwApiLog },*/
     ];
     
     private FunctionItem? _selectedUserFunction;

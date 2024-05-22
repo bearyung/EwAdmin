@@ -76,8 +76,7 @@ public class AppUpdateService : ReactiveObject, IAppUpdateService
                 Console.WriteLine("No update available");
                 return; // no update available
             }
-
-
+            
             // download new version
             await _appUpdateManager.DownloadUpdatesAsync(_appUpdate, Progress).ConfigureAwait(false);
         }

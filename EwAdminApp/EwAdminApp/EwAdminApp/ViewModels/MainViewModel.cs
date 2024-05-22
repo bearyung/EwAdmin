@@ -23,6 +23,8 @@ public class MainViewModel : ViewModelBase
 
     // reactiveUI command for logout
     public ReactiveCommand<Unit, Unit> LogoutCommand { get; }
+    
+    public ReactiveCommand<Unit, Unit> LoginCommand { get; }
 
     // reactiveUI command for switching the content view model
     public ReactiveCommand<ModuleItem, Unit> SwitchContentCommand { get; }
@@ -38,6 +40,9 @@ public class MainViewModel : ViewModelBase
 
         // initialize the logout command
         LogoutCommand = ReactiveCommand.Create(Logout);
+        
+        // initialize the login command
+        LoginCommand = ReactiveCommand.Create(Login);
 
         // Define the command for switching content
         SwitchContentCommand =
@@ -69,7 +74,7 @@ public class MainViewModel : ViewModelBase
             // check for updates by DI the AppUpdateService using Locator
             // code here
             var appUpdateService = Locator.Current.GetService<IAppUpdateService>();
-            appUpdateService?.CheckForUpdates();
+            appUpdateService?.DownloadUpdates();
 
             // listen to the ModuleItemEvent and update the ContentViewModel property
             // SwitchContentViewModel method will throw an exception if the module is not supported
@@ -95,6 +100,36 @@ public class MainViewModel : ViewModelBase
                     // emit the ExecutingCommandsCount property to the message bus
                     // code here
                     MessageBus.Current.SendMessage(new ExecutingCommandsCountEvent(ExecutingCommandsCount));
+                })
+                .DisposeWith(disposables);
+            
+            // add the exception handling for the LoginCommand
+            // code here
+            LoginCommand.ThrownExceptions
+                .Subscribe(ex =>
+                {
+                    Console.WriteLine($"{GetType().Name}: Error logging in: {ex.Message}");
+                    // Optionally show an error message to the user
+                })
+                .DisposeWith(disposables);
+            
+            // add the exception handling for the LogoutCommand
+            // code here
+            LogoutCommand.ThrownExceptions
+                .Subscribe(ex =>
+                {
+                    Console.WriteLine($"{GetType().Name}: Error logging out: {ex.Message}");
+                    // Optionally show an error message to the user
+                })
+                .DisposeWith(disposables);
+            
+            // add the exception handling for the SwitchContentCommand
+            // code here
+            SwitchContentCommand.ThrownExceptions
+                .Subscribe(ex =>
+                {
+                    Console.WriteLine($"{GetType().Name}: Error switching module: {ex.Message}");
+                    // Optionally show an error message to the user
                 })
                 .DisposeWith(disposables);
 
@@ -157,6 +192,11 @@ public class MainViewModel : ViewModelBase
         // navigate to the login page
         ContentViewModel = new LoginViewModel(logout: true);
     }
+    
+    private void Login()
+    {
+        ContentViewModel = new LoginViewModel();
+    }
 
     private void SwitchContentViewModel(ModuleItem moduleItem)
     {
@@ -172,6 +212,7 @@ public class MainViewModel : ViewModelBase
                 UserModuleEnum.ViewDataModule => new DashboardViewDataViewModel(),
                 UserModuleEnum.ToolBoxModule => new DashboardToolBoxViewModel(),
                 UserModuleEnum.SettingsModule => new SettingsViewModel(),
+                UserModuleEnum.HelpModule => new HelpViewModel(),
                 _ => throw new NotSupportedException($"Module {moduleItem.Module} is not supported.")
             };
         }
