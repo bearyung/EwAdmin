@@ -112,6 +112,12 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
             
             CurrentVersion = appUpdateService.AppUpdateManager.CurrentVersion?.ToString();
             UpdaterVersion = VelopackRuntimeInfo.VelopackNugetVersion.ToString();
+            
+            // set the properties of HasUpdates, CanDownloadUpdates, CanApplyUpdates and FileSize
+            HasUpdates = appUpdateService.AppUpdate != null;
+            CanDownloadUpdates = appUpdateService is { AppUpdate: not null, AppUpdateManager.IsUpdatePendingRestart: false };
+            CanApplyUpdates = appUpdateService.AppUpdateManager.IsUpdatePendingRestart;
+            FileSize = Information.FromBytes(appUpdateService.AppUpdate?.TargetFullRelease.Size ?? 0).Mebibytes.ToString("0.00") + "MB";
         }
         
         // init the CheckForUpdatesCommand
@@ -142,10 +148,10 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
                 .ToProperty(this, x => x.IsBusy)
                 .DisposeWith(disposables);
             
-            // set the CanDownloadUpdates, CanApplyUpdates properties
-            HasUpdates = appUpdateService.AppUpdate != null;
-            CanDownloadUpdates = appUpdateService is { AppUpdate: not null, AppUpdateManager.IsUpdatePendingRestart: false };
-            CanApplyUpdates = appUpdateService.AppUpdateManager.IsUpdatePendingRestart;
+            // auto check for updates when the viewmodel is activated
+            CheckForUpdatesCommand.Execute()
+                .Subscribe()
+                .DisposeWith(disposables);
             
             // catch the exception when the CheckForUpdatesCommand is executed
             CheckForUpdatesCommand.ThrownExceptions
@@ -184,9 +190,11 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
                     
                     if (appUpdateService.AppUpdate != null)
                     {
-                        LatestVersion = appUpdateService.AppUpdate?.TargetFullRelease.Version.Release;
-                        var fileSizeInBytes = Information.FromBytes(appUpdateService.AppUpdate?.TargetFullRelease.Size ?? 0);
-                        FileSize =  fileSizeInBytes.Mebibytes+ "MB";
+                        LatestVersion = appUpdateService.AppUpdate?.TargetFullRelease.Version.ToString();
+                        
+                        // set the FileSize property (2 decimal places)
+                        // code here
+                        FileSize = Information.FromBytes(appUpdateService.AppUpdate?.TargetFullRelease.Size ?? 0).Mebibytes.ToString("0.00") + "MB";
                     }
                 })
                 .DisposeWith(disposables);

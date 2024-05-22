@@ -10,7 +10,7 @@
              VerticalContentAlignment="Center">
     <StackPanel MaxWidth=" 500" MaxHeight="600" Spacing="12">
         <StackPanel>
-            <Label>1.02</Label>
+            <Label>1.03</Label>
             <Grid ColumnDefinitions="120,*">
                 <Label Grid.Column="0"
                        HorizontalContentAlignment="Right"
@@ -66,6 +66,7 @@
         </Grid>
         <Grid ColumnDefinitions="120,*">
             <ProgressBar Grid.Column="1" 
+                         IsVisible="{Binding CanDownloadUpdates}"
                          Minimum="0" Maximum="100" Value="{Binding ProgressValue}"/>
         </Grid>
         <Grid ColumnDefinitions="120,*">
