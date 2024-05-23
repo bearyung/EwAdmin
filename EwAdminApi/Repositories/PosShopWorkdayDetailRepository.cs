@@ -18,7 +18,7 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
         int accountId, int shopId, DateTime? startDate, DateTime? endDate,
         int page, int pageSize)
     {
-        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
 
         // if startDate is null, return the latest 10 records,
         // otherwise return the records between startDate and endDate with pagination
@@ -106,7 +106,7 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
     // output: updated ShopWorkdayDetail
     public async Task<ShopWorkdayDetail?> UpdateShopWorkdayDetailAsync(ShopWorkdayDetail shopWorkdayDetail)
     {
-        using var db = await GetPosDatabaseConnection(shopWorkdayDetail.AccountId)
+        using var db = await GetPosDatabaseConnectionByAccount(shopWorkdayDetail.AccountId)
             .ConfigureAwait(false);
         var query = @"
         UPDATE [dbo].[ShopWorkdayDetail]
@@ -135,7 +135,7 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
         // delete the shop workday detail with the given workday detail id
         // delete the shop workday period details with the same workday detail id
         // the shop workday period details are deleted within the same transaction
-        using var db = await GetPosDatabaseConnection(shopWorkdayDetail.AccountId)
+        using var db = await GetPosDatabaseConnectionByAccount(shopWorkdayDetail.AccountId)
             .ConfigureAwait(false);
         db?.Open();
         using var transaction = db?.BeginTransaction();

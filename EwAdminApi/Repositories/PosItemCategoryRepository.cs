@@ -18,7 +18,7 @@ public class PosItemCategoryRepository : PosRepositoryBase
     (int accountId, int page, int pageSize, bool showEnabledRecords = true, bool showDisabledRecords = false,
         DateTime? lastModifiedDateTime = null)
     {
-        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
         var query = @"
             SELECT 
@@ -82,7 +82,7 @@ public class PosItemCategoryRepository : PosRepositoryBase
     // a method to get the item category detail
     public async Task<ItemCategory?> GetItemCategoryDetailAsync(int accountId, int categoryId)
     {
-        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         var query = @"
             SELECT 
                  [CategoryId]
@@ -146,7 +146,7 @@ public class PosItemCategoryRepository : PosRepositoryBase
     /// </returns>
     public async Task<ItemCategory?> UpdateItemCategoryAsync(ItemCategory itemCategory)
     {
-        using var db = await GetPosDatabaseConnection(itemCategory.AccountId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnectionByAccount(itemCategory.AccountId).ConfigureAwait(false);
         var query = @"
             UPDATE [dbo].[ItemCategory]
             SET 

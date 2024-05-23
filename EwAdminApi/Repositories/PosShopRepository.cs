@@ -18,7 +18,7 @@ public class PosShopRepository : PosRepositoryBase
     // code here
     public async Task<IEnumerable<Shop>> GetShopListAsync(int accountId, int page, int pageSize, int? shopId = null)
     {
-        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         
         // write the query to get the shop list with pagination
         // shopId is optional, if it is null, it should not be included in the query
@@ -72,7 +72,7 @@ public class PosShopRepository : PosRepositoryBase
     {
         // get the connection from webadmin DB
         // get the shop details from pos DB
-        using var db = await GetPosDatabaseConnection(accountId).ConfigureAwait(false);
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         var query = @"
             SELECT [ShopId]
                   ,[AccountId]

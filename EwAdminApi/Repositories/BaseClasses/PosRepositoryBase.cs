@@ -14,7 +14,7 @@ public class PosRepositoryBase
         _connectionService = connectionService;
     }
 
-    protected async Task<IDbConnection?> GetPosDatabaseConnection(int brandId)
+    protected async Task<IDbConnection?> GetPosDatabaseConnectionByAccount(int brandId)
     {
         using var db = _connectionService.GetConnection();
         var query = @"
@@ -30,6 +30,32 @@ public class PosRepositoryBase
             BrandId = brandId
         };
 
+        if (db != null)
+        {
+            var result = await db.QuerySingleOrDefaultAsync<RegionMaster>(query, parameters).ConfigureAwait(false);
+
+            if (result is { DbServer: not null, DbName: not null, DbUsername: not null, DbPassword: not null })
+                return _connectionService.GetConnection(result.DbServer, result.DbName,
+                    result.DbUsername,
+                    result.DbPassword);
+        }
+
+        return null;
+    }
+
+    protected async Task<IDbConnection?> GetPosDatabaseConnectionByRegion(int regionId)
+    {
+        using var db = _connectionService.GetConnection();
+        var query = @"
+            select region.DBServer, region.DBName, region.DBUsername, region.DBPassword
+            from webadmin_RegionMaster region
+            WHERE regionId = @RegionId";
+
+        var parameters = new
+        {
+            RegionId = regionId
+        };
+        
         if (db != null)
         {
             var result = await db.QuerySingleOrDefaultAsync<RegionMaster>(query, parameters).ConfigureAwait(false);
