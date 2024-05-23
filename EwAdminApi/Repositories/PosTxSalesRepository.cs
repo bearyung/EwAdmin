@@ -7,10 +7,8 @@ namespace EwAdminApi.Repositories;
 
 public class PosTxSalesRepository : PosRepositoryBase
 {
-    private readonly IConnectionService _connectionService;
     public PosTxSalesRepository(IConnectionService connectionService) : base(connectionService)
     {
-        _connectionService = connectionService;
     }
     
     /// <summary>

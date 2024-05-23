@@ -17,8 +17,8 @@ public class DashboardFixViewModel : ViewModelBase
             { DisplayName = "Fix Workday Period Detail", Function = UserFunctionEnum.FixWorkdayPeriodDetail },
         new FunctionItem
             { DisplayName = "Fix Tx Payment", Function = UserFunctionEnum.FixTxPayment },
-        // new FunctionItem
-        //     { DisplayName = "Fix Item Category", Function = UserFunctionEnum.FixItemCategory },
+        new FunctionItem
+            { DisplayName = "Fix Item Category", Function = UserFunctionEnum.FixItemCategory },
         // new FunctionItem
         //     { DisplayName = "Fix Incorrect Day-end", Function = UserFunctionEnum.FixIncorrectDayEnd},
         // new FunctionItem
@@ -52,7 +52,7 @@ public class DashboardFixViewModel : ViewModelBase
         {
             // log the activation of viewmodel
             Console.WriteLine($"{GetType().Name} activated");
-            
+
             // When the selected user function changes, switch the view model
             this.WhenAnyValue(x => x.SelectedUserFunction)
                 .Select(x => x != null ? SelectViewModel(x.Function) : null)
@@ -71,7 +71,7 @@ public class DashboardFixViewModel : ViewModelBase
                     ExecutingCommandsCount = x;
                 })
                 .DisposeWith(disposables);
-            
+
             // log the deactivation of the viewmodel
             Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
                 .DisposeWith(disposables);

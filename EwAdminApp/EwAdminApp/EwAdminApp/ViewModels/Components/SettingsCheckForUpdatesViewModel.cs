@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -83,8 +82,8 @@ public class SettingsCheckForUpdatesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _progressValue, value);
     }
     
-    private string _deltaAssetListString;
-    public string DeltaAssetListString
+    private string? _deltaAssetListString;
+    public string? DeltaAssetListString
     {
         get => _deltaAssetListString;
         set => this.RaiseAndSetIfChanged(ref _deltaAssetListString, value);
