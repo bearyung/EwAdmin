@@ -25,7 +25,7 @@
             <Border Background="DimGray"
                     BorderThickness="0">
                 <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
-                    Workday Detail
+                    Item Category Details
                 </Label>
             </Border>
             <ScrollViewer Grid.Row="1" FontSize="12">
@@ -73,6 +73,11 @@
                     <Label>Is Modifier</Label>
                     <TextBox Classes="Readonly"
                              Text="{Binding SelectedItemCategory.IsModifier, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is IsTerminal</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.IsTerminal, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Category Type Id</Label>

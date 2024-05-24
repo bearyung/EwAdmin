@@ -2,7 +2,75 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="EwAdminApp.Views.Components.ItemCategoryDetailEditView">
-    ItemCategoryDetailEditView
+             x:Class="EwAdminApp.Views.Components.ItemCategoryDetailEditView"
+             x:DataType="vm:ItemCategoryDetailEditViewModel">
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <Border
+        Name="ShopWorkdayDetailPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,*,46">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    Item Category Details
+                </Label>
+            </Border>
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Margin="8">
+                    <Label>Account ID</Label>
+                    <TextBox Classes="Readonly"
+                             Focusable="False"
+                             Text="{Binding SelectedItemCategory.AccountId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Category ID</Label>
+                    <TextBox Classes="Readonly"
+                             Focusable="False"
+                             Text="{Binding SelectedItemCategory.CategoryId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Category Type Id</Label>
+                    <TextBox Text="{Binding SelectedItemCategory.CategoryTypeId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Parent Category Id</Label>
+                    <TextBox Text="{Binding SelectedItemCategory.ParentCategoryId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>IsTerminal</Label>
+                    <CheckBox 
+                        IsChecked="{Binding SelectedItemCategory.IsTerminal,
+                        FallbackValue=false,
+                        TargetNullValue=false}"></CheckBox>
+                    <Label>Enabled</Label>
+                    <CheckBox 
+                        IsChecked="{Binding SelectedItemCategory.Enabled,
+                        FallbackValue=false,
+                        TargetNullValue=false}"></CheckBox>
+                </StackPanel>
+            </ScrollViewer>
+            <StackPanel Grid.Row="2"
+                        Margin="8"
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right"
+                        Spacing="4">
+                <Button Content="Save"
+                        Background="Green"
+                        Command="{Binding SaveCommand}" />
+                <Button Content="Cancel"
+                        Command="{Binding CancelCommand}" />
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>

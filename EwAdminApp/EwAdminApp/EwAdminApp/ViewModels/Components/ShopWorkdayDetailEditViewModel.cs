@@ -55,7 +55,7 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         get => _isBusy;
         set => this.RaiseAndSetIfChanged(ref _isBusy, value);
     }
-    
+
     // add a cancellationTokenSource property
     private CancellationTokenSource _cancellationTokenSource = new();
 
@@ -71,8 +71,9 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
             (selectedShopWorkdayPeriodDetail, isBusy) => selectedShopWorkdayPeriodDetail != null && !isBusy);
 
         var canCancel = this.WhenAnyValue(
+            x => x.SelectedShopWorkdayDetailClone,
             x => x.IsBusy,
-            isBusy => !isBusy);
+            (selectedShopWorkdayPeriodDetailClone, isBusy) => selectedShopWorkdayPeriodDetailClone != null && !isBusy);
 
         // Create the SaveCommand
         SaveCommand = ReactiveCommand.CreateFromTask(DoSave, canSave);
@@ -84,39 +85,39 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         {
             // console log when the viewmodel is activated
             Console.WriteLine($"{GetType().Name}: Activated");
-            
+
             // when the SaveCommand is executing, set the IsBusy property to true
             SaveCommand.IsExecuting.Subscribe(isExecuting =>
-            {
-                var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
-                // set the IsBusy property
-                IsBusy = isExecuting;
-
-                // increment or decrement the ExecutingCommandsCount property
-                ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
-                // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                if (!isInitial)
                 {
-                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
-                        new ActionStatus
-                        {
-                            ActionStatusEnum = isExecuting
-                                ? ActionStatus.StatusEnum.Executing
-                                : ActionStatus.StatusEnum.Completed,
-                            Message = isExecuting ? "Saving ShopWorkdayDetail..." : "ShopWorkdayDetail saved"
-                        }));
-                }
-            })
-            .DisposeWith(disposables);
+                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
+
+                    // set the IsBusy property
+                    IsBusy = isExecuting;
+
+                    // increment or decrement the ExecutingCommandsCount property
+                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
+
+                    // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
+                    if (!isInitial)
+                    {
+                        MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                            new ActionStatus
+                            {
+                                ActionStatusEnum = isExecuting
+                                    ? ActionStatus.StatusEnum.Executing
+                                    : ActionStatus.StatusEnum.Completed,
+                                Message = isExecuting ? "Saving ShopWorkdayDetail..." : "ShopWorkdayDetail saved"
+                            }));
+                    }
+                })
+                .DisposeWith(disposables);
 
             // handle the exception when the SaveCommand is executed
             SaveCommand.ThrownExceptions.Subscribe(exception =>
-            {
-                Console.WriteLine($"An error occurred: {exception.Message}");
-            })
-            .DisposeWith(disposables);
+                {
+                    Console.WriteLine($"An error occurred: {exception.Message}");
+                })
+                .DisposeWith(disposables);
 
             // listen to the Message Bus for ShopWorkdayDetailEvent
             // when the event is received, set the SelectedShopWorkdayPeriodDetail property
@@ -135,12 +136,12 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
                     });
                 })
                 .DisposeWith(disposables);
-            
+
             // console log when the viewmodel is deactivated
             Disposable.Create(() =>
                 {
                     Console.WriteLine($"{GetType().Name} is being deactivated.");
-                    
+
                     // cancel the CancellationTokenSource
                     _cancellationTokenSource.Cancel();
                 })
@@ -154,16 +155,16 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         {
             // Cancel the previous save operation
             await _cancellationTokenSource.CancelAsync();
-            
+
             // Create a new CancellationTokenSource
             _cancellationTokenSource = new CancellationTokenSource();
-            
+
             // Get the CancellationToken from the CancellationTokenSource
             var cancellationToken = _cancellationTokenSource.Token;
-            
+
             // Throw an OperationCanceledException if the CancellationToken is cancelled
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             // Save the SelectedShopWorkdayDetail
             // HTTP PATCH request to the API to update the ShopWorkdayDetail
             // API Endpoint: /api/PosAdmin/UpdateShopWorkdayDetail

@@ -22,7 +22,7 @@
         <Grid RowDefinitions="16,38, *">
             <Border Background="DimGray"
                     BorderThickness="0">
-                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">Workday List</Label>
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">Item Category List</Label>
             </Border>
             <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
                 <Grid ColumnDefinitions="*, 150, 150, 150, 70">
