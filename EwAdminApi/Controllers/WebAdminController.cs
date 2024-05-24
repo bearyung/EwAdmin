@@ -11,15 +11,18 @@ namespace EwAdminApi.Controllers;
 public class WebAdminController : ControllerBase
 {
     private readonly WebAdminCompanyMasterRepository _webAdminCompanyMasterRepository;
+    private readonly WebAdminRegionMasterRepository _webAdminRegionMasterRepository;
 
-    public WebAdminController(WebAdminCompanyMasterRepository webAdminCompanyMasterRepository)
+    public WebAdminController(WebAdminCompanyMasterRepository webAdminCompanyMasterRepository,
+        WebAdminRegionMasterRepository webAdminRegionMasterRepository)
     {
         _webAdminCompanyMasterRepository = webAdminCompanyMasterRepository;
+        _webAdminRegionMasterRepository = webAdminRegionMasterRepository;
     }
 
 
     /// <summary>
-    /// This method is responsible for fetching a list of companies.
+    /// Handles the GET request to fetch the list of companies.
     /// </summary>
     /// <param name="page">The page number to fetch. Defaults to 1 if not provided.</param>
     /// <param name="pageSize">The number of records per page. Defaults to 20 if not provided.</param>
@@ -51,11 +54,11 @@ public class WebAdminController : ControllerBase
         // Return the fetched list of companies.
         return Ok(resultList);
     }
-    
+
     // add an API endpoint (hello) to return the HttpContext.Items["MondayUserData"] if it exists
     // code here
     /// <summary>
-    /// Handle the request to get current user data from HttpContext.Items.
+    /// Handles the GET request to fetch current user data from HttpContext.Items.
     /// </summary>
     /// <returns>
     /// Returns the MondayUserData from HttpContext.Items if it exists, otherwise returns a BadRequest.
@@ -73,5 +76,44 @@ public class WebAdminController : ControllerBase
         }
 
         return new CustomBadRequestResult("MondayUserData not found in HttpContext.Items.");
+    }
+
+    /// <summary>
+    /// Handles the GET request to fetch the list of regions.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns>
+    /// An IActionResult containing the list of regions for the given page and pageSize.
+    /// - If the region list is fetched successfully, it returns an Ok result with the list of regions.
+    /// - If the page or pageSize is invalid, it returns a BadRequest.
+    /// </returns>
+    [HttpGet("regionlist")]
+    [ProducesResponseType(typeof(IEnumerable<RegionMasterDatabaseMetadata>), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetRegionList(
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        // Check if the page or pageSize is less than or equal to 0. If so, return a BadRequest.
+        if (page <= 0 || pageSize <= 0)
+        {
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
+        }
+
+        // Check if the pageSize is more than 100. If so, return a BadRequest.
+        if (pageSize > 100)
+        {
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
+        }
+
+        // Fetch the list of regions from the repository.
+        var resultList = await _webAdminRegionMasterRepository
+            .GetRegionListAsync(page, pageSize)
+            .ConfigureAwait(false);
+
+        // Return the fetched list of regions.
+        return Ok(resultList);
     }
 }

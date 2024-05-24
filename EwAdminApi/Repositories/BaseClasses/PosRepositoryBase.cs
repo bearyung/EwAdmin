@@ -5,14 +5,9 @@ using EwAdminApi.Services;
 
 namespace EwAdminApi.Repositories.BaseClasses;
 
-public class PosRepositoryBase
+public class PosRepositoryBase(IConnectionService connectionService)
 {
-    private readonly IConnectionService _connectionService;
-
-    public PosRepositoryBase(IConnectionService connectionService)
-    {
-        _connectionService = connectionService;
-    }
+    private readonly IConnectionService _connectionService = connectionService;
 
     protected async Task<IDbConnection?> GetPosDatabaseConnectionByAccount(int brandId)
     {
@@ -32,7 +27,7 @@ public class PosRepositoryBase
 
         if (db != null)
         {
-            var result = await db.QuerySingleOrDefaultAsync<RegionMaster>(query, parameters).ConfigureAwait(false);
+            var result = await db.QuerySingleOrDefaultAsync<RegionMasterDatabaseMetadata>(query, parameters).ConfigureAwait(false);
 
             if (result is { DbServer: not null, DbName: not null, DbUsername: not null, DbPassword: not null })
                 return _connectionService.GetConnection(result.DbServer, result.DbName,
@@ -58,7 +53,7 @@ public class PosRepositoryBase
         
         if (db != null)
         {
-            var result = await db.QuerySingleOrDefaultAsync<RegionMaster>(query, parameters).ConfigureAwait(false);
+            var result = await db.QuerySingleOrDefaultAsync<RegionMasterDatabaseMetadata>(query, parameters).ConfigureAwait(false);
 
             if (result is { DbServer: not null, DbName: not null, DbUsername: not null, DbPassword: not null })
                 return _connectionService.GetConnection(result.DbServer, result.DbName,

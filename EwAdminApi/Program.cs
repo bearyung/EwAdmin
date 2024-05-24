@@ -1,4 +1,3 @@
-using System.Data;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
@@ -6,9 +5,7 @@ using EwAdminApi.Middlewares;
 using EwAdminApi.Repositories;
 using EwAdminApi.Services;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.Data.SqlClient;
 using Microsoft.OpenApi.Models;
-using MondaySharp.NET.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +24,7 @@ builder.Services.AddScoped<PosShopWorkdayPeriodDetailRepository>();
 builder.Services.AddScoped<PosTxSalesRepository>();
 builder.Services.AddScoped<PosPaymentMethodRepository>();
 builder.Services.AddScoped<PosItemCategoryRepository>();
+builder.Services.AddScoped<WebAdminRegionMasterRepository>();
 
 // builder.Services.TryAddMondayClient(options =>
 // {
@@ -71,9 +69,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 // cross-origin resource sharing with specific origins (https://localhost:5001)
-app.UseCors(builder =>
+app.UseCors(c =>
 {
-    builder.WithOrigins("https://localhost:5001")
+    c.WithOrigins("https://localhost:5001")
         .AllowAnyHeader()
         .AllowAnyMethod();
 });
