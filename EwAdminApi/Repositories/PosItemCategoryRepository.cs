@@ -16,7 +16,7 @@ public class PosItemCategoryRepository : PosRepositoryBase
     // a method to get the list of item category with pagination
     public async Task<IEnumerable<ItemCategory>?> GetItemCategoryListAsync
     (int accountId, int page, int pageSize, bool showEnabledRecords = true, bool showDisabledRecords = false,
-        DateTime? lastModifiedDateTime = null)
+        DateTime? lastModifiedDateTime = null, string? categoryNameContains = null)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
@@ -54,6 +54,7 @@ public class PosItemCategoryRepository : PosRepositoryBase
             AND (@ShowEnabledRecords = 1 OR Enabled = 0)
             AND (@ShowDisabledRecords = 1 OR Enabled = 1)
             AND (@LastModifiedDateTime IS NULL OR ModifiedDate >= @LastModifiedDateTime)
+            AND (@CategoryNameContains IS NULL OR CategoryName LIKE N'%' + @CategoryNameContains + '%')
             ORDER BY DisplayIndex
             OFFSET @Offset ROWS
             FETCH NEXT @PageSize ROWS ONLY
@@ -66,7 +67,8 @@ public class PosItemCategoryRepository : PosRepositoryBase
             PageSize = pageSize,
             ShowEnabledRecords = showEnabledRecords ? 1 : 0,
             ShowDisabledRecords = showDisabledRecords ? 1 : 0,
-            LastModifiedDateTime = lastModifiedDateTime
+            LastModifiedDateTime = lastModifiedDateTime,
+            CategoryNameContains = categoryNameContains
         };
 
         if (db != null)
@@ -152,6 +154,7 @@ public class PosItemCategoryRepository : PosRepositoryBase
             SET 
                 ParentCategoryId = @ParentCategoryId,
                 IsTerminal = @IsTerminal,
+                CategoryTypeId = @CategoryTypeId,
                 Enabled = @Enabled, 
                 ModifiedBy = @ModifiedBy, ModifiedDate = GETDATE()
             WHERE CategoryId = @CategoryId
@@ -165,7 +168,8 @@ public class PosItemCategoryRepository : PosRepositoryBase
             itemCategory.Enabled,
             itemCategory.ModifiedBy,
             itemCategory.CategoryId,
-            itemCategory.AccountId
+            itemCategory.AccountId,
+            itemCategory.CategoryTypeId
         };
 
         if (db != null)

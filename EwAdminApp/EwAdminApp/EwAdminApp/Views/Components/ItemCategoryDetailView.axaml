@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.ItemCategoryDetailView"
+             x:DataType="vm:ItemCategoryDetailViewModel">
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+            <Setter Property="Margin" Value="0,0,0,8"></Setter>
+        </Style>
+        <Style Selector="Label">
+            <Setter Property="Foreground" Value="#787878"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <Border
+        Name="TxPaymentDetailPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1">
+        <Grid RowDefinitions="16,*">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    Workday Detail
+                </Label>
+            </Border>
+            <ScrollViewer Grid.Row="1" FontSize="12">
+                <StackPanel Margin="8">
+                    <Label>Account ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.AccountId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Category ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.CategoryId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Category Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.CategoryName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Category Name Alt</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.CategoryNameAlt, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Category Code</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.CategoryCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Display Index</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.DisplayIndex, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Parent Category Id</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.ParentCategoryId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Public Display</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.IsPublicDisplay, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Modifier</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.IsModifier, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Category Type Id</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.CategoryTypeId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Enabled</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.Enabled, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Created By</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.CreatedBy, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Created Date</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.CreatedDate, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Modified By</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.ModifiedBy, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Modified Date</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedItemCategory.ModifiedDate, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>

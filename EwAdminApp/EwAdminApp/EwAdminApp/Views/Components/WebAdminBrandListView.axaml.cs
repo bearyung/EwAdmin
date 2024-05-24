@@ -7,21 +7,18 @@ using EwAdminApp.ViewModels.Components;
 
 namespace EwAdminApp.Views.Components;
 
-public partial class ShopListView : ReactiveUserControl<ShopListViewModel>
+public partial class WebAdminBrandListView : ReactiveUserControl<WebAdminBrandListViewModel>
 {
-    // public static readonly StyledProperty<Shop?> ShopProperty = 
-    //     AvaloniaProperty.Register<ShopListView, Shop?>(nameof(Shop));
-
-    public ShopListView()
+    public WebAdminBrandListView()
     {
         InitializeComponent();
     }
 
-    private void SearchShopTextBox_OnKeyDown(object? sender, KeyEventArgs e)
+    private void SearchBrandTextBox_OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {
-            if (DataContext is ShopListViewModel vm)
+            if (DataContext is WebAdminBrandListViewModel vm)
             {
                 // execute the SearchCommand when the Enter key is pressed
                 vm.SearchCommand?.Execute().Subscribe();
@@ -42,8 +39,9 @@ public partial class ShopListView : ReactiveUserControl<ShopListViewModel>
         {
             if (sender is TextBox)
             {
-                ShopListDataGrid.Focus();
+                BrandListDataGrid.Focus();
             }
         }
     }
+
 }

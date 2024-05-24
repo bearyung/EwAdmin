@@ -23,7 +23,6 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
         // add a new instance of ShopListViewModel to the ShopPanel property
         // code here
         var shopSelectorPanelViewModel = new ShopListViewModel();
-
         ShopSelectorPanel = shopSelectorPanelViewModel;
 
         // add a new instance of ShopWorkdayListViewModel to the ShopWorkdaySelectorPanel property

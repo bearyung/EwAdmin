@@ -156,11 +156,14 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
                     // clear the searchText property
                     // SearchText = string.Empty;
 
-                    // clear the ShopWorkdayDetailList property
-                    ShopWorkdayDetailList?.Clear();
+                    RxApp.MainThreadScheduler.Schedule(() =>
+                    {
+                        // clear the ShopWorkdayDetailList property
+                        ShopWorkdayDetailList?.Clear();
 
-                    // clear the SelectedShopWorkdayDetail property
-                    SelectedShopWorkdayDetail = null;
+                        // clear the SelectedShopWorkdayDetail property
+                        SelectedShopWorkdayDetail = null;
+                    });
                 })
                 .DisposeWith(disposables);
             
@@ -186,7 +189,7 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
         try
         {
             // Cancel the previous search operation
-            await _cancellationTokenSource.CancelAsync()!;
+            await _cancellationTokenSource.CancelAsync();
             
             // Create a new CancellationTokenSource
             _cancellationTokenSource = new CancellationTokenSource();

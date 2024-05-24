@@ -88,6 +88,8 @@ public class DashboardFixViewModel : ViewModelBase
                 return new FixShopWorkdayPeriodDetailViewModel();
             case UserFunctionEnum.FixTxPayment:
                 return new FixTxPaymentViewModel();
+            case UserFunctionEnum.FixItemCategory:
+                return new FixItemCategoryViewModel();
             default:
                 return null;
         }

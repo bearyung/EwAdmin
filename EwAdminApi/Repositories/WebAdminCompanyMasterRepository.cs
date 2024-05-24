@@ -14,21 +14,26 @@ public class WebAdminCompanyMasterRepository
         _connectionService = connectionService;
     }
 
-    public async Task<IEnumerable<CompanyMaster>> GetCompanyMasterListAsync(int page, int pageSize)
+    public async Task<IEnumerable<CompanyMaster>> GetCompanyMasterListAsync(int page, int pageSize, int? companyId = null)
     {
         using var db = _connectionService.GetConnection();
         var offset = (page - 1) * pageSize;
         var query = @"
-        SELECT companyId, companyName 
-        FROM webadmin_companymaster
-        ORDER BY companyId
+        SELECT company.CompanyId, company.CompanyName, region.RegionId, region.RegionName
+            from webadmin_CompanyMaster company, webadmin_ResellerAreaMaster reseller, webadmin_RegionMaster region
+        WHERE company.ResellerAreaId = reseller.ResellerAreaId
+            and reseller.RegionId = region.RegionId
+            and company.Enabled = 1
+            and (@CompanyId is null or company.CompanyId = @CompanyId)
+        ORDER BY company.CompanyId
         OFFSET @Offset ROWS 
         FETCH NEXT @PageSize ROWS ONLY";
 
         var parameters = new
         {
             Offset = offset,
-            PageSize = pageSize
+            PageSize = pageSize,
+            CompanyId = companyId
         };
 
         if (db != null)

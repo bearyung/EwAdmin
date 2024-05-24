@@ -17,7 +17,6 @@ var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
 // Add services to the container.
 builder.Services.AddSingleton<IConnectionService, ConnectionService>();
-builder.Services.AddScoped<WebAdminCompanyMasterRepository>();
 builder.Services.AddScoped<PosShopRepository>();
 builder.Services.AddScoped<PosShopWorkdayDetailRepository>();
 builder.Services.AddScoped<PosShopWorkdayPeriodDetailRepository>();
@@ -25,6 +24,8 @@ builder.Services.AddScoped<PosTxSalesRepository>();
 builder.Services.AddScoped<PosPaymentMethodRepository>();
 builder.Services.AddScoped<PosItemCategoryRepository>();
 builder.Services.AddScoped<WebAdminRegionMasterRepository>();
+builder.Services.AddScoped<WebAdminCompanyMasterRepository>();
+builder.Services.AddScoped<WebAdminBrandMasterRepository>();
 
 // builder.Services.TryAddMondayClient(options =>
 // {

@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.WebAdminBrandListView"
+             x:DataType="vm:WebAdminBrandListViewModel">
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <!-- A ShopListView is a UserControl that displays a list of shops. -->
+    <!-- provide a seach box for user to input the account id as the search field -->
+    <Border
+        Name="ShopSelectorPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,38, *">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">Brand List</Label>
+            </Border>
+            <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
+                <Grid ColumnDefinitions="*, *, 70">
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="0" Watermark="Account Id / Brand Id"
+                             Text="{Binding SearchTextBrandId}"
+                             Classes="Digits"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchBrandTextBox_OnKeyDown"/>
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="1" Watermark="Company Id"
+                             Text="{Binding SearchTextCompanyId}"
+                             Classes="Digits"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchBrandTextBox_OnKeyDown"/>
+                    <Button Grid.Column="2" Content="Search" Command="{Binding SearchCommand}" Margin="0 0 0 0" />
+                </Grid>
+            </Border>
+            <DataGrid Name="BrandListDataGrid"
+                      Grid.Row="2" IsReadOnly="True"
+                      SelectionMode="Single"
+                      GridLinesVisibility="All"
+                      ItemsSource="{Binding BrandList}"
+                      SelectedItem="{Binding SelectedBrand}"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Brand ID" Binding="{Binding BrandId}" />
+                    <DataGridTextColumn Header="Brand Name" Binding="{Binding BrandName}" />
+                    <DataGridTextColumn Header="Company ID" Binding="{Binding CompanyId}" />
+                    <DataGridTextColumn Header="Company Company" Binding="{Binding CompanyName}" />
+                    <DataGridTextColumn Header="Region ID" Binding="{Binding RegionId}" />
+                    <DataGridTextColumn Header="Region Name" Binding="{Binding RegionName}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Border>
+</UserControl>

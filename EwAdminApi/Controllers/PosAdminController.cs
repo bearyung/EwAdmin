@@ -557,7 +557,7 @@ public class PosAdminController : ControllerBase
         
         return Ok(resultList);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the list of item categories.
     /// </summary>
@@ -566,6 +566,8 @@ public class PosAdminController : ControllerBase
     /// <param name="pageSize"></param>
     /// <param name="showEnabledRecords"></param>
     /// <param name="showDisabledRecords"></param>
+    /// <param name="lastModifiedDateTime"></param>
+    /// <param name="categoryNameContains"></param>
     /// <returns>
     /// An IActionResult that represents the result of the action method:
     /// - If the item categories are found, it returns an HTTP 200 status code along with the item category details.
@@ -580,7 +582,8 @@ public class PosAdminController : ControllerBase
     public async Task<IActionResult> GetItemCategoryList(
         [FromQuery, Required] int accountId, 
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20, 
-        [FromQuery] bool showEnabledRecords = true, [FromQuery] bool showDisabledRecords = false) 
+        [FromQuery] bool showEnabledRecords = true, [FromQuery] bool showDisabledRecords = false, 
+        [FromQuery]DateTime? lastModifiedDateTime = null, [FromQuery]string? categoryNameContains = null) 
     {
         // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
         if (page <= 0 || pageSize <= 0)
@@ -596,7 +599,9 @@ public class PosAdminController : ControllerBase
         
         // get the item category list from PosItemCategoryRepository
         var resultList = await _posItemCategoryRepository
-            .GetItemCategoryListAsync(accountId, page, pageSize, showEnabledRecords, showDisabledRecords )
+            .GetItemCategoryListAsync(accountId: accountId, page, pageSize, 
+                showEnabledRecords, showDisabledRecords, 
+                lastModifiedDateTime, categoryNameContains)
             .ConfigureAwait(false);
         
         return Ok(resultList);
