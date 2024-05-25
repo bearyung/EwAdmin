@@ -13,7 +13,7 @@ public class WebAdminRegionMasterRepository(IConnectionService connectionService
     public async Task<IEnumerable<RegionMaster>> GetRegionListAsync(int page, int pageSize, int? regionId = null)
     {
         using var db = _connectionService.GetConnection();
-        
+
         // write the query to get the region list with pagination
         // regionId is optional, if it is null, it should not be included in the query
         var query = @"
@@ -35,12 +35,11 @@ public class WebAdminRegionMasterRepository(IConnectionService connectionService
         };
 
         // execute the query and return the result
-        if (regionId == null)
+        if (db != null)
         {
             return await db.QueryAsync<RegionMaster>(query, parameters).ConfigureAwait(false);
         }
-        
-        return Enumerable.Empty<RegionMaster>();
-        
+
+        return [];
     }
 }

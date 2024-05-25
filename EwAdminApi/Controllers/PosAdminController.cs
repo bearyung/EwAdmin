@@ -652,7 +652,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> UpdateItemCategory(
-        [FromBody, Required] ItemCategory itemCategory)
+        [JsonBinder, Required] ItemCategory itemCategory)
     {
         // Validate the ID fields
         if (itemCategory.AccountId == 0 || itemCategory.CategoryId == 0)

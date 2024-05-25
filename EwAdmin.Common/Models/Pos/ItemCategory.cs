@@ -55,4 +55,5 @@ public class ItemCategory
     public bool? IsOnlineStoreDisplay { get; set; }
  
     public string? CategoryCode { get; set; }
+
 }

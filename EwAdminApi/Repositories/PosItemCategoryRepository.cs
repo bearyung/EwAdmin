@@ -5,16 +5,17 @@ using EwAdminApi.Services;
 
 namespace EwAdminApi.Repositories;
 
-public class PosItemCategoryRepository : PosRepositoryBase
+public class PosItemCategoryRepository : PosItemCategoryRepositoryBase
 {
-    public PosItemCategoryRepository(IConnectionService connectionService) : base(connectionService)
+    public PosItemCategoryRepository(IConnectionService connectionService, IHttpContextAccessor httpContextAccessor) :
+        base(connectionService, httpContextAccessor)
     {
     }
 
     // input: accountId, shopId, page, pageSize, Enabled (1 = true, 0 = false), lastModifiedDate
     // output: list of ItemCategory
     // a method to get the list of item category with pagination
-    public async Task<IEnumerable<ItemCategory>?> GetItemCategoryListAsync
+    public async Task<IEnumerable<ItemCategory>> GetItemCategoryListAsync
     (int accountId, int page, int pageSize, bool showEnabledRecords = true, bool showDisabledRecords = false,
         DateTime? lastModifiedDateTime = null, string? categoryNameContains = null)
     {
@@ -76,7 +77,7 @@ public class PosItemCategoryRepository : PosRepositoryBase
             return await (db.QueryAsync<ItemCategory>(query, parameters)).ConfigureAwait(false);
         }
 
-        return null;
+        return [];
     }
 
     // input: accountId, categoryId
@@ -149,28 +150,13 @@ public class PosItemCategoryRepository : PosRepositoryBase
     public async Task<ItemCategory?> UpdateItemCategoryAsync(ItemCategory itemCategory)
     {
         using var db = await GetPosDatabaseConnectionByAccount(itemCategory.AccountId).ConfigureAwait(false);
-        var query = @"
-            UPDATE [dbo].[ItemCategory]
-            SET 
-                ParentCategoryId = @ParentCategoryId,
-                IsTerminal = @IsTerminal,
-                CategoryTypeId = @CategoryTypeId,
-                Enabled = @Enabled, 
-                ModifiedBy = @ModifiedBy, ModifiedDate = GETDATE()
-            WHERE CategoryId = @CategoryId
-            AND AccountId = @AccountId
-            ";
-
-        var parameters = new
-        {
-            itemCategory.ParentCategoryId,
-            itemCategory.IsTerminal,
-            itemCategory.Enabled,
-            itemCategory.ModifiedBy,
-            itemCategory.CategoryId,
-            itemCategory.AccountId,
-            itemCategory.CategoryTypeId
-        };
+        var (query, parameters) = BuildUpdateQuery(itemCategory, [
+            nameof(ItemCategory.ParentCategoryId),
+            nameof(ItemCategory.IsTerminal),
+            nameof(ItemCategory.Enabled),
+            nameof(ItemCategory.ModifiedBy),
+            nameof(ItemCategory.CategoryTypeId)
+        ]);
 
         if (db != null)
         {

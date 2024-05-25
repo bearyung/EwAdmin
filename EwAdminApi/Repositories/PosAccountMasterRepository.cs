@@ -60,7 +60,7 @@ public class PosAccountMasterRepository(IConnectionService connectionService) : 
             return await db.QueryAsync<AccountMaster>(query, parameters).ConfigureAwait(false);    
         }
 
-        return Enumerable.Empty<AccountMaster>();
+        return [];
     }
     
     // add a new method to get the account master by account id

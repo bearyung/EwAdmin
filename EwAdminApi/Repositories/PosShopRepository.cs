@@ -65,7 +65,7 @@ public class PosShopRepository : PosRepositoryBase
             return await db.QueryAsync<Shop>(query, parameters).ConfigureAwait(false);
         }
 
-        return Enumerable.Empty<Shop>();
+        return [];
     }
 
     public async Task<Shop?> GetShopDetailAsync(int accountId, int shopId)

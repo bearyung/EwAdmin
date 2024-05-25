@@ -14,7 +14,7 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
         _connectionService = connectionService;
     }
 
-    public async Task<IEnumerable<ShopWorkdayDetail>?> GetShopWorkdayDetailListAsync(
+    public async Task<IEnumerable<ShopWorkdayDetail>> GetShopWorkdayDetailListAsync(
         int accountId, int shopId, DateTime? startDate, DateTime? endDate,
         int page, int pageSize)
     {
@@ -95,7 +95,7 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
             if (db != null)
                 return await (db.QueryAsync<ShopWorkdayDetail>(query, parameters)).ConfigureAwait(false);
             else
-                return new List<ShopWorkdayDetail>();
+                return [];
         }
     }
     

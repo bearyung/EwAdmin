@@ -38,6 +38,6 @@ public class WebAdminBrandMasterRepository(IConnectionService connectionService)
         if (db != null)
             return await db.QueryAsync<BrandMaster>(query, parameters).ConfigureAwait(false);
         else
-            return new List<BrandMaster>();
+            return [];
     }
 }

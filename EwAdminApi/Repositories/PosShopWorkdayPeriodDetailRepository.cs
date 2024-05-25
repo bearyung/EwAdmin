@@ -16,7 +16,7 @@ public class PosShopWorkdayPeriodDetailRepository : PosRepositoryBase
 
     // input: accountId, shopId, workdaydetailid, page, pageSize
     // output: list of ShopWorkdayPeriodDetail
-    public async Task<IEnumerable<ShopWorkdayPeriodDetail>?> GetShopWorkdayPeriodDetailListAsync(
+    public async Task<IEnumerable<ShopWorkdayPeriodDetail>> GetShopWorkdayPeriodDetailListAsync(
         int accountId, int shopId, int workdayDetailId, int page, int pageSize)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
@@ -57,9 +57,11 @@ public class PosShopWorkdayPeriodDetailRepository : PosRepositoryBase
         };
 
         if (db != null)
-            return await (db.QueryAsync<ShopWorkdayPeriodDetail>(query, parameters)).ConfigureAwait(false);
-        else
-            return new List<ShopWorkdayPeriodDetail>();
+        {
+            return await (db.QueryAsync<ShopWorkdayPeriodDetail>(query, parameters)).ConfigureAwait(false);   
+        }
+        
+        return [];
     }
 
     // UpdateShopWorkdayPeriodDetailListAsync
@@ -132,9 +134,11 @@ public class PosShopWorkdayPeriodDetailRepository : PosRepositoryBase
         };
 
         if (db != null)
+        {
             return await (db.QuerySingleOrDefaultAsync<ShopWorkdayPeriodDetail>(query, parameters))
                 .ConfigureAwait(false);
-        else
-            return null;
+        }
+        
+        return null;
     }
 }

@@ -39,9 +39,11 @@ public class PosTxSalesRepository : PosRepositoryBase
             WorkdayDetailId = workdayDetailId
         };
         if (db != null)
+        {
             return await db.QuerySingleAsync<int>(query, parameters).ConfigureAwait(false);
-        else
-            return -1;
+        }
+
+        return -1;
     }
     
     /// <summary>
@@ -173,9 +175,11 @@ public class PosTxSalesRepository : PosRepositoryBase
             TxSalesHeaderId = txSalesHeaderId
         };
         if (db != null)
+        {
             return await db.QuerySingleOrDefaultAsync<TxSalesHeader>(query, parameters).ConfigureAwait(false);
-        else
-            return null;
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -190,7 +194,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// <returns>
     /// A list of transactions for the given account, shop, and transaction date.
     /// </returns>
-    public async Task<IEnumerable<TxSalesHeaderMin>?> GetTxSalesHeaderListAsync(int accountId, int shopId,
+    public async Task<IEnumerable<TxSalesHeaderMin>> GetTxSalesHeaderListAsync(int accountId, int shopId,
         DateTime txDate, int page, int pageSize, int? txSalesHeaderid = null)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
@@ -255,7 +259,7 @@ public class PosTxSalesRepository : PosRepositoryBase
             return await db.QueryAsync<TxSalesHeader>(query, parameters).ConfigureAwait(false);
         }
         
-        return null;
+        return [];
     }
     
     /// <summary>
@@ -269,7 +273,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// <returns>
     /// A list of payments for the given account, shop, and transaction sales header id.
     /// </returns>
-    public async Task<IEnumerable<TxPaymentMin>?> GetTxPaymentListAsync(int accountId, int shopId, int txSalesHeaderId, int page, int pageSize)
+    public async Task<IEnumerable<TxPaymentMin>> GetTxPaymentListAsync(int accountId, int shopId, int txSalesHeaderId, int page, int pageSize)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
@@ -305,7 +309,7 @@ public class PosTxSalesRepository : PosRepositoryBase
             return await db.QueryAsync<TxPaymentMin>(query, parameters).ConfigureAwait(false);
         }
         
-        return null;
+        return [];
     }
     
     // A new method to get the full details (all the fields in TxPayment class TxPayment : TxPaymentMin) of txpayment given the txpaymentid

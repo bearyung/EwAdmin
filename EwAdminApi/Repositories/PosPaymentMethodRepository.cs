@@ -16,7 +16,7 @@ public class PosPaymentMethodRepository : PosRepositoryBase
 
     // input: accountId, shopId, page, pageSize
     // output: list of PaymentMethod
-    public async Task<IEnumerable<PaymentMethod>?> GetPaymentMethodListAsync(int accountId, int shopId, int page,
+    public async Task<IEnumerable<PaymentMethod>> GetPaymentMethodListAsync(int accountId, int shopId, int page,
         int pageSize)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
@@ -57,6 +57,6 @@ public class PosPaymentMethodRepository : PosRepositoryBase
             return await (db.QueryAsync<PaymentMethod>(query, parameters)).ConfigureAwait(false);
         }
 
-        return null;
+        return [];
     }
 }

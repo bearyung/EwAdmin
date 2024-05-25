@@ -37,8 +37,10 @@ public class WebAdminCompanyMasterRepository
         };
 
         if (db != null)
+        {
             return await db.QueryAsync<CompanyMaster>(query, parameters).ConfigureAwait(false);
-        else
-            return new List<CompanyMaster>();
+        }
+
+        return [];
     }
 }
