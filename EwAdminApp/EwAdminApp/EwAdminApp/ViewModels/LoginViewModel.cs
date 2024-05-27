@@ -122,15 +122,13 @@ public class LoginViewModel : ViewModelBase
                     ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
 
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
-                    if (!isInitial)
+                    if (!isInitial && isExecuting)
                     {
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
-                                ActionStatusEnum = isExecuting
-                                    ? ActionStatus.StatusEnum.Executing
-                                    : ActionStatus.StatusEnum.Completed,
-                                Message = isExecuting ? "Saving API key..." : "API key saved"
+                                ActionStatusEnum = ActionStatus.StatusEnum.Executing,
+                                Message = "Saving API key..."
                             }));
                     }
                 })
@@ -171,6 +169,24 @@ public class LoginViewModel : ViewModelBase
                     }
                 })
                 .DisposeWith(disposables);
+            
+            // Subscribe to the ExecutingCommandsCount property
+            this.WhenAnyValue(x => x.ExecutingCommandsCount)
+                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
+                .DisposeWith(disposables);
+
+            // Subscribe to the SaveApiKeyCommand's Executed observable
+            // Subscribe to the SaveApiKeyCommand itself
+            SaveApiKeyCommand.Subscribe(_ =>
+                {
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                            Message = "API key saved"
+                        }));
+                })
+                .DisposeWith(disposables);
 
             // log the deactivation of the viewmodel
             Disposable.Create(() =>
@@ -197,7 +213,16 @@ public class LoginViewModel : ViewModelBase
             if (httpClient == null) return null;
             var response = await httpClient.SendAsync(request);
 
-            if (!response.IsSuccessStatusCode) return null;
+            if (!response.IsSuccessStatusCode)
+            {
+                // log the error
+                Console.WriteLine($"Error: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                Console.WriteLine($"Error: {errorContent}");
+                
+                // throw an exception with error code and content
+                throw new Exception($"Error: {response.StatusCode} - {errorContent}");
+            }
             var content = await response.Content.ReadAsStringAsync();
             // Deserialize the response content to LoginUserResponse, with options to case-insensitive
             // code here

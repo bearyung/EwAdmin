@@ -108,12 +108,8 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
-                                ActionStatusEnum = isExecuting
-                                    ? ActionStatus.StatusEnum.Executing
-                                    : ActionStatus.StatusEnum.Completed,
-                                Message = isExecuting
-                                    ? "Searching for shop workday period detail list..."
-                                    : "Shop workday period detail list search completed"
+                                ActionStatusEnum = ActionStatus.StatusEnum.Executing,
+                                Message = "Searching for shop workday period detail list..."
                             }));
                     }
                 })
@@ -153,6 +149,24 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
                 .Subscribe(shopWorkdayPeriodDetail =>
                 {
                     MessageBus.Current.SendMessage(new ShopWorkdayPeriodDetailEvent(shopWorkdayPeriodDetail));
+                })
+                .DisposeWith(disposables);
+            
+            // Subscribe to the ExecutingCommandsCount property
+            this.WhenAnyValue(x => x.ExecutingCommandsCount)
+                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
+                .DisposeWith(disposables);
+
+            // Subscribe to the SearchCommand's Executed observable
+            // Subscribe to the SearchCommand itself
+            SearchCommand.Subscribe(_ =>
+                {
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                            Message = "Shop workday period detail search completed"
+                        }));
                 })
                 .DisposeWith(disposables);
 
@@ -203,7 +217,16 @@ public class ShopWorkdayPeriodDetailListViewModel : ViewModelBase
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
             var response = await httpClient.SendAsync(request, cancellationToken);
-            if (!response.IsSuccessStatusCode) return;
+            if (!response.IsSuccessStatusCode)
+            {
+                // log the error
+                Console.WriteLine($"Error: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"Error: {errorContent}");
+                
+                // throw an exception with error code and content
+                throw new Exception($"Error: {response.StatusCode} - {errorContent}");
+            }
 
             // get the shop workday period details from the response
             var content = await response.Content.ReadAsStringAsync(cancellationToken);

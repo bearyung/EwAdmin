@@ -24,6 +24,7 @@ public class ShopListViewModel : ViewModelBase
     private bool _isBusy;
     private string? _searchTextAccountId;
     private string? _searchTextShopId;
+    private string? _searchTextShopNameContains;
 
     public ObservableCollection<Shop> ShopList
     {
@@ -53,6 +54,12 @@ public class ShopListViewModel : ViewModelBase
     {
         get => _searchTextShopId;
         set => this.RaiseAndSetIfChanged(ref _searchTextShopId, value);
+    }
+    
+    public string? SearchTextShopNameContains
+    {
+        get => _searchTextShopNameContains;
+        set => this.RaiseAndSetIfChanged(ref _searchTextShopNameContains, value);
     }
 
     public ReactiveCommand<Unit, Unit>? SearchCommand { get; }
@@ -95,15 +102,13 @@ public class ShopListViewModel : ViewModelBase
                     ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
 
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
-                    if (!isInitial)
+                    if (!isInitial && isExecuting)
                     {
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
-                                ActionStatusEnum = isExecuting
-                                    ? ActionStatus.StatusEnum.Executing
-                                    : ActionStatus.StatusEnum.Completed,
-                                Message = isExecuting ? "Searching for shops..." : "Shops search completed"
+                                ActionStatusEnum = ActionStatus.StatusEnum.Executing,
+                                Message = "Searching for shops..."
                             }));
                     }
                 })
@@ -114,11 +119,32 @@ public class ShopListViewModel : ViewModelBase
             {
                 Console.WriteLine("Failed to search for shops");
                 Console.WriteLine(ex.Message);
+
+                // use MessageBus to emit an ActionStatusMessageEvent for the error operation
+                MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                    new ActionStatus
+                    {
+                        ActionStatusEnum = ActionStatus.StatusEnum.Error,
+                        Message = ex.Message
+                    }));
             });
 
             // Subscribe to the ExecutingCommandsCount property
             this.WhenAnyValue(x => x.ExecutingCommandsCount)
                 .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
+                .DisposeWith(disposables);
+
+            // Subscribe to the SearchCommand's Executed observable
+            // Subscribe to the SearchCommand itself
+            SearchCommand.Subscribe(_ =>
+                {
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                            Message = "Shop search completed"
+                        }));
+                })
                 .DisposeWith(disposables);
 
             // console log when the viewmodel is deactivated
@@ -165,12 +191,21 @@ public class ShopListViewModel : ViewModelBase
             var request =
                 new HttpRequestMessage(HttpMethod.Get,
                     $"/api/PosAdmin/shopList?" +
-                    $"accountid={SearchTextAccountId}&shopId={SearchTextShopId}");
+                    $"accountid={SearchTextAccountId}&shopId={SearchTextShopId}&shopNameContains={SearchTextShopNameContains}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
             var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-            if (!response.IsSuccessStatusCode) return;
+            if (!response.IsSuccessStatusCode)
+            {
+                // log the error
+                Console.WriteLine($"Error: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"Error: {errorContent}");
+
+                // throw an exception with error code and content
+                throw new Exception($"Error: {response.StatusCode} - {errorContent}");
+            }
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var resultShopList = JsonSerializer.Deserialize<List<Shop>>(content,

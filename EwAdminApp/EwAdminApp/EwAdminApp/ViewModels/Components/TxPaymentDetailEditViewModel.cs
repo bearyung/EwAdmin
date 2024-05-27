@@ -139,15 +139,13 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                     ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
 
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial)
+                    if (!isInitial && isExecuting)
                     {
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
-                                ActionStatusEnum = isExecuting
-                                    ? ActionStatus.StatusEnum.Executing
-                                    : ActionStatus.StatusEnum.Completed,
-                                Message = isExecuting ? "Saving TxPayment..." : "TxPayment saved"
+                                ActionStatusEnum = ActionStatus.StatusEnum.Executing,
+                                Message = "Saving TxPayment..."
                             }));
                     }
                 })
@@ -171,6 +169,24 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             MessageBus.Current.Listen<ShopEvent>()
                 .Subscribe(shopEvent => { SelectedShop = shopEvent.ShopMessage; })
                 .DisposeWith(disposables);
+            
+            // Subscribe to the ExecutingCommandsCount property
+            this.WhenAnyValue(x => x.ExecutingCommandsCount)
+                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
+                .DisposeWith(disposables);
+            
+            // Subscribe to the SaveCommand's Executed observable
+            // Subscribe to the SaveCommand itself
+            SaveCommand.Subscribe(_ =>
+                {
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                            Message = "TxPayment saved"
+                        }));
+                })
+                .DisposeWith(disposables);
 
 
             // handle the exception when the PaymentMethodListCommand is executed
@@ -193,17 +209,13 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                     ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
 
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial)
+                    if (!isInitial && isExecuting)
                     {
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
-                                ActionStatusEnum = isExecuting
-                                    ? ActionStatus.StatusEnum.Executing
-                                    : ActionStatus.StatusEnum.Completed,
-                                Message = isExecuting
-                                    ? "Getting payment method list..."
-                                    : "Payment method list retrieved"
+                                ActionStatusEnum = ActionStatus.StatusEnum.Executing,
+                                Message = "Getting payment method list..."
                             }));
                     }
                 })
@@ -234,6 +246,17 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                         SelectedPaymentMethod = AvailablePaymentMethodList?.FirstOrDefault(paymentMethod =>
                             paymentMethod.PaymentMethodId == txPayment?.PaymentMethodId);
                     }
+                })
+                .DisposeWith(disposables);
+            
+            PaymentMethodListCommand.Subscribe(_ =>
+                {
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                            Message = "Payment method list retrieved"
+                        }));
                 })
                 .DisposeWith(disposables);
 
@@ -294,7 +317,16 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             // Check if the response is successful
-            if (!response.IsSuccessStatusCode) return;
+            if (!response.IsSuccessStatusCode)
+            {
+                // log the error
+                Console.WriteLine($"Error: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"Error: {errorContent}");
+                
+                // throw an exception with error code and content
+                throw new Exception($"Error: {response.StatusCode} - {errorContent}");
+            }
 
             // Read the content of the response
             var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -400,7 +432,16 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
 
             var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-            if (!response.IsSuccessStatusCode) return;
+            if (!response.IsSuccessStatusCode)
+            {
+                // log the error
+                Console.WriteLine($"Error: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"Error: {errorContent}");
+                
+                // throw an exception with error code and content
+                throw new Exception($"Error: {response.StatusCode} - {errorContent}");
+            }
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 

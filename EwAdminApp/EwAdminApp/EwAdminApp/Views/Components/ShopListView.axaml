@@ -26,7 +26,7 @@
                 <Label FontSize="8" Foreground="#232323" FontWeight="Bold">Shop List</Label>
             </Border>
             <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
-                <Grid ColumnDefinitions="*, *, 70">
+                <Grid ColumnDefinitions="*, *, *, 70">
                     <TextBox BorderBrush="Transparent"
                              Grid.Column="0" Watermark="Account Id"
                              Text="{Binding SearchTextAccountId}"
@@ -39,7 +39,12 @@
                              Classes="Digits"
                              Margin="0 0 0 0"
                              KeyDown="SearchShopTextBox_OnKeyDown" />
-                    <Button Grid.Column="2" Content="Search" Command="{Binding SearchCommand}" Margin="0 0 0 0" />
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="2" Watermark="Shop Name Contains"
+                             Text="{Binding SearchTextShopNameContains}"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchShopTextBox_OnKeyDown" />
+                    <Button Grid.Column="3" Content="Search" Command="{Binding SearchCommand}" Margin="0 0 0 0" />
                 </Grid>
             </Border>
             <DataGrid Name="ShopListDataGrid"

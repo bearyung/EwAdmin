@@ -28,6 +28,9 @@ public class MondayAuthorizationMiddleware
             await _next(context).ConfigureAwait(false);
             return;
         }
+        
+        // Enable buffering so the request body can be read multiple times
+        context.Request.EnableBuffering();
 
         logger.LogInformation("Attempting to retrieve user data from Monday.com");
         string? apiKey = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
@@ -58,7 +61,8 @@ public class MondayAuthorizationMiddleware
         var jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = new SnakeCaseNamingPolicy(),
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            WriteIndented = true
         };
         var content = new StringContent(JsonSerializer.Serialize(meQuery, jsonOptions), Encoding.UTF8,
             "application/json");
@@ -140,29 +144,29 @@ public class MondayAuthorizationMiddleware
                 .ConfigureAwait(false);
             return;
         }
-
-        // add a record to Monday access log, Monday Board ID: 6709158498
-        /* Sample item structure
-         {
-           "name": "202405261305",
-           "id": "6709158504",
-           "column_values": [
-             {
-               "id": "person",
-               "value": "{\"changed_at\":\"2024-05-26T03:35:46.257Z\",\"personsAndTeams\":[{\"id\":39629823,\"kind\":\"person\"}]}"
-             },
-             {
-               "id": "text__1",
-               "value": "\"285.123.1.10\""
-             },
-             {
-               "id": "text3__1",
-               "value": "\"/api/account/detail/\""
-             }
-        */
-        // person column id: person
-        // Source IP: text__1
-        // API Path: text3__1
+        
+        // init the http request parameters, header, body to a string variable to be used in the mutation
+        // code here
+        
+        // Read and log the request body
+        string requestBody;
+        using (var reader = new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true))
+        {
+            requestBody = await reader.ReadToEndAsync();
+            context.Request.Body.Position = 0; // Reset the stream position for the next middleware
+        }
+        
+        // Log the request header, don't log the Authorization header
+        var requestHeaders = context.Request.Headers
+            .Where(h => !h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
+            .ToDictionary(h => h.Key, h => h.Value.ToString());
+        
+        var requestLog = new StringBuilder();
+        requestLog.AppendLine($"Request Method: {context.Request.Method}");
+        requestLog.AppendLine($"Request Path: {context.Request.Path}");
+        requestLog.AppendLine($"Request Query String: {context.Request.QueryString}");
+        requestLog.AppendLine($"Request Headers: {JsonSerializer.Serialize(requestHeaders, jsonOptions)}");
+        requestLog.AppendLine($"Request Body: {requestBody}");
 
         var logQuery = new
         {
@@ -185,7 +189,8 @@ public class MondayAuthorizationMiddleware
                     text37__1 = userData?.Data?.Me?.Name,
                     text__1 = context.Connection.RemoteIpAddress?.ToString(),
                     text3__1 = apiPath,
-                    date__1 = DateTime.UtcNow.AddDays(30).ToString("yyyy-MM-dd")
+                    date__1 = DateTime.UtcNow.AddDays(30).ToString("yyyy-MM-dd"),
+                    long_text__1 = requestLog.ToString()
                 }, jsonOptions)
             }
         };

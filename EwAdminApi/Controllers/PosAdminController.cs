@@ -43,6 +43,7 @@ public class PosAdminController : ControllerBase
     /// <param name="shopId">The shop ID from the query string.</param>
     /// <param name="page">The page number for pagination. Defaults to 1 if not provided.</param>
     /// <param name="pageSize">The number of records per page. Defaults to 20 if not provided.</param>
+    /// <param name="shopNameContains">The shop name to filter the results. If not provided, fetches all records.</param>
     /// <returns>
     /// An IActionResult that represents the result of the action method:
     /// - If the shops are found, it returns an HTTP 200 status code along with the shop details.
@@ -55,7 +56,8 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetShopList(
-        [FromQuery, Required] int accountId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] int? shopId = null)
+        [FromQuery, Required] int accountId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20, 
+        [FromQuery] int? shopId = null, [FromQuery] string? shopNameContains = null)
     {
         // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
         if (page <= 0 || pageSize <= 0)
@@ -70,7 +72,9 @@ public class PosAdminController : ControllerBase
         }
         
         // get the shop list from PosShopRepository
-        var resultList = await _posShopRepository.GetShopListAsync(accountId, page, pageSize, shopId).ConfigureAwait(false);
+        var resultList = await _posShopRepository
+            .GetShopListAsync(accountId, page, pageSize, shopId, shopNameContains)
+            .ConfigureAwait(false);
         
         return Ok(resultList);
     }

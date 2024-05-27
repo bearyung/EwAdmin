@@ -96,17 +96,13 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
                     ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
 
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial)
+                    if (!isInitial && isExecuting)
                     {
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
-                                ActionStatusEnum = isExecuting
-                                    ? ActionStatus.StatusEnum.Executing
-                                    : ActionStatus.StatusEnum.Completed,
-                                Message = isExecuting
-                                    ? "Saving ShopWorkdayPeriodDetail..."
-                                    : "ShopWorkdayPeriodDetail saved"
+                                ActionStatusEnum = ActionStatus.StatusEnum.Executing,
+                                Message = "Saving ShopWorkdayPeriodDetail..."
                             }));
                     }
                 })
@@ -134,6 +130,24 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
                         SelectedShopWorkdayPeriodDetail =
                             shopWorkdayPeriodDetailEvent.ShopWorkdayPeriodDetailMessage;
                     });
+                })
+                .DisposeWith(disposables);
+            
+            // Subscribe to the ExecutingCommandsCount property
+            this.WhenAnyValue(x => x.ExecutingCommandsCount)
+                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
+                .DisposeWith(disposables);
+
+            // Subscribe to the SaveCommand's Executed observable
+            // Subscribe to the SaveCommand itself
+            SaveCommand.Subscribe(_ =>
+                {
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                            Message = "ShopWorkdayPeriodDetail saved successfully"
+                        }));
                 })
                 .DisposeWith(disposables);
             
@@ -204,7 +218,16 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
 
             var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-            if (!response.IsSuccessStatusCode) return;
+            if (!response.IsSuccessStatusCode)
+            {
+                // log the error
+                Console.WriteLine($"Error: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"Error: {errorContent}");
+                
+                // throw an exception with error code and content
+                throw new Exception($"Error: {response.StatusCode} - {errorContent}");
+            }
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 

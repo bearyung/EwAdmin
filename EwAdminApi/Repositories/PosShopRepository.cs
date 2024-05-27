@@ -16,10 +16,11 @@ public class PosShopRepository : PosRepositoryBase
 
     // add a new method to get the shop list with pagination
     // code here
-    public async Task<IEnumerable<Shop>> GetShopListAsync(int accountId, int page, int pageSize, int? shopId = null)
+    public async Task<IEnumerable<Shop>> GetShopListAsync(int accountId, int page, int pageSize,
+        int? shopId = null, string? shopNameContains = null)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
-        
+
         // write the query to get the shop list with pagination
         // shopId is optional, if it is null, it should not be included in the query
         var query = @"
@@ -46,6 +47,10 @@ public class PosShopRepository : PosRepositoryBase
               FROM [dbo].[Shop]
               where accountid = @AccountId
               AND (@ShopId IS NULL OR shopid = @ShopId)
+              AND (@ShopNameContains IS NULL 
+                OR Name LIKE N'%' + @ShopNameContains + '%' 
+                OR AltName LIKE N'%' + @ShopNameContains + '%' 
+                OR ShopCode LIKE N'%' + @ShopNameContains + '%')
               ORDER BY ShopId
               OFFSET @Offset ROWS
               FETCH NEXT @PageSize ROWS ONLY";
@@ -56,7 +61,8 @@ public class PosShopRepository : PosRepositoryBase
             AccountId = accountId,
             Offset = (page - 1) * pageSize,
             PageSize = pageSize,
-            ShopId = shopId
+            ShopId = shopId,
+            ShopNameContains = shopNameContains
         };
 
 

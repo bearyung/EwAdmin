@@ -117,17 +117,13 @@ public class TxSalesHeaderListViewModel : ViewModelBase
                     ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
 
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
-                    if (!isInitial)
+                    if (!isInitial && isExecuting)
                     {
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
-                                ActionStatusEnum = isExecuting
-                                    ? ActionStatus.StatusEnum.Executing
-                                    : ActionStatus.StatusEnum.Completed,
-                                Message = isExecuting
-                                    ? "Searching for TxSalesHeader list..."
-                                    : "TxSalesHeader list search completed"
+                                ActionStatusEnum = ActionStatus.StatusEnum.Executing,
+                                Message = "Searching for TxSalesHeader list..."
                             }));
                     }
                 })
@@ -197,6 +193,24 @@ public class TxSalesHeaderListViewModel : ViewModelBase
                 })
                 .DisposeWith(disposables);
             
+            // Subscribe to the ExecutingCommandsCount property
+            this.WhenAnyValue(x => x.ExecutingCommandsCount)
+                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
+                .DisposeWith(disposables);
+
+            // Subscribe to the SearchCommand's Executed observable
+            // Subscribe to the SearchCommand itself
+            SearchCommand.Subscribe(_ =>
+                {
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                            Message = "TxSalesHeader search completed"
+                        }));
+                })
+                .DisposeWith(disposables);
+            
             // console log when the ViewModel is deactivated
             Disposable.Create(() =>
                 {
@@ -256,24 +270,32 @@ public class TxSalesHeaderListViewModel : ViewModelBase
 
             var response = await httpClient.SendAsync(request, cancellationToken);
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsStringAsync(cancellationToken);
-                var resultTxSalesHeaderList = JsonSerializer.Deserialize<List<TxSalesHeaderMin>>(content,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
-
-                // Add the search results to the TxSalesHeaderList property
-                RxApp.MainThreadScheduler.Schedule(() =>
-                {
-                    foreach (var txSalesHeader in resultTxSalesHeaderList)
-                    {
-                        TxSalesHeaderList?.Add(txSalesHeader);
-                    }
-
-                    // add the first TxSalesHeader in the list to the SelectedTxSalesHeader property
-                    SelectedTxSalesHeader = TxSalesHeaderList?.FirstOrDefault();
-                });
+                // log the error
+                Console.WriteLine($"Error: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                Console.WriteLine($"Error: {errorContent}");
+                
+                // throw an exception with error code and content
+                throw new Exception($"Error: {response.StatusCode} - {errorContent}");
             }
+
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var resultTxSalesHeaderList = JsonSerializer.Deserialize<List<TxSalesHeaderMin>>(content,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
+
+            // Add the search results to the TxSalesHeaderList property
+            RxApp.MainThreadScheduler.Schedule(() =>
+            {
+                foreach (var txSalesHeader in resultTxSalesHeaderList)
+                {
+                    TxSalesHeaderList?.Add(txSalesHeader);
+                }
+
+                // add the first TxSalesHeader in the list to the SelectedTxSalesHeader property
+                SelectedTxSalesHeader = TxSalesHeaderList?.FirstOrDefault();
+            });
         }
         catch (OperationCanceledException)
         {
