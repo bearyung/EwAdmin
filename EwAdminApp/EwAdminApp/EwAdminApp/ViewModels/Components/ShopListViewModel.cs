@@ -191,7 +191,8 @@ public class ShopListViewModel : ViewModelBase
             var request =
                 new HttpRequestMessage(HttpMethod.Get,
                     $"/api/PosAdmin/shopList?" +
-                    $"accountid={SearchTextAccountId}&shopId={SearchTextShopId}&shopNameContains={SearchTextShopNameContains}");
+                    $"page=1&pageSize=100&" +
+                    $"accountId={SearchTextAccountId}&shopId={SearchTextShopId}&shopNameContains={SearchTextShopNameContains}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
             var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
