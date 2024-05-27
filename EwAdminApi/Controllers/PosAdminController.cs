@@ -228,6 +228,7 @@ public class PosAdminController : ControllerBase
         
         // override the modified by field with the user name from Monday
         shopWorkdayPeriodDetail.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        shopWorkdayPeriodDetail.ModifiedDate = DateTime.Now;
         
         // Implementation to update shop workday period detail
         var updatedShopWorkdayPeriodDetail = 
@@ -277,6 +278,7 @@ public class PosAdminController : ControllerBase
         
         // override the modified by field with the user name from Monday
         shopWorkdayDetail.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        shopWorkdayDetail.ModifiedDate = DateTime.Now;
         
         // Implementation to update shop workday detail
         var updatedShopWorkdayDetail = 
@@ -505,6 +507,7 @@ public class PosAdminController : ControllerBase
         
         // override the modified by field with the user name from Monday
         txPayment.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        txPayment.ModifiedDate = DateTime.Now;
         
         // Implementation to update transaction payment
         var updatedTxPayment = 
@@ -671,6 +674,7 @@ public class PosAdminController : ControllerBase
         
         // override the modified by field with the user name from Monday
         itemCategory.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        itemCategory.ModifiedDate = DateTime.Now;
         
         // Implementation to update item category
         var updatedItemCategory = 

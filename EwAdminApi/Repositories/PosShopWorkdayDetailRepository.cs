@@ -5,11 +5,12 @@ using EwAdminApi.Services;
 
 namespace EwAdminApi.Repositories;
 
-public class PosShopWorkdayDetailRepository : PosRepositoryBase
+public class PosShopWorkdayDetailRepository : PosShopWorkdayDetailRepositoryBase
 {
     private readonly IConnectionService _connectionService;
 
-    public PosShopWorkdayDetailRepository(IConnectionService connectionService):base(connectionService)
+    public PosShopWorkdayDetailRepository(IConnectionService connectionService,
+        IHttpContextAccessor httpContextAccessor) : base(connectionService, httpContextAccessor)
     {
         _connectionService = connectionService;
     }
@@ -58,7 +59,7 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
         {
             // if enddate is null, set it to the startdate + 1 day
             endDate ??= startDate.Value.AddDays(1);
-            
+
             var offset = (page - 1) * pageSize;
             var query = @"
             SELECT 
@@ -98,7 +99,7 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
                 return [];
         }
     }
-    
+
     // UpdateShopWorkdayDetailAsync
     // input: ShopWorkdayDetail
     //          only OpenDatetime, CloseDatetime, IsClosed, Enabled, ModifiedBy  is being updated
@@ -108,25 +109,24 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
     {
         using var db = await GetPosDatabaseConnectionByAccount(shopWorkdayDetail.AccountId)
             .ConfigureAwait(false);
-        var query = @"
-        UPDATE [dbo].[ShopWorkdayDetail]
-        SET [OpenDatetime] = @OpenDatetime
-           ,[CloseDatetime] = @CloseDatetime
-           ,[IsClosed] = @IsClosed
-           ,[Enabled] = @Enabled
-           ,[ModifiedDate] = GETDATE()
-           ,[ModifiedBy] = @ModifiedBy
-        WHERE AccountId = @AccountId
-        AND ShopId = @ShopId
-        AND WorkdayDetailId = @WorkdayDetailId
-        ";
+        
+        // only OpenDatetime, CloseDatetime, IsClosed, Enabled, ModifiedDate, ModifiedBy to be updated using BuildUpdateQuery
+        var (query, parameters) = BuildUpdateQuery(shopWorkdayDetail, [
+            nameof(ShopWorkdayDetail.OpenDatetime),
+            nameof(ShopWorkdayDetail.CloseDatetime),
+            nameof(ShopWorkdayDetail.IsClosed),
+            nameof(ShopWorkdayDetail.Enabled)
+        ],[
+            nameof(ItemCategory.ModifiedDate),
+            nameof(ItemCategory.ModifiedBy),
+        ]);
 
         if (db != null)
-            await db.ExecuteAsync(query, shopWorkdayDetail).ConfigureAwait(false);
+            await db.ExecuteAsync(query, parameters).ConfigureAwait(false);
 
         return shopWorkdayDetail;
     }
-    
+
     // DeleteShopWorkdayDetailAsync
     // input: ShopWorkdayDetail
     // output: boolean indicating success
@@ -158,7 +158,7 @@ public class PosShopWorkdayDetailRepository : PosRepositoryBase
         await db!.ExecuteAsync(query2, shopWorkdayDetail, transaction).ConfigureAwait(false);
 
         transaction?.Commit();
-        
+
 
         return true;
     }

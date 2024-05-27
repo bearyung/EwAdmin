@@ -143,28 +143,30 @@ public class PosItemCategoryRepository : PosItemCategoryRepositoryBase
     /// <summary>
     /// Update an item category
     /// </summary>
-    /// <param name="itemCategory"></param>
+    /// <param name="itemCategoryObj"></param>
     /// <returns>
     /// Returns true if the item category is updated successfully
     /// </returns>
-    public async Task<ItemCategory?> UpdateItemCategoryAsync(ItemCategory itemCategory)
+    public async Task<ItemCategory?> UpdateItemCategoryAsync(ItemCategory itemCategoryObj)
     {
-        using var db = await GetPosDatabaseConnectionByAccount(itemCategory.AccountId).ConfigureAwait(false);
-        var (query, parameters) = BuildUpdateQuery(itemCategory, [
+        using var db = await GetPosDatabaseConnectionByAccount(itemCategoryObj.AccountId).ConfigureAwait(false);
+        var (query, parameters) = BuildUpdateQuery(itemCategoryObj, [
             nameof(ItemCategory.ParentCategoryId),
             nameof(ItemCategory.IsTerminal),
             nameof(ItemCategory.Enabled),
-            nameof(ItemCategory.ModifiedBy),
             nameof(ItemCategory.CategoryTypeId)
+        ], [
+            nameof(ItemCategory.ModifiedDate),
+            nameof(ItemCategory.ModifiedBy),
         ]);
 
         if (db != null)
         {
-            // if updqte is successful, return the updated item category
+            // if update is successful, return the updated item category
             var result = await db.ExecuteAsync(query, parameters).ConfigureAwait(false);
             if (result > 0)
             {
-                return await GetItemCategoryDetailAsync(itemCategory.AccountId, itemCategory.CategoryId)
+                return await GetItemCategoryDetailAsync(itemCategoryObj.AccountId, itemCategoryObj.CategoryId)
                     .ConfigureAwait(false);
             }
         }

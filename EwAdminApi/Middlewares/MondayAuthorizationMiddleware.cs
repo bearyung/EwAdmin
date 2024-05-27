@@ -28,13 +28,14 @@ public class MondayAuthorizationMiddleware
             await _next(context).ConfigureAwait(false);
             return;
         }
-        
+
         logger.LogInformation("Attempting to retrieve user data from Monday.com");
         string? apiKey = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
         if (string.IsNullOrEmpty(apiKey))
         {
             context.Response.StatusCode = 401; // Unauthorized
-            await context.Response.WriteAsJsonAsync(new {errorMessage = "Unauthorized: API key is missing."}).ConfigureAwait(false);
+            await context.Response.WriteAsJsonAsync(new { errorMessage = "Unauthorized: API key is missing." })
+                .ConfigureAwait(false);
             return;
         }
 
@@ -68,7 +69,7 @@ public class MondayAuthorizationMiddleware
         {
             logger.LogError($"Failed to retrieve user data: {response.StatusCode}");
             context.Response.StatusCode = 401; // Unauthorized
-            await context.Response.WriteAsJsonAsync(new {errorMessage = "Unauthorized access"}).ConfigureAwait(false);
+            await context.Response.WriteAsJsonAsync(new { errorMessage = "Unauthorized access" }).ConfigureAwait(false);
             return;
         }
 
@@ -119,7 +120,7 @@ public class MondayAuthorizationMiddleware
         {
             logger.LogError($"Failed to retrieve user data: {checkAccessResponse.StatusCode}");
             context.Response.StatusCode = 401; // Unauthorized
-            await context.Response.WriteAsJsonAsync(new {errorMessage = "Unauthorized access"}).ConfigureAwait(false);
+            await context.Response.WriteAsJsonAsync(new { errorMessage = "Unauthorized access" }).ConfigureAwait(false);
             return;
         }
 
@@ -134,11 +135,78 @@ public class MondayAuthorizationMiddleware
         {
             logger.LogWarning($"Access denied for user {userData?.Data?.Me?.Id} to path {apiPath}");
             context.Response.StatusCode = 403; // Forbidden
-            await context.Response.WriteAsJsonAsync(new {errorMessage = "Access Denied: You do not have rights to access this API."}).ConfigureAwait(false);
+            await context.Response
+                .WriteAsJsonAsync(new { errorMessage = "Access Denied: You do not have rights to access this API." })
+                .ConfigureAwait(false);
             return;
         }
 
-        // Optionally, you might want to store this user data in the HttpContext for downstream use
+        // add a record to Monday access log, Monday Board ID: 6709158498
+        /* Sample item structure
+         {
+           "name": "202405261305",
+           "id": "6709158504",
+           "column_values": [
+             {
+               "id": "person",
+               "value": "{\"changed_at\":\"2024-05-26T03:35:46.257Z\",\"personsAndTeams\":[{\"id\":39629823,\"kind\":\"person\"}]}"
+             },
+             {
+               "id": "text__1",
+               "value": "\"285.123.1.10\""
+             },
+             {
+               "id": "text3__1",
+               "value": "\"/api/account/detail/\""
+             }
+        */
+        // person column id: person
+        // Source IP: text__1
+        // API Path: text3__1
+
+        var logQuery = new
+        {
+            query = """
+                        mutation ($item_name: String!, $column_values: JSON!) {
+                          create_item(
+                            board_id: 6709158498
+                            item_name: $item_name
+                            column_values: $column_values
+                          ) {
+                            id
+                          }
+                        }
+                    """,
+            variables = new
+            {
+                item_name = DateTime.UtcNow.Ticks.ToString(),
+                column_values = JsonSerializer.Serialize(new
+                {
+                    text37__1 = userData?.Data?.Me?.Name,
+                    text__1 = context.Connection.RemoteIpAddress?.ToString(),
+                    text3__1 = apiPath,
+                    date__1 = DateTime.UtcNow.AddDays(30).ToString("yyyy-MM-dd")
+                }, jsonOptions)
+            }
+        };
+
+        var logContent = new StringContent(JsonSerializer.Serialize(logQuery, jsonOptions), Encoding.UTF8,
+            "application/json");
+
+        var logResponse = await client.PostAsync("", logContent).ConfigureAwait(false);
+
+        if (!logResponse.IsSuccessStatusCode)
+        {
+            logger.LogError($"Failed to log user access: {logResponse.StatusCode}");
+
+            // return error response to user even if the log fails
+            context.Response.StatusCode = 500; // Internal Server Error
+            await context.Response.WriteAsJsonAsync(new { errorMessage = "Failed to log user access." })
+                .ConfigureAwait(false);
+            return;
+        }
+
+        // store the user data in the context for further use
         context.Items["MondayUserData"] = userData;
 
         logger.LogInformation($"Access granted for user {userData?.Data?.Me?.Id} to path {apiPath}");
