@@ -27,8 +27,8 @@ public class DashboardFixViewModel : ViewModelBase
         //     { DisplayName = "Remap Table to Tx", Function = UserFunctionEnum.FixTxTableRemap },
         // new FunctionItem
         //     { DisplayName = "Remap Cash Drawer to Tx", Function = UserFunctionEnum.FixTxCashDrawerRemap },
-        // new FunctionItem
-        //     { DisplayName = "Adjust Tx Cus Count", Function = UserFunctionEnum.FixTxCustomerCount },
+        new FunctionItem
+            { DisplayName = "Adjust Tx Cus Count", Function = UserFunctionEnum.FixTxCustomerCount },
     ];
 
     private FunctionItem? _selectedUserFunction;

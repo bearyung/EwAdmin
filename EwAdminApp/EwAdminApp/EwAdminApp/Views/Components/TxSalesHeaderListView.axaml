@@ -67,6 +67,8 @@
                                         Binding="{Binding TxSalesHeaderId}" />
                     <DataGridTextColumn Header="TxDate"
                                         Binding="{Binding TxDate}" />
+                    <DataGridTextColumn Header="TableCode"
+                                        Binding="{Binding TableCode}" />
                     <DataGridTextColumn Header="AmountTotal"
                                         Binding="{Binding AmountTotal}" />
                     <DataGridTextColumn Header="AmountSubtotal"
