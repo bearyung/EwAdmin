@@ -8,9 +8,10 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <Authors>Everyware Limited</Authors>
         <Company>Everyware Limited</Company>
-        <AssemblyVersion>1.0.2</AssemblyVersion>
-        <FileVersion>1.0.2</FileVersion>
-        <Version>1.0.2</Version>
+        <AssemblyVersion>1.0.5</AssemblyVersion>
+        <FileVersion>1.0.5</FileVersion>
+        <Version>1.0.5</Version>
+        <Copyright>Everyware Limited</Copyright>
     </PropertyGroup>
 
     <PropertyGroup>
