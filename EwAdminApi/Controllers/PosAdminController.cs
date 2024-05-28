@@ -17,6 +17,7 @@ public class PosAdminController : ControllerBase
     private readonly PosTxSalesRepository _posTxSalesRepository;
     private readonly PosPaymentMethodRepository _posPaymentMethodRepository;
     private readonly PosItemCategoryRepository _posItemCategoryRepository;
+    private readonly PosTableMasterRepository _posTableMasterRepository;
 
     public PosAdminController(
         PosShopRepository posShopRepository,
@@ -24,7 +25,8 @@ public class PosAdminController : ControllerBase
         PosShopWorkdayPeriodDetailRepository posShopWorkdayPeriodDetailRepository,
         PosTxSalesRepository posTxSalesRepository,
         PosPaymentMethodRepository posPaymentMethodRepository,
-        PosItemCategoryRepository posItemCategoryRepository)
+        PosItemCategoryRepository posItemCategoryRepository,
+        PosTableMasterRepository posTableMasterRepository)
     {
         _posShopRepository = posShopRepository;
         _posShopWorkdayDetailRepository = posShopWorkdayDetailRepository;
@@ -32,6 +34,7 @@ public class PosAdminController : ControllerBase
         _posTxSalesRepository = posTxSalesRepository;
         _posPaymentMethodRepository = posPaymentMethodRepository;
         _posItemCategoryRepository = posItemCategoryRepository;
+        _posTableMasterRepository = posTableMasterRepository;
     }
 
     // add an API endpoint shopList to return the list of shops
@@ -718,5 +721,54 @@ public class PosAdminController : ControllerBase
         }
 
         return Ok(updatedItemCategory);
+    }
+    
+    // add an API endpoint tableList to return the list of tables
+    /// <summary>
+    /// Handles the GET request to fetch the list of tables.
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <param name="shopId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="tableId"></param>
+    /// <param name="tableCode"></param>
+    /// <param name="showDisabled"></param>
+    /// <param name="showEnabled"></param>
+    /// <param name="showTempTable"></param>
+    /// <param name="showTakeAway"></param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the tables are found, it returns an HTTP 200 status code along with the table details.
+    /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
+    /// </returns>
+    [HttpGet("tableList")]
+    [ProducesResponseType(typeof(IEnumerable<TableMaster>), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GetTableList(
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
+        [FromQuery] int? tableId = null, [FromQuery] string? tableCode = null, 
+        [FromQuery] bool showDisabled = false, [FromQuery] bool showEnabled = true, [FromQuery] bool showTempTable = true, [FromQuery] bool showTakeAway = true)
+    {
+        // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
+        if (page <= 0 || pageSize <= 0)
+        {
+            return new CustomBadRequestResult("Page and PageSize must be greater than zero.");
+        }
+
+        // Check if pageSize is more than 100. If so, return a BadRequest.
+        if (pageSize > 100)
+        {
+            return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
+        }
+
+        // get the table list from PosTableMasterRepository
+        var resultList = await _posTableMasterRepository
+            .GetTableListAsync(accountId, shopId, page, pageSize, tableId, tableCode, showDisabled, showEnabled, showTempTable, showTakeAway)
+            .ConfigureAwait(false);
+
+        return Ok(resultList);
     }
 }

@@ -26,6 +26,7 @@ builder.Services.AddScoped<PosItemCategoryRepository>();
 builder.Services.AddScoped<WebAdminRegionMasterRepository>();
 builder.Services.AddScoped<WebAdminCompanyMasterRepository>();
 builder.Services.AddScoped<WebAdminBrandMasterRepository>();
+builder.Services.AddScoped<PosTableMasterRepository>();
 
 // builder.Services.TryAddMondayClient(options =>
 // {
