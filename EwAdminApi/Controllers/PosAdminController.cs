@@ -33,7 +33,7 @@ public class PosAdminController : ControllerBase
         _posPaymentMethodRepository = posPaymentMethodRepository;
         _posItemCategoryRepository = posItemCategoryRepository;
     }
-    
+
     // add an API endpoint shopList to return the list of shops
     // code here
     /// <summary>
@@ -56,7 +56,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetShopList(
-        [FromQuery, Required] int accountId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20, 
+        [FromQuery, Required] int accountId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
         [FromQuery] int? shopId = null, [FromQuery] string? shopNameContains = null)
     {
         // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
@@ -70,15 +70,15 @@ public class PosAdminController : ControllerBase
         {
             return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
-        
+
         // get the shop list from PosShopRepository
         var resultList = await _posShopRepository
             .GetShopListAsync(accountId, page, pageSize, shopId, shopNameContains)
             .ConfigureAwait(false);
-        
+
         return Ok(resultList);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the details of a specific shop.
     /// </summary>
@@ -109,7 +109,7 @@ public class PosAdminController : ControllerBase
         // If the shop is found, returns an HTTP 200 OK response with the shop details.
         return Ok(shop);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the list of shop workday details.
     /// </summary>
@@ -131,7 +131,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetShopWorkdayDetailList(
-        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, 
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId,
         [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
@@ -147,14 +147,16 @@ public class PosAdminController : ControllerBase
         {
             return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
-        
+
         // get the shop workday detail list from PosShopWorkdayDetailRepository
-        var resultList = 
-            await _posShopWorkdayDetailRepository.GetShopWorkdayDetailListAsync(accountId, shopId, startDate, endDate, page, pageSize).ConfigureAwait(false);
-        
+        var resultList =
+            await _posShopWorkdayDetailRepository
+                .GetShopWorkdayDetailListAsync(accountId, shopId, startDate, endDate, page, pageSize)
+                .ConfigureAwait(false);
+
         return Ok(resultList);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the list of shop workday period details.
     /// </summary>
@@ -169,14 +171,14 @@ public class PosAdminController : ControllerBase
     /// - If the page or pageSize is invalid, it returns an HTTP 400 status code with a custom error message.
     /// - If the pageSize is more than 100, it also returns an HTTP 400 status code with a custom error message.
     /// </returns>
-    
     [HttpGet("shopWorkdayPeriodDetailList")]
     [ProducesResponseType(typeof(IEnumerable<ShopWorkdayPeriodDetail>), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetShopWorkdayPeriodDetailList(
-        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] int workdayDetailId,
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId,
+        [FromQuery, Required] int workdayDetailId,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         // Implementation to fetch shop workday period detail
@@ -189,14 +191,16 @@ public class PosAdminController : ControllerBase
         {
             return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
-        
+
         // get the shop workday period detail list from PosShopWorkdayPeriodDetailRepository
-        var resultList = 
-            await _posShopWorkdayPeriodDetailRepository.GetShopWorkdayPeriodDetailListAsync(accountId, shopId, workdayDetailId, page, pageSize).ConfigureAwait(false);
-        
+        var resultList =
+            await _posShopWorkdayPeriodDetailRepository
+                .GetShopWorkdayPeriodDetailListAsync(accountId, shopId, workdayDetailId, page, pageSize)
+                .ConfigureAwait(false);
+
         return Ok(resultList);
     }
-    
+
     /// <summary>
     /// Handles the PATCH request to update a shop workday period detail.
     /// </summary>
@@ -206,7 +210,6 @@ public class PosAdminController : ControllerBase
     /// - If the shop workday period detail is updated successfully, it returns an HTTP 200 status code along with the updated shop workday period detail.
     /// - If the user data is not found, it returns an HTTP 400 status code with a custom error message.
     /// </returns>
-        
     [HttpPatch("updateShopWorkdayPeriodDetail")]
     [ProducesResponseType(typeof(ShopWorkdayPeriodDetail), 200)]
     [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
@@ -216,9 +219,11 @@ public class PosAdminController : ControllerBase
         [FromBody, Required] ShopWorkdayPeriodDetail shopWorkdayPeriodDetail)
     {
         // Validate the identify fields
-        if (shopWorkdayPeriodDetail.AccountId == 0 || shopWorkdayPeriodDetail.ShopId == 0 || shopWorkdayPeriodDetail.WorkdayPeriodDetailId == 0)
+        if (shopWorkdayPeriodDetail.AccountId == 0 || shopWorkdayPeriodDetail.ShopId == 0 ||
+            shopWorkdayPeriodDetail.WorkdayPeriodDetailId == 0)
         {
-            return new CustomBadRequestResult("AccountId, ShopId and ShopWorkdayPeriodDetailId must be greater than zero.");
+            return new CustomBadRequestResult(
+                "AccountId, ShopId and ShopWorkdayPeriodDetailId must be greater than zero.");
         }
 
         // Get the Monday user data from the HttpContext
@@ -229,25 +234,26 @@ public class PosAdminController : ControllerBase
             // Handle the case where the data is not found
             return new CustomBadRequestResult("User data not found.");
         }
-        
+
         // override the modified by field with the user name from Monday
         shopWorkdayPeriodDetail.ModifiedBy = mondayUserData?.Data?.Me?.Name;
         shopWorkdayPeriodDetail.ModifiedDate = DateTime.Now;
-        
+
         // Implementation to update shop workday period detail
-        var updatedShopWorkdayPeriodDetail = 
-            await _posShopWorkdayPeriodDetailRepository.UpdateShopWorkdayPeriodDetailAsync(shopWorkdayPeriodDetail).ConfigureAwait(false);
-        
+        var updatedShopWorkdayPeriodDetail =
+            await _posShopWorkdayPeriodDetailRepository.UpdateShopWorkdayPeriodDetailAsync(shopWorkdayPeriodDetail)
+                .ConfigureAwait(false);
+
         // If the shop workday period detail is not updated successfully, return a custom 400 Bad Request response with a custom error message.
         // otherwise, return an HTTP 200 OK response with the updated shop workday period detail.
         if (updatedShopWorkdayPeriodDetail == null)
         {
-            return new CustomBadRequestResult("Failed to update shop workday period detail.");   
+            return new CustomBadRequestResult("Failed to update shop workday period detail.");
         }
-        
+
         return Ok(updatedShopWorkdayPeriodDetail);
     }
-    
+
     /// <summary>
     /// Handles the PATCH request to update a shop workday detail.
     /// </summary>
@@ -279,25 +285,25 @@ public class PosAdminController : ControllerBase
             // Handle the case where the data is not found
             return new CustomBadRequestResult("User data not found.");
         }
-        
+
         // override the modified by field with the user name from Monday
         shopWorkdayDetail.ModifiedBy = mondayUserData?.Data?.Me?.Name;
         shopWorkdayDetail.ModifiedDate = DateTime.Now;
-        
+
         // Implementation to update shop workday detail
-        var updatedShopWorkdayDetail = 
+        var updatedShopWorkdayDetail =
             await _posShopWorkdayDetailRepository.UpdateShopWorkdayDetailAsync(shopWorkdayDetail).ConfigureAwait(false);
-        
+
         // If the shop workday detail is not updated successfully, return a custom 400 Bad Request response with a custom error message.
         // Otherwise, return an HTTP 200 OK response with the updated shop workday detail.
         if (updatedShopWorkdayDetail == null)
         {
-            return new CustomBadRequestResult("Failed to update shop workday detail.");   
+            return new CustomBadRequestResult("Failed to update shop workday detail.");
         }
-        
+
         return Ok(updatedShopWorkdayDetail);
     }
-    
+
     /// <summary>
     /// Handles the DELETE request to delete a shop workday detail.
     /// </summary>
@@ -319,11 +325,12 @@ public class PosAdminController : ControllerBase
         {
             return new CustomBadRequestResult("AccountId, ShopId and WorkdayDetailId must be greater than zero.");
         }
-        
+
         // check if there are any transactions in the given workday detail id
-        var txCount = 
-            await _posTxSalesRepository.GetTxCountInWorkdayDetailIdAsync(shopWorkdayDetail.AccountId, shopWorkdayDetail.ShopId, shopWorkdayDetail.WorkdayDetailId).ConfigureAwait(false);
-        
+        var txCount =
+            await _posTxSalesRepository.GetTxCountInWorkdayDetailIdAsync(shopWorkdayDetail.AccountId,
+                shopWorkdayDetail.ShopId, shopWorkdayDetail.WorkdayDetailId).ConfigureAwait(false);
+
         // return error to user if there are transactions in the workday detail
         if (txCount > 0)
         {
@@ -331,12 +338,12 @@ public class PosAdminController : ControllerBase
         }
 
         // Implementation to delete shop workday detail
-        var isDeleted = 
+        var isDeleted =
             await _posShopWorkdayDetailRepository.DeleteShopWorkdayDetailAsync(shopWorkdayDetail).ConfigureAwait(false);
-        
+
         return Ok(isDeleted);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the details of a specific transaction header.
     /// </summary>
@@ -353,20 +360,23 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxSalesHeader(
-        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] int txSalesHeaderId)
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId,
+        [FromQuery, Required] int txSalesHeaderId)
     {
         // Implementation to fetch transaction header
-        var txHeader = await _posTxSalesRepository.GetTxSalesHeaderAsync(accountId, shopId, txSalesHeaderId).ConfigureAwait(false);
-        
+        var txHeader = await _posTxSalesRepository.GetTxSalesHeaderAsync(accountId, shopId, txSalesHeaderId)
+            .ConfigureAwait(false);
+
         // If the transaction header is not found, return a custom 404 Not Found response with a custom error message.
         if (txHeader == null)
         {
             return new CustomNotFoundRequestResult("Transaction header not found.");
         }
+
         return Ok(txHeader);
     }
-    
-    
+
+
     /// <summary>
     /// Handles the GET request to fetch the list of transaction headers.
     /// </summary>
@@ -376,6 +386,10 @@ public class PosAdminController : ControllerBase
     /// <param name="txSalesHeaderId"></param>
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
+    /// <param name="tableCode"></param>
+    /// <param name="cusCountGte"></param>
+    /// <param name="amountTotalGte"></param>
+    /// <param name="amountTotalLte"></param>
     /// <returns>
     /// An IActionResult that represents the result of the action method:
     /// - If the transaction headers are found, it returns an HTTP 200 status code along with the transaction header details.
@@ -389,7 +403,9 @@ public class PosAdminController : ControllerBase
     public async Task<IActionResult> GetTxSalesHeaderList(
         [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] DateTime txDate,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
-        [FromQuery] int? txSalesHeaderId = null)
+        [FromQuery] int? txSalesHeaderId = null, [FromQuery] string? tableCode = null,
+        [FromQuery] int? cusCountGte = null, [FromQuery] decimal? amountTotalGte = null,
+        [FromQuery] decimal? amountTotalLte = null)
     {
         // Implementation to fetch transaction header list
         if (page <= 0 || pageSize <= 0)
@@ -401,14 +417,17 @@ public class PosAdminController : ControllerBase
         {
             return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
-        
+
         // get the transaction header list from PosTxRepository
-        var resultList = 
-            await _posTxSalesRepository.GetTxSalesHeaderListAsync(accountId, shopId, txDate, page, pageSize, txSalesHeaderId).ConfigureAwait(false);
-        
+        var resultList =
+            await _posTxSalesRepository
+                .GetTxSalesHeaderListAsync(accountId, shopId, txDate, page, pageSize, txSalesHeaderId, tableCode,
+                    cusCountGte, amountTotalGte, amountTotalLte)
+                .ConfigureAwait(false);
+
         return Ok(resultList);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the list of transaction payments for a specific transaction header.
     /// </summary>
@@ -428,7 +447,8 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxPaymentList(
-        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] int txSalesHeaderId,
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId,
+        [FromQuery, Required] int txSalesHeaderId,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         // Implementation to fetch transaction payment list
@@ -441,14 +461,15 @@ public class PosAdminController : ControllerBase
         {
             return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
-        
+
         // get the transaction payment list from PosTxRepository
-        var resultList = 
-            await _posTxSalesRepository.GetTxPaymentListAsync(accountId, shopId, txSalesHeaderId, page, pageSize).ConfigureAwait(false);
-        
+        var resultList =
+            await _posTxSalesRepository.GetTxPaymentListAsync(accountId, shopId, txSalesHeaderId, page, pageSize)
+                .ConfigureAwait(false);
+
         return Ok(resultList);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the details of a specific transaction payment.
     /// </summary>
@@ -465,19 +486,21 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxPayment(
-        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery,Required] int txPaymentId)
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] int txPaymentId)
     {
         // Implementation to fetch transaction payment
-        var txPayment = await _posTxSalesRepository.GetTxPaymentAsync(accountId, shopId, txPaymentId).ConfigureAwait(false);
-        
+        var txPayment = await _posTxSalesRepository.GetTxPaymentAsync(accountId, shopId, txPaymentId)
+            .ConfigureAwait(false);
+
         // If the transaction payment is not found, return a custom 404 Not Found response with a custom error message.
         if (txPayment == null)
         {
             return new CustomNotFoundRequestResult("Transaction payment not found.");
         }
+
         return Ok(txPayment);
     }
-    
+
     /// <summary>
     /// Handles the PATCH request to update a transaction payment.
     /// </summary>
@@ -508,25 +531,25 @@ public class PosAdminController : ControllerBase
             // Handle the case where the data is not found
             return new CustomBadRequestResult("User data not found.");
         }
-        
+
         // override the modified by field with the user name from Monday
         txPayment.ModifiedBy = mondayUserData?.Data?.Me?.Name;
         txPayment.ModifiedDate = DateTime.Now;
-        
+
         // Implementation to update transaction payment
-        var updatedTxPayment = 
+        var updatedTxPayment =
             await _posTxSalesRepository.UpdateTxPaymentAsync(txPayment).ConfigureAwait(false);
-        
+
         // If the transaction payment is not updated successfully, return a custom 400 Bad Request response with a custom error message.
         // Otherwise, return an HTTP 200 OK response with the updated transaction payment details.
         if (updatedTxPayment == null)
         {
-            return new CustomBadRequestResult("Failed to update transaction payment.");   
+            return new CustomBadRequestResult("Failed to update transaction payment.");
         }
-        
+
         return Ok(updatedTxPayment);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the list of payment methods.
     /// </summary>
@@ -545,7 +568,8 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetPaymentMethodList(
-        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
     {
         // Implementation to fetch payment method list
         if (page <= 0 || pageSize <= 0)
@@ -557,11 +581,12 @@ public class PosAdminController : ControllerBase
         {
             return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
-        
+
         // get the payment method list from PosPaymentMethodRepository
-        var resultList = 
-            await _posPaymentMethodRepository.GetPaymentMethodListAsync(accountId, shopId, page, pageSize).ConfigureAwait(false);
-        
+        var resultList =
+            await _posPaymentMethodRepository.GetPaymentMethodListAsync(accountId, shopId, page, pageSize)
+                .ConfigureAwait(false);
+
         return Ok(resultList);
     }
 
@@ -587,10 +612,10 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetItemCategoryList(
-        [FromQuery, Required] int accountId, 
-        [FromQuery] int page = 1, [FromQuery] int pageSize = 20, 
-        [FromQuery] bool showEnabledRecords = true, [FromQuery] bool showDisabledRecords = false, 
-        [FromQuery]DateTime? lastModifiedDateTime = null, [FromQuery]string? categoryNameContains = null) 
+        [FromQuery, Required] int accountId,
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
+        [FromQuery] bool showEnabledRecords = true, [FromQuery] bool showDisabledRecords = false,
+        [FromQuery] DateTime? lastModifiedDateTime = null, [FromQuery] string? categoryNameContains = null)
     {
         // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
         if (page <= 0 || pageSize <= 0)
@@ -603,17 +628,17 @@ public class PosAdminController : ControllerBase
         {
             return new CustomBadRequestResult("PageSize must be smaller or equal to 100.");
         }
-        
+
         // get the item category list from PosItemCategoryRepository
         var resultList = await _posItemCategoryRepository
-            .GetItemCategoryListAsync(accountId: accountId, page, pageSize, 
-                showEnabledRecords, showDisabledRecords, 
+            .GetItemCategoryListAsync(accountId: accountId, page, pageSize,
+                showEnabledRecords, showDisabledRecords,
                 lastModifiedDateTime, categoryNameContains)
             .ConfigureAwait(false);
-        
+
         return Ok(resultList);
     }
-    
+
     /// <summary>
     /// Handles the GET request to fetch the details of a specific item category.
     /// </summary>
@@ -633,7 +658,8 @@ public class PosAdminController : ControllerBase
         [FromQuery, Required] int accountId, [FromQuery, Required] int categoryId)
     {
         // Fetches the item category details using the provided account ID and item category ID.
-        var itemCategory = await _posItemCategoryRepository.GetItemCategoryDetailAsync(accountId, categoryId).ConfigureAwait(false);
+        var itemCategory = await _posItemCategoryRepository.GetItemCategoryDetailAsync(accountId, categoryId)
+            .ConfigureAwait(false);
 
         // If the item category is not found, returns a custom 404 Not Found response with a custom error message.
         if (itemCategory == null)
@@ -644,7 +670,7 @@ public class PosAdminController : ControllerBase
         // If the item category is found, returns an HTTP 200 OK response with the item category details.
         return Ok(itemCategory);
     }
-    
+
     /// <summary>
     /// Handles the PATCH request to update an item category.
     /// </summary>
@@ -675,22 +701,22 @@ public class PosAdminController : ControllerBase
             // Handle the case where the data is not found
             return new CustomBadRequestResult("User data not found.");
         }
-        
+
         // override the modified by field with the user name from Monday
         itemCategory.ModifiedBy = mondayUserData?.Data?.Me?.Name;
         itemCategory.ModifiedDate = DateTime.Now;
-        
+
         // Implementation to update item category
-        var updatedItemCategory = 
+        var updatedItemCategory =
             await _posItemCategoryRepository.UpdateItemCategoryAsync(itemCategory).ConfigureAwait(false);
-        
+
         // If the item category is not updated successfully, return a custom 400 Bad Request response with a custom error message.
         // otherwise, return an HTTP 200 OK response with the updated item category.
         if (updatedItemCategory == null)
         {
-            return new CustomBadRequestResult("Failed to update item category.");   
+            return new CustomBadRequestResult("Failed to update item category.");
         }
-        
+
         return Ok(updatedItemCategory);
     }
 }

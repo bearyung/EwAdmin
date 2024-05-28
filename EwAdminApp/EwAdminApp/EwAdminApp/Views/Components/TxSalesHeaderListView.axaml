@@ -25,13 +25,28 @@
                 <Label FontSize="8" Foreground="#232323" FontWeight="Bold">TxSalesHeader List</Label>
             </Border>
             <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
-                <Grid ColumnDefinitions="*, 70">
+                <Grid ColumnDefinitions="140, 90, 90, 220, *, 70">
                     <TextBox BorderBrush="Transparent"
                              Grid.Column="0" Watermark="TxSalesHeaderId"
                              Text="{Binding SearchTextTxSalesHeaderId}"
                              Margin="0 0 0 0"
                              KeyDown="SearchTextBox_OnKeyDown" />
-                    <Button Grid.Column="1" Content="Search"
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="1" Watermark="CusCount"
+                             Text="{Binding SearchTextCusCount}"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchTextBox_OnKeyDown" />
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="2" Watermark="TableCode"
+                             Text="{Binding SearchTextTableCode}"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchTextBox_OnKeyDown" />
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="3" Watermark="AmountTotal [From:To]"
+                             Text="{Binding SearchTextAmountTotal}"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchTextBox_OnKeyDown" />
+                    <Button Grid.Column="5" Content="Search"
                             Command="{Binding SearchCommand}"
                             Margin="0 0 0 0" />
                 </Grid>
@@ -44,12 +59,50 @@
                       SelectedItem="{Binding SelectedTxSalesHeader}"
                       AutoGenerateColumns="False">
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="AccountId"
+                                        Binding="{Binding AccountId}" />
+                    <DataGridTextColumn Header="ShopId"
+                                        Binding="{Binding ShopId}" />
                     <DataGridTextColumn Header="TxSalesHeaderId"
                                         Binding="{Binding TxSalesHeaderId}" />
+                    <DataGridTextColumn Header="TxDate"
+                                        Binding="{Binding TxDate}" />
                     <DataGridTextColumn Header="AmountTotal"
                                         Binding="{Binding AmountTotal}" />
+                    <DataGridTextColumn Header="AmountSubtotal"
+                                        Binding="{Binding AmountSubtotal}" />
+                    <DataGridTextColumn Header="AmountServiceCharge"
+                                        Binding="{Binding AmountServiceCharge}" />
+                    <DataGridTextColumn Header="AmountDiscount"
+                                        Binding="{Binding AmountDiscount}" />
+                    <DataGridTextColumn Header="AmountRounding"
+                                        Binding="{Binding AmountRounding}" />
+                    <DataGridTextColumn Header="AmountMinChargeOffset"
+                                        Binding="{Binding AmountMinChargeOffset}" />
+                    <DataGridTextColumn Header="AmountTaxation"
+                                        Binding="{Binding AmountTaxation}" />
                     <DataGridTextColumn Header="CheckinUserName"
                                         Binding="{Binding CheckinUserName}" />
+                    <DataGridTextColumn Header="CheckinDatetime"
+                                        Binding="{Binding CheckinDatetime}" />
+                    <DataGridTextColumn Header="CheckoutUserName"
+                                        Binding="{Binding CheckoutUserName}" />
+                    <DataGridTextColumn Header="CheckoutDatetime"
+                                        Binding="{Binding CheckoutDatetime}" />
+                    <DataGridTextColumn Header="CashierUserName"
+                                        Binding="{Binding CashierUserName}" />
+                    <DataGridTextColumn Header="CashierDatetime"
+                                        Binding="{Binding CashierDatetime}" />
+                    <DataGridTextColumn Header="IsOdoTx"
+                                        Binding="{Binding IsOdoTx}" />
+                    <DataGridTextColumn Header="Enabled"
+                                        Binding="{Binding Enabled}" />
+                    <DataGridTextColumn Header="DisabledReasonDesc"
+                                        Binding="{Binding DisabledReasonDesc}" />
+                    <DataGridTextColumn Header="DisabledByUserName"
+                                        Binding="{Binding DisabledByUserName}" />
+                    <DataGridTextColumn Header="DisabledDateTime"
+                                        Binding="{Binding DisabledDateTime}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

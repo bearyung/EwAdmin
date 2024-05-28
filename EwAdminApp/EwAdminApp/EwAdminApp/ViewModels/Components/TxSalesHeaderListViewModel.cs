@@ -47,13 +47,37 @@ public class TxSalesHeaderListViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isBusy, value);
     }
 
-    // Add a property for SearchText
+    // Add properties for SearchText
     private string? _searchTextTxSalesHeaderId;
 
     public string? SearchTextTxSalesHeaderId
     {
         get => _searchTextTxSalesHeaderId;
         set => this.RaiseAndSetIfChanged(ref _searchTextTxSalesHeaderId, value);
+    }
+
+    private string? _searchTextCusCount;
+    
+    public string? SearchTextCusCount
+    {
+        get => _searchTextCusCount;
+        set => this.RaiseAndSetIfChanged(ref _searchTextCusCount, value);
+    }
+    
+    private string? _searchTextTableCode;
+    
+    public string? SearchTextTableCode
+    {
+        get => _searchTextTableCode;
+        set => this.RaiseAndSetIfChanged(ref _searchTextTableCode, value);
+    }
+    
+    private string? _searchTextAmountTotal;
+    
+    public string? SearchTextAmountTotal
+    {
+        get => _searchTextAmountTotal;
+        set => this.RaiseAndSetIfChanged(ref _searchTextAmountTotal, value);
     }
 
     // add a property for SelectedShop
@@ -257,13 +281,51 @@ public class TxSalesHeaderListViewModel : ViewModelBase
 
             var httpClient = Locator.Current.GetService<HttpClient>();
             if (httpClient == null) return;
+            
+            // create the parameters of amountTotalGte, amountTotalLte from SearchTextAmountTotal for the request
+            // input format of SearchTextAmountTotal is "1000:2000" or "1000" or "1000:" or ":2000"
+            var amountTotalGte = "";
+            var amountTotalLte = "";
+            if (!string.IsNullOrEmpty(SearchTextAmountTotal))
+            {
+                var amountTotaArrl = SearchTextAmountTotal.Split(':');
+                if (amountTotaArrl.Length == 1)
+                {
+                    // case of ":1000", user want amount less than or equal to 1000
+                    if (amountTotaArrl[0].StartsWith(":"))
+                    {
+                        amountTotalLte = amountTotaArrl[0].Substring(1);
+                    }
+                    // case of "1000:", user want amount greater than or equal to 1000
+                    else if (amountTotaArrl[0].EndsWith(":"))
+                    {
+                        amountTotalGte = amountTotaArrl[0];
+                    }
+                    // case of "1000", user want exact amount
+                    else
+                    {
+                        amountTotalLte = amountTotaArrl[0];
+                        amountTotalGte = amountTotaArrl[0];
+                    }
+                }
+                // case of "1000:2000", user want amount between 1000 and 2000 (inclusive)
+                else if (amountTotaArrl.Length == 2)
+                {
+                    amountTotalGte = amountTotaArrl[0];
+                    amountTotalLte = amountTotaArrl[1];
+                }
+            }
 
             var request = new HttpRequestMessage(HttpMethod.Get,
                 $"/api/PosAdmin/txSalesHeaderList?" +
                 $"accountid={SelectedShop?.AccountId}" +
                 $"&shopid={SelectedShop?.ShopId}" +
                 $"&txDate={SelectedShopWorkdayDetail?.OpenDatetime:yyyy-MM-dd}" +
-                $"&txSalesHeaderId={SearchTextTxSalesHeaderId}");
+                $"&txSalesHeaderId={SearchTextTxSalesHeaderId}" + 
+                $"&cusCountGte={SearchTextCusCount}" +
+                $"&tableCode={SearchTextTableCode}" +
+                $"&amountTotalGte={amountTotalGte}" +
+                $"&amountTotalLte={amountTotalLte}");
 
             // add the header bearer token
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");

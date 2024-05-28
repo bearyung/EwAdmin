@@ -190,12 +190,18 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// <param name="txDate"></param>
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
-    /// <param name="txSalesHeaderid"></param>
+    /// <param name="txSalesHeaderId"></param>
+    /// <param name="tableCode"></param>
+    /// <param name="cusCountGte"></param>
+    /// <param name="amountTotalGte"></param>
+    /// <param name="amountTotalLte"></param>
     /// <returns>
     /// A list of transactions for the given account, shop, and transaction date.
     /// </returns>
     public async Task<IEnumerable<TxSalesHeaderMin>> GetTxSalesHeaderListAsync(int accountId, int shopId,
-        DateTime txDate, int page, int pageSize, int? txSalesHeaderid = null)
+        DateTime txDate, int page, int pageSize, 
+        int? txSalesHeaderId = null, string? tableCode = null, 
+        int? cusCountGte = null, decimal? amountTotalGte = null, decimal? amountTotalLte = null)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
@@ -240,6 +246,10 @@ public class PosTxSalesRepository : PosRepositoryBase
             FROM [dbo].[TxSalesHeader]
             WHERE AccountId = @AccountId AND ShopId = @ShopId AND TxDate = @TxDate
             AND (@TxSalesHeaderId IS NULL OR TxSalesHeaderId = @TxSalesHeaderId)
+            AND (@TableCode IS NULL OR TableCode = @TableCode)
+            AND (@CusCountGte IS NULL OR CusCount >= @CusCountGte)
+            AND (@AmountTotalGte IS NULL OR AmountTotal >= @AmountTotalGte)
+            AND (@AmountTotalLte IS NULL OR AmountTotal <= @AmountTotalLte)
             ORDER BY TxSalesHeaderId DESC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
         
@@ -249,9 +259,13 @@ public class PosTxSalesRepository : PosRepositoryBase
             AccountId = accountId,
             ShopId = shopId,
             TxDate = txDate,
-            TxSalesHeaderId = txSalesHeaderid,
+            TxSalesHeaderId = txSalesHeaderId,
             Offset = offset,
-            PageSize = pageSize
+            PageSize = pageSize,
+            TableCode = tableCode,
+            CusCountGte = cusCountGte,
+            AmountTotalGte = amountTotalGte,
+            AmountTotalLte = amountTotalLte
         };
         
         if (db != null)
