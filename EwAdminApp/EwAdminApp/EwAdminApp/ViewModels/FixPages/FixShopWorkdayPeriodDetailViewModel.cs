@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using EwAdminApp.ViewModels.Components;
 using ReactiveUI;
 
-namespace EwAdminApp.ViewModels;
+namespace EwAdminApp.ViewModels.FixPages;
 
 public class FixShopWorkdayPeriodDetailViewModel : ViewModelBase
 {

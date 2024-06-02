@@ -138,7 +138,9 @@ public class TxPaymentListViewModel : ViewModelBase
                     // execute the SearchCommand
                     if (SelectedTxSalesHeader != null)
                     {
-                        SearchCommand.Execute().Subscribe();
+                        SearchCommand.Execute()
+                            .Subscribe()
+                            .DisposeWith(disposables);
                     }
                 })
                 .DisposeWith(disposables);

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using EwAdminApp.Models;
+using EwAdminApp.ViewModels.FixPages;
 using ReactiveUI;
 
 namespace EwAdminApp.ViewModels;
@@ -23,12 +24,12 @@ public class DashboardFixViewModel : ViewModelBase
         //     { DisplayName = "Fix Incorrect Day-end", Function = UserFunctionEnum.FixIncorrectDayEnd},
         // new FunctionItem
         //     { DisplayName = "Fix Table Master", Function = UserFunctionEnum.FixTableMaster },
-        // new FunctionItem
-        //     { DisplayName = "Remap Table to Tx", Function = UserFunctionEnum.FixTxTableRemap },
+        new FunctionItem
+            { DisplayName = "Remap Table to Tx", Function = UserFunctionEnum.FixTxTableRemap },
         // new FunctionItem
         //     { DisplayName = "Remap Cash Drawer to Tx", Function = UserFunctionEnum.FixTxCashDrawerRemap },
-        new FunctionItem
-            { DisplayName = "Adjust Tx Cus Count", Function = UserFunctionEnum.FixTxCustomerCount },
+        // new FunctionItem
+        //    { DisplayName = "Adjust Tx Cus Count", Function = UserFunctionEnum.FixTxCustomerCount },
     ];
 
     private FunctionItem? _selectedUserFunction;
@@ -90,6 +91,8 @@ public class DashboardFixViewModel : ViewModelBase
                 return new FixTxPaymentViewModel();
             case UserFunctionEnum.FixItemCategory:
                 return new FixItemCategoryViewModel();
+            case UserFunctionEnum.FixTxTableRemap:
+                return new FixTxSalesHeaderTableMappingViewModel();
             default:
                 return null;
         }

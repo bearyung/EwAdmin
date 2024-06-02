@@ -5,7 +5,7 @@ using EwAdmin.Common.Models.Pos;
 using EwAdminApp.ViewModels.Components;
 using ReactiveUI;
 
-namespace EwAdminApp.ViewModels;
+namespace EwAdminApp.ViewModels.FixPages;
 
 public class FixTxPaymentViewModel : ViewModelBase
 {

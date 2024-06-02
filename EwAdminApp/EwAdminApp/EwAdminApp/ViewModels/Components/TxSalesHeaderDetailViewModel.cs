@@ -2,7 +2,6 @@ using System;
 using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,19 +13,33 @@ using Splat;
 
 namespace EwAdminApp.ViewModels.Components;
 
-public class TxPaymentDetailViewModel : ViewModelBase
+public class TxSalesHeaderDetailViewModel : ViewModelBase
 {
-    // Add a property for SelectedTxPayment
-    private TxPayment? _selectedTxPayment;
+    // properties
+    // selectedTxSalesHeader
+    private TxSalesHeaderMin? _selectedTxSalesHeaderMin;
 
-    public TxPayment? SelectedTxPayment
+    private TxSalesHeader? _selectedTxSalesHeader;
+
+    private bool _isBusy;
+
+    // add a command for DoSearch
+    private ReactiveCommand<Unit, Unit> SearchCommand { get; }
+
+    // add a cancellationTokenSource property
+    private CancellationTokenSource _cancellationTokenSource = new();
+
+    public TxSalesHeaderMin? SelectedTxSalesHeaderMin
     {
-        get => _selectedTxPayment;
-        set => this.RaiseAndSetIfChanged(ref _selectedTxPayment, value);
+        get => _selectedTxSalesHeaderMin;
+        set => this.RaiseAndSetIfChanged(ref _selectedTxSalesHeaderMin, value);
     }
 
-    // Add a property for IsBusy
-    private bool _isBusy;
+    public TxSalesHeader? SelectedTxSalesHeader
+    {
+        get => _selectedTxSalesHeader;
+        set => this.RaiseAndSetIfChanged(ref _selectedTxSalesHeader, value);
+    }
 
     public bool IsBusy
     {
@@ -34,45 +47,31 @@ public class TxPaymentDetailViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isBusy, value);
     }
 
-    // Add a property for SelectedTxPaymentMin
-    private TxPaymentMin? _selectedTxPaymentMin;
-
-    public TxPaymentMin? SelectedTxPaymentMin
-    {
-        get => _selectedTxPaymentMin;
-        set => this.RaiseAndSetIfChanged(ref _selectedTxPaymentMin, value);
-    }
-
-    // add a command for DoSearch
-    private ReactiveCommand<Unit, Unit> SearchCommand { get; }
-    
-    // add a cancellationTokenSource property
-    private CancellationTokenSource _cancellationTokenSource = new();
-
     // add a constructor
-    public TxPaymentDetailViewModel()
+    // code here
+    public TxSalesHeaderDetailViewModel()
     {
         // Create an observable that evaluates whether SearchCommand can execute
-        // SearchCommand can be executed if SelectedTxPaymentMin is not null and IsBusy is false
+        // SearchCommand can be executed if SelectedTxSalesHeaderMin is not null and IsBusy is false
         var canExecuteSearch = this.WhenAnyValue(
-            x => x.SelectedTxPaymentMin,
+            x => x.SelectedTxSalesHeaderMin,
             x => x.IsBusy,
-            (selectedTxPaymentMin, isBusy) => selectedTxPaymentMin != null && !isBusy);
+            (selectedTxSalesHeaderMin, isBusy) => selectedTxSalesHeaderMin != null && !isBusy);
 
         // implement the SearchCommand
         SearchCommand = ReactiveCommand.CreateFromTask(
             execute: DoSearch,
             canExecute: canExecuteSearch);
 
-        this.WhenActivated((disposables) =>
+        this.WhenActivated(disposables =>
         {
             // log the activation of the ViewModel
             Console.WriteLine($"{GetType().Name} activated");
-            
+
             // handle the exception when the SearchCommand is executed
             SearchCommand.ThrownExceptions.Subscribe(ex =>
                 {
-                    Console.WriteLine("Failed to search for txPayment");
+                    Console.WriteLine("Failed to search for TxSalesHeader.");
                     Console.WriteLine(ex.Message);
                 })
                 .DisposeWith(disposables);
@@ -80,7 +79,8 @@ public class TxPaymentDetailViewModel : ViewModelBase
             // set the IsBusy property to true when the SearchCommand is executing
             // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
             // amend the ExecutingCommandsCount property
-            SearchCommand.IsExecuting.Subscribe(isExecuting =>
+            SearchCommand.IsExecuting
+                .Subscribe(isExecuting =>
                 {
                     var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
 
@@ -97,38 +97,38 @@ public class TxPaymentDetailViewModel : ViewModelBase
                             new ActionStatus
                             {
                                 ActionStatusEnum = ActionStatus.StatusEnum.Executing,
-                                Message = "Searching TxPayment..."
+                                Message = "Searching for TxSalesHeader..."
                             }));
                     }
                 })
                 .DisposeWith(disposables);
 
-            // use ReactiveUI MessageBus to subscribe to the TxPaymentMinEvent
-            MessageBus.Current.Listen<TxPaymentMinEvent>()
-                .Subscribe(txPaymentMinEvent =>
+            // use ReactiveUI MessageBus to subscribe the TxSalesHeaderMinEvent
+            MessageBus.Current.Listen<TxSalesHeaderMinEvent>()
+                .Subscribe(txSalesHeaderMinEvent =>
                 {
-                    // console log the TxPaymentMinEvent
+                    // console log the event
                     Console.WriteLine(
-                        $"{GetType().Name}: Received {txPaymentMinEvent.GetType().Name}: {txPaymentMinEvent.TxPaymentMinMessage?.TxPaymentId}");
+                        $"Received {txSalesHeaderMinEvent.GetType().Name}: {txSalesHeaderMinEvent.TxSalesHeaderMinMessage?.TxSalesHeaderId}");
 
-                    // terminate previous SearchCommand
+                    // terminate the previous SearchCommand
                     SearchCommand.Dispose();
 
-                    // clear the SelectedTxPayment property
-                    SelectedTxPayment = null;
+                    // clear the SelectedTxSalesHeader property
+                    SelectedTxSalesHeader = null;
 
-                    // set the SelectedTxPaymentMin property to the TxPaymentMin from the event
-                    SelectedTxPaymentMin = txPaymentMinEvent.TxPaymentMinMessage;
+                    // set the SelectedTxSalesHeaderMin property
+                    SelectedTxSalesHeaderMin = txSalesHeaderMinEvent.TxSalesHeaderMinMessage;
                 })
                 .DisposeWith(disposables);
             
-            // when the SelectedTxPaymentMin property changes, clear the SelectedTxPayment and
-            // execute the SearchCommand if it is not null
-            this.WhenAnyValue(x => x.SelectedTxPaymentMin)
-                .Subscribe(txPaymentMin =>
+            // when the SelectedTxSalesHeaderMin property changes, clear the SelectedTxSalesHeader property
+            // execute the SearchCommand
+            this.WhenAnyValue(x => x.SelectedTxSalesHeaderMin)
+                .Subscribe(txSalesHeaderMin =>
                 {
-                    SelectedTxPayment = null;
-                    if (txPaymentMin != null)
+                    SelectedTxSalesHeader = null;
+                    if (txSalesHeaderMin != null)
                     {
                         SearchCommand.Execute()
                             .Subscribe()
@@ -137,47 +137,19 @@ public class TxPaymentDetailViewModel : ViewModelBase
                 })
                 .DisposeWith(disposables);
             
-            // use the MessageBus to subscribe to the TxPaymentEvent
-            MessageBus.Current.Listen<TxPaymentEvent>()
-                .Subscribe(txPaymentEvent =>
+            // use ReactiveUI MessageBus to send the TxSalesHeaderEvent when there's changes in the SelectedTxSalesHeader property
+            this.WhenAnyValue(x => x.SelectedTxSalesHeader)
+                .Subscribe(selectedTxSalesHeader =>
                 {
-                    // console log the TxPaymentEvent
-                    Console.WriteLine(
-                        $"{GetType().Name}: TxPaymentEvent received: {txPaymentEvent.TxPaymentMessage?.TxPaymentId}");
-
-                    // set the SelectedTxPayment property to the TxPayment from the event
-                    SelectedTxPayment = txPaymentEvent.TxPaymentMessage;
+                    MessageBus.Current.SendMessage(new TxSalesHeaderEvent(selectedTxSalesHeader));
                 })
                 .DisposeWith(disposables);
 
-            // when the SelectedTxPayment property changes, use ReactiveUI MessageBus to publish the TxPaymentEvent
-            this.WhenAnyValue(x => x.SelectedTxPayment)
-                .Subscribe(txPayment => { MessageBus.Current.SendMessage(new TxPaymentEvent(txPayment)); })
-                .DisposeWith(disposables);
-            
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
-                .DisposeWith(disposables);
-
-            // Subscribe to the SearchCommand's Executed observable
-            // Subscribe to the SearchCommand itself
-            SearchCommand.Subscribe(_ =>
-                {
-                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
-                        new ActionStatus
-                        {
-                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
-                            Message = "TxPayment search completed"
-                        }));
-                })
-                .DisposeWith(disposables);
-            
             // log the deactivation of the ViewModel
             Disposable.Create(() =>
                 {
                     Console.WriteLine($"{GetType().Name} is being deactivated.");
-                    
+
                     // cancel the CancellationTokenSource
                     _cancellationTokenSource.Cancel();
                 })
@@ -185,13 +157,12 @@ public class TxPaymentDetailViewModel : ViewModelBase
         });
     }
 
-    // add an async method DoSearch
-    // this method will be called when the SearchCommand is executed
-    // this method will be used to search the detail of TxPayment
-    // based on the selected TxPaymentMin
-    // the result will be displayed in the view
-    // API call will be used to get the detail of TxPayment
-    // API Endpoint: /api/PosAdmin/txPayment?accountid={accountId}&shopid={shopId}&txPaymentId={txPaymentId}
+    // method: DoSearch 
+    // get the accountId, shopId and txSalesHeaderId from the selectedTxSalesHeaderMin
+    // and use the API endpoint to get the TxSalesHeader object
+    // use the HTTP GET method
+
+    // API endpoint: /api/PosAdmin/txSalesHeader?accountId={accountId}&shopId={shopId}&txSalesHeaderId={txSalesHeaderId}
     // code here
     public async Task DoSearch()
     {
@@ -199,16 +170,16 @@ public class TxPaymentDetailViewModel : ViewModelBase
         {
             // Cancel the previous search operation
             await _cancellationTokenSource.CancelAsync();
-            
+
             // Create a new CancellationTokenSource
             _cancellationTokenSource = new CancellationTokenSource();
-            
+
             // Get the CancellationToken from the CancellationTokenSource
             var cancellationToken = _cancellationTokenSource.Token;
-            
+
             // Throw an OperationCanceledException if the CancellationToken is cancelled
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             // perform the search for the detail of TxPayment
             var currentLoginSettings = Locator.Current.GetService<LoginSettings>();
             if (currentLoginSettings == null) return;
@@ -217,7 +188,7 @@ public class TxPaymentDetailViewModel : ViewModelBase
             if (httpClient == null) return;
 
             var request = new HttpRequestMessage(HttpMethod.Get,
-                $"/api/PosAdmin/txPayment?accountid={SelectedTxPaymentMin?.AccountId}&shopid={SelectedTxPaymentMin?.ShopId}&txPaymentId={SelectedTxPaymentMin?.TxPaymentId}");
+                $"/api/PosAdmin/txSalesHeader?accountId={SelectedTxSalesHeaderMin?.AccountId}&shopId={SelectedTxSalesHeaderMin?.ShopId}&txSalesHeaderId={SelectedTxSalesHeaderMin?.TxSalesHeaderId}");
 
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
@@ -229,17 +200,17 @@ public class TxPaymentDetailViewModel : ViewModelBase
                 Console.WriteLine($"Error: {response.StatusCode}");
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 Console.WriteLine($"Error: {errorContent}");
-                
+
                 // throw an exception with error code and content
                 throw new Exception($"Error: {response.StatusCode} - {errorContent}");
             }
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var resultTxPayment = JsonSerializer.Deserialize<TxPayment>(content,
+            var resultTxSalesHeader = JsonSerializer.Deserialize<TxSalesHeader>(content,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            // set the result to the SelectedTxPayment property
-            SelectedTxPayment = resultTxPayment;
+            // set the result to the SelectedTxSalesHeader property
+            SelectedTxSalesHeader = resultTxSalesHeader;
         }
         catch (OperationCanceledException)
         {

@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.FixPages"
+             xmlns:fixPages="clr-namespace:EwAdminApp.ViewModels.FixPages"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.FixPages.FixShopWorkdayPeriodDetailView"
+             x:DataType="fixPages:FixShopWorkdayPeriodDetailViewModel">
+    <Grid ColumnDefinitions="440, *, 200"
+          RowDefinitions="300, *">
+        <ContentControl Grid.Row="0" Grid.Column="0"
+                        Content="{Binding ShopSelectorPanel}" />
+        <ContentControl Grid.Row="0" Grid.Column="1"
+                        Content="{Binding ShopWorkdaySelectorPanel}"/>
+        <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                        Content="{Binding ShopWorkdayPeriodSelectorPanel}" />
+        <Grid Grid.Row="0" Grid.Column="2" RowSpan="2"
+              RowDefinitions="*, 300">
+            <ContentControl Grid.Row="0"
+                            Content="{Binding ShopWorkdayPeriodDetailPanel}"/>
+            <ContentControl Grid.Row="1"
+                            Content="{Binding ShopWorkdayPeriodDetailEditPanel}"/>
+        </Grid>
+    </Grid>
+</UserControl>

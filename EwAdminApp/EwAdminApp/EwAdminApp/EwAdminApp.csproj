@@ -36,10 +36,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Views\FixShopWorkdayDetailView.axaml.cs">
-        <DependentUpon>FixTxShopWorkdayDetailView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
       <Compile Update="Views\Components\ShopWorkdayDetailEditView.axaml.cs">
         <DependentUpon>ShopWorkdayDetailEditView.axaml</DependentUpon>
         <SubType>Code</SubType>
@@ -50,6 +46,22 @@
       </Compile>
       <Compile Update="Views\SettingsView.axaml.cs">
         <DependentUpon>SettingsView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\FixPages\FixitemCategoryView.axaml.cs">
+        <DependentUpon>FixitemCategoryView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\FixPages\FixShopWorkdayDetailView.axaml.cs">
+        <DependentUpon>FixShopWorkdayDetailView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\FixPages\FixShopWorkdayPeriodDetailView.axaml.cs">
+        <DependentUpon>FixShopWorkdayPeriodDetailView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\FixPages\FixTxPaymentView.axaml.cs">
+        <DependentUpon>FixTxPaymentView.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>

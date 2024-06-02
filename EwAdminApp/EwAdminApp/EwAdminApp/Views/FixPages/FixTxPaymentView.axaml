@@ -2,11 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:EwAdminApp.ViewModels"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.FixPages"
              xmlns:componentViews="clr-namespace:EwAdminApp.Views.Components"
+             xmlns:fixPages="clr-namespace:EwAdminApp.ViewModels.FixPages"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
-             x:Class="EwAdminApp.Views.FixTxPaymentView"
-             x:DataType="vm:FixTxPaymentViewModel">
+             x:Class="EwAdminApp.Views.FixPages.FixTxPaymentView"
+             x:DataType="fixPages:FixTxPaymentViewModel">
     <Grid ColumnDefinitions="440, *, 200"
           RowDefinitions="200, *, 200">
         <ContentControl Grid.Row="0" Grid.Column="0"

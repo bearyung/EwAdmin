@@ -1,0 +1,422 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.TxSalesHeaderDetailView"
+             x:DataType="vm:TxSalesHeaderDetailViewModel">
+    <!-- set the style of textboxes with no border -->
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+            <Setter Property="Margin" Value="0,0,0,8"></Setter>
+        </Style>
+        <Style Selector="Label">
+            <Setter Property="Foreground" Value="#787878"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <Border
+        Name="TxPaymentDetailPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,*">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    TxSalesHeader Detail
+                </Label>
+            </Border>
+            <ScrollViewer Grid.Row="1" FontSize="12">
+                <StackPanel Margin="8">
+                    <Label>Account ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AccountId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Shop ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ShopId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>TxSalesHeader ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TxSalesHeaderId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Receipt No</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ReceiptNo, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Current Tx</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsCurrentTx, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Voided</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.Voided, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Previous Table ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.PreviousTableId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Previous Table Code</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.PreviousTableCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Section ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.SectionId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Section Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.SectionName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Created Date</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CreatedDate, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Created By</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CreatedBy, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Modified Date</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ModifiedDate, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Modified By</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ModifiedBy, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Take Away</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsTakeAway, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Take Away Running Index</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TakeAwayRunningIndex, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Workday Period Detail ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.WorkdayPeriodDetailId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Workday Period Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.WorkdayPeriodName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Discount ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DiscountId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Discount Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DiscountName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Cash Drawer Code</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CashDrawerCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Receipt Print Count</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ReceiptPrintCount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Tx Revoke Count</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TxRevokeCount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Service Charge ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ServiceChargeId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Service Charge Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ServiceChargeName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Tips</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountTips, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Time Limited</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsTimeLimited, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Time Limited Minutes</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TimeLimitedMinutes, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Cus Count</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CusCount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Discount By User ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DiscountByUserId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Discount By User Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DiscountByUserName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Point Total</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountPointTotal, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Member Point Remain</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.MemberPointRemain, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Taxation ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TaxationId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Taxation Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TaxationName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Min Charge Offset Waived</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsMinChargeOffsetWaived, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Min Charge Tx</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsMinChargeTx, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Min Charge Per Head</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsMinChargePerHead, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Min Charge Amount</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.MinChargeAmount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Min Charge Member Amount</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.MinChargeMemberAmount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Prepaid Recharge Tx</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsPrepaidRechargeTx, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Invoice Print Pending</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsInvoicePrintPending, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Invoice Num</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.InvoiceNum, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Order Num</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.OrderNum, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Deposit Tx</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsDepositTx, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Total Deposit Amount</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TotalDepositAmount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Deposit Remark</Label>
+                    <TextBox Classes="Readonly"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxSalesHeader.DepositRemark, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Deposit Outstanding</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsDepositOutstanding, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Return Tx</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsReturnTx, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Has Returned</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.HasReturned, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Returned DateTime</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ReturnedDateTime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Returned TxSalesHeader ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ReturnedTxSalesHeaderId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>New TxSalesHeader ID For Return</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.NewTxSalesHeaderIdForReturn, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Api Gateway Ref ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ApiGatewayRefId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Api Gateway Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ApiGatewayName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Api Gateway Ref Remark</Label>
+                    <TextBox Classes="Readonly"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxSalesHeader.ApiGatewayRefRemark, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Table Remark</Label>
+                    <TextBox Classes="Readonly"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxSalesHeader.TableRemark, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>TxSalesHeader Remark</Label>
+                    <TextBox Classes="Readonly"
+                             MaxHeight="100"
+                             TextWrapping="Wrap"
+                             Text="{Binding SelectedTxSalesHeader.TxSalesHeaderRemark, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Total Payment Method Surcharge Amount</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TotalPaymentMethodSurchargeAmount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Non Sales Tx</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsNonSalesTx, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is No Other Loyalty Tx</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsNoOtherLoyaltyTx, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Start Workday Period Detail ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.StartWorkdayPeriodDetailId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Start Workday Period Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.StartWorkdayPeriodName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Tx On Hold</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsTxOnHold, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Odo Order Token</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.OdoOrderToken, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Overpayment</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountOverpayment, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Tx Status ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TxStatusId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Overrided Checklist Printer Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.OverridedChecklistPrinterName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Order Source Type ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.OrderSourceTypeId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Order Source Ref ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.OrderSourceRefId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Order Channel ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.OrderChannelId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Order Channel Code</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.OrderChannelCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Order Channel Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.OrderChannelName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Api Gateway Ref Code</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ApiGatewayRefCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Api Gateway Response Code</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.ApiGatewayResponseCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>

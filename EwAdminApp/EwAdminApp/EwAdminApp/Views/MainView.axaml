@@ -16,7 +16,9 @@
     </Design.DataContext>
     <dialogHostAvalonia:DialogHost 
         Name="MainViewDialogHost"
-        CloseOnClickAway="False">
+        CloseOnClickAway="True" 
+        DisableOpeningAnimation="True" 
+        OverlayBackground="Black">
         <dialogHostAvalonia:DialogHost.DialogContent>
             <!-- put your dialog content here-->
         </dialogHostAvalonia:DialogHost.DialogContent>

@@ -1,14 +1,12 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using EwAdminApp.ViewModels;
+using EwAdminApp.ViewModels.FixPages;
 
-namespace EwAdminApp.Views;
+namespace EwAdminApp.Views.FixPages;
 
-public partial class FixShopWorkdayDetailView : ReactiveUserControl<FixShopWorkdayDetailViewModel>
+public partial class FixTxPaymentView : ReactiveUserControl<FixTxPaymentViewModel>
 {
-    public FixShopWorkdayDetailView()
+    public FixTxPaymentView()
     {
         InitializeComponent();
 
