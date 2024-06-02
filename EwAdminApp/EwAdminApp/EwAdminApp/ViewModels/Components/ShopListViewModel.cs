@@ -94,16 +94,15 @@ public class ShopListViewModel : ViewModelBase
             // set the IsBusy property to True when the SearchCommand is executing, False when it is completed
             SearchCommand.IsExecuting.Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     IsBusy = isExecuting;
-
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
+                    
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                            sourceTypeName: GetType().Name, 
+                            isExecutionIncrement: true));
+                        
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -120,6 +119,11 @@ public class ShopListViewModel : ViewModelBase
                 Console.WriteLine("Failed to search for shops");
                 Console.WriteLine(ex.Message);
 
+                // use MessageBus to emit an ExecutingCommandFlagEvent to notify the root an execution has been completed
+                MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                    sourceTypeName: GetType().Name, 
+                    isExecutionIncrement: false));
+                
                 // use MessageBus to emit an ActionStatusMessageEvent for the error operation
                 MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                     new ActionStatus
@@ -129,15 +133,15 @@ public class ShopListViewModel : ViewModelBase
                     }));
             });
 
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
-                .DisposeWith(disposables);
-
             // Subscribe to the SearchCommand's Executed observable
             // Subscribe to the SearchCommand itself
             SearchCommand.Subscribe(_ =>
                 {
+                    // use MessageBus to emit an ExecutingCommandFlagEvent to notify the root an execution has been completed
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                    
                     MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                         new ActionStatus
                         {
@@ -229,6 +233,7 @@ public class ShopListViewModel : ViewModelBase
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
+            throw;
         }
         catch (Exception e)
         {

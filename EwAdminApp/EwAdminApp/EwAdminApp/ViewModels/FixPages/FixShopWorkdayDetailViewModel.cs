@@ -45,27 +45,6 @@ public class FixShopWorkdayDetailViewModel : ViewModelBase
             // log when the viewmodel is activated
             Console.WriteLine($"{GetType().Name} activated");
             
-            // when the ExecutingCommandsCount property of the
-            // ShopSelectorPanel, ShopWorkdaySelectorPanel, ShopWorkdayDetailPanel, and ShopWorkdayDetailEditPanel changes,
-            // use CombineLatest to get the sum of the ExecutingCommandsCount properties
-            // update the ExecutingCommandsCount property of this view model
-            // code here
-            this.WhenAnyValue(x => x.ShopSelectorPanel!.ExecutingCommandsCount)
-                .CombineLatest(this.WhenAnyValue(x => x.ShopWorkdaySelectorPanel!.ExecutingCommandsCount))
-                .CombineLatest(this.WhenAnyValue(x => x.ShopWorkdayDetailPanel!.ExecutingCommandsCount))
-                .CombineLatest(this.WhenAnyValue(x => x.ShopWorkdayDetailEditPanel!.ExecutingCommandsCount))
-                .Subscribe(x =>
-                {
-                    var combinedCount = x.Item1.Item1.Item1 + x.Item1.Item1.Item2 + x.Item1.Item2 + x.Item2;
-
-                    // log the ExecutingCommandsCount properties
-                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {combinedCount}");
-
-                    // Update the ExecutingCommandsCount property
-                    ExecutingCommandsCount = combinedCount;
-                })
-                .DisposeWith(disposables);
-            
             // log when the viewmodel is deactivated
             Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
                 .DisposeWith(disposables);

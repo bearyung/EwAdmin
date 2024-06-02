@@ -58,23 +58,6 @@ public class DashboardToolBoxViewModel : ViewModelBase
                 .Subscribe(SwitchViewModel)
                 .DisposeWith(disposables);
             
-            // when the ExecutingCommandsCount property of the SelectedContentViewModel changes,
-            // update the view model's ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.SelectedContentViewModel!.ExecutingCommandsCount)
-                .Subscribe(x =>
-                {
-                    // log the ExecutingCommandsCount property
-                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {x}");
-                    
-                    // Update the ExecutingCommandsCount property
-                    ExecutingCommandsCount = x;
-                    
-                    // emit the ExecutingCommandsCount property to the message bus
-                    // code here
-                    MessageBus.Current.SendMessage(new ExecutingCommandsCountEvent(ExecutingCommandsCount));
-                })
-                .DisposeWith(disposables);
-            
             // log the deactivation of the viewmodel
             Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
                 .DisposeWith(disposables);

@@ -130,17 +130,16 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             // set the IsBusy property to true when the SaveCommand is executing
             SaveCommand.IsExecuting.Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     // set the IsBusy property
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                            sourceTypeName: GetType().Name, 
+                            isExecutionIncrement: true));
+                        
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -170,21 +169,32 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                 .Subscribe(shopEvent => { SelectedShop = shopEvent.ShopMessage; })
                 .DisposeWith(disposables);
             
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
-                .DisposeWith(disposables);
-            
             // Subscribe to the SaveCommand's Executed observable
             // Subscribe to the SaveCommand itself
             SaveCommand.Subscribe(_ =>
                 {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                    
                     MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                         new ActionStatus
                         {
                             ActionStatusEnum = ActionStatus.StatusEnum.Completed,
                             Message = "TxPayment saved"
                         }));
+                })
+                .DisposeWith(disposables);
+            
+            // handle the exception when the SaveCommand is executed
+            SaveCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    Console.WriteLine("Failed to save TxPayment");
+                    Console.WriteLine(ex.Message);
+                    
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
                 })
                 .DisposeWith(disposables);
 
@@ -194,23 +204,26 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
                 {
                     Console.WriteLine("Failed to get payment method list");
                     Console.WriteLine(ex.Message);
+                    
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
                 })
                 .DisposeWith(disposables);
 
             // set the IsBusy property to true when the PaymentMethodListCommand is executing
             PaymentMethodListCommand.IsExecuting.Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     // set the IsBusy property
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                            sourceTypeName: GetType().Name, 
+                            isExecutionIncrement: true));
+                        
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -251,6 +264,10 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
             
             PaymentMethodListCommand.Subscribe(_ =>
                 {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                    
                     MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                         new ActionStatus
                         {
@@ -349,6 +366,7 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(GetPaymentMethodList)} operation cancelled");
+            throw;
         }
         catch (Exception e)
         {
@@ -468,6 +486,7 @@ public class TxPaymentDetailEditViewModel : ViewModelBase
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(DoSave)} operation cancelled");
+            throw;
         }
         catch (Exception ex)
         {

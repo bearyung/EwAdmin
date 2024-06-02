@@ -12,7 +12,7 @@ public class PosTableMasterRepository(
     // add a new method to get the table list with pagination
     public async Task<IEnumerable<TableMaster>> GetTableListAsync(int accountId, int shopId, int page, int pageSize,
         int? tableId = null, string? tableCode = null, 
-        bool showDisabled = false, bool showEnabled = true, bool showTempTable = true, bool showTakeAway = true)
+        bool showDisabled = false, bool showEnabled = true, bool showTempTable = true, bool showTakeAway = true, bool showDineIn = true)
     {
         
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
@@ -52,7 +52,8 @@ public class PosTableMasterRepository(
                 (@ShowDisabled = 1 OR tm.Enabled = 1) AND
                 (@ShowEnabled = 1 OR tm.Enabled = 0) AND
                 (@ShowTempTable = 1 OR tm.IsTempTable = 0) AND
-                (@ShowTakeAway = 1 OR tm.IsTakeAway = 0)
+                (@ShowTakeAway = 1 OR tm.IsTakeAway = 0) AND
+                (@ShowDineIn = 1 OR tm.IsTakeAway = 1)
             ORDER BY tm.TableId
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 

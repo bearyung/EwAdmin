@@ -100,6 +100,10 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
                 {
                     Console.WriteLine("Failed to search for shop workday detail");
                     Console.WriteLine(ex.Message);
+                    
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
                 })
                 .DisposeWith(disposables);
 
@@ -107,17 +111,16 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
             SearchCommand.IsExecuting
                 .Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     // set the IsBusy property
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                            sourceTypeName: GetType().Name, 
+                            isExecutionIncrement: true));
+                        
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -163,15 +166,14 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
                 })
                 .DisposeWith(disposables);
             
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
-                .DisposeWith(disposables);
-            
             // Subscribe to the SearchCommand's Executed observable
             // Subscribe to the SearchCommand itself
             SearchCommand.Subscribe(_ =>
                 {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                    
                     MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                         new ActionStatus
                         {
@@ -270,6 +272,7 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
+            throw;
         }
         catch (Exception e)
         {

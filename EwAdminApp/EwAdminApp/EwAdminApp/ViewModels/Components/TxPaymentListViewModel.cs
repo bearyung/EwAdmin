@@ -90,8 +90,12 @@ public class TxPaymentListViewModel : ViewModelBase
             SearchCommand.ThrownExceptions
                 .Subscribe(ex =>
                 {
-                    Console.WriteLine("Failed to search for txpayment");
+                    Console.WriteLine("Failed to search for txPayment");
                     Console.WriteLine(ex.Message);
+                    
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
                 })
                 .DisposeWith(disposables);
 
@@ -99,17 +103,16 @@ public class TxPaymentListViewModel : ViewModelBase
             SearchCommand.IsExecuting
                 .Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     // set the IsBusy property
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                            sourceTypeName: GetType().Name, 
+                            isExecutionIncrement: true));
+                        
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -151,6 +154,23 @@ public class TxPaymentListViewModel : ViewModelBase
                 {
                     // emit the TxPaymentMinEvent using the ReactiveUI MessageBus
                     MessageBus.Current.SendMessage(new TxPaymentMinEvent(selectedTxPayment));
+                })
+                .DisposeWith(disposables);
+            
+            // Subscribe to the SearchCommand's Executed observable
+            // Subscribe to the SearchCommand itself
+            SearchCommand.Subscribe(_ =>
+                {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                    
+                    MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
+                        new ActionStatus
+                        {
+                            ActionStatusEnum = ActionStatus.StatusEnum.Completed,
+                            Message = "TxPayment list search completed."
+                        }));
                 })
                 .DisposeWith(disposables);
 
@@ -238,6 +258,7 @@ public class TxPaymentListViewModel : ViewModelBase
         catch (OperationCanceledException)
         {
             Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
+            throw;
         }
         catch (Exception e)
         {

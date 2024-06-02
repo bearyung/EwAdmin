@@ -94,14 +94,14 @@ public class ActionStatusMonitorViewModel : ViewModelBase
             
             // subscribe to the MessageBus.Current.Listen<ExecutingCommandsCountEvent>()
             // and update the TotalExecutingCommandCount property
-            MessageBus.Current.Listen<ExecutingCommandsCountEvent>()
-                .Subscribe(executingCommandsCountEvent =>
+            MessageBus.Current.Listen<ExecutingCommandFlagEvent>()
+                .Subscribe(x =>
                 {
                     // log the ExecutingCommandsCountEvent
-                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCountEvent: {executingCommandsCountEvent.ExecutingCommandsCount}");
+                    Console.WriteLine($"{GetType().Name}: Received: {nameof(ExecutingCommandFlagEvent)}: {x.SourceTypeName}: {x.IsExecutionIncrement}");
 
                     // update the TotalExecutingCommandCount property
-                    TotalExecutingCommandCount = executingCommandsCountEvent.ExecutingCommandsCount;
+                    TotalExecutingCommandCount += x.IsExecutionIncrement ? 1 : (TotalExecutingCommandCount > 0 ? -1 : 0);
                     
                     // update the IsBackgroundCommandExecuting property
                     IsBackgroundCommandExecuting = TotalExecutingCommandCount > 0;

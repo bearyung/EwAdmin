@@ -83,26 +83,6 @@ public class MainViewModel : ViewModelBase
             //     .Subscribe(x => SwitchContentViewModel(x.ModuleItemMessage!))
             //     .DisposeWith(disposables);
 
-            // when the ExecutingCommandsCount property of the ContentViewModel and FooterViewModel changes,
-            // update the view model's ExecutingCommandsCount property by summing the ExecutingCommandsCount properties
-            this.WhenAnyValue(x => x.ContentViewModel!.ExecutingCommandsCount)
-                .CombineLatest(this.WhenAnyValue(x => x.FooterViewModel!.ExecutingCommandsCount))
-                .Subscribe(x =>
-                {
-                    var combinedCount = x.Item1 + x.Item2;
-
-                    // log the ExecutingCommandsCount properties
-                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {combinedCount}");
-
-                    // Update the ExecutingCommandsCount property
-                    ExecutingCommandsCount = combinedCount;
-
-                    // emit the ExecutingCommandsCount property to the message bus
-                    // code here
-                    MessageBus.Current.SendMessage(new ExecutingCommandsCountEvent(ExecutingCommandsCount));
-                })
-                .DisposeWith(disposables);
-            
             // add the exception handling for the LoginCommand
             // code here
             LoginCommand.ThrownExceptions

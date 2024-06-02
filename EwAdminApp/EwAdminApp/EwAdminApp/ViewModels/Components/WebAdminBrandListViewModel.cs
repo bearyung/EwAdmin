@@ -73,16 +73,15 @@ public class WebAdminBrandListViewModel : ViewModelBase
             // set the isBusy property to true when the search command is executing
             SearchCommand.IsExecuting.Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent(
+                            sourceTypeName: GetType().Name,
+                            isExecutionIncrement: true));
+
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -99,38 +98,32 @@ public class WebAdminBrandListViewModel : ViewModelBase
                 // log the exception
                 Console.WriteLine($"{GetType().Name}: Failed to search for shops");
                 Console.WriteLine(ex.Message);
+
+                MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent(
+                    sourceTypeName: GetType().Name,
+                    isExecutionIncrement: false));
             });
 
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count =>
-                {
-                    // log the ExecutingCommandsCount property value
-                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}");
-                })
-                .DisposeWith(disposables);
-            
             // when the SelectedBrand property changes, emit the WebAdminBrandEvent using the ReactiveUI MessageBus
             this.WhenAnyValue(x => x.SelectedBrand)
                 .Subscribe(brand =>
                 {
                     // log the selected brand
                     Console.WriteLine($"{GetType().Name}: Selected brand: {brand?.BrandId}");
-                    
+
                     // emit the WebAdminBrandEvent
                     MessageBus.Current.SendMessage(new WebAdminBrandEvent(brand));
                 })
-                .DisposeWith(disposables);
-            
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
                 .DisposeWith(disposables);
 
             // Subscribe to the SearchCommand's Executed observable
             // Subscribe to the SearchCommand itself
             SearchCommand.Subscribe(_ =>
                 {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent(
+                        sourceTypeName: GetType().Name,
+                        isExecutionIncrement: false));
+
                     MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                         new ActionStatus
                         {
@@ -194,7 +187,7 @@ public class WebAdminBrandListViewModel : ViewModelBase
                 Console.WriteLine($"Error: {response.StatusCode}");
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 Console.WriteLine($"Error: {errorContent}");
-                
+
                 // throw an exception with error code and content
                 throw new Exception($"Error: {response.StatusCode} - {errorContent}");
             }
@@ -220,6 +213,7 @@ public class WebAdminBrandListViewModel : ViewModelBase
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(DoSearch)} operation cancelled");
+            throw;
         }
         catch (Exception e)
         {

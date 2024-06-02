@@ -89,17 +89,16 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
             // when the SaveCommand is executing, set the IsBusy property to true
             SaveCommand.IsExecuting.Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     // set the IsBusy property
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent(
+                            sourceTypeName: GetType().Name,
+                            isExecutionIncrement: true));
+
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -114,6 +113,10 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
             SaveCommand.ThrownExceptions.Subscribe(exception =>
                 {
                     Console.WriteLine($"An error occurred: {exception.Message}");
+
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent(
+                        sourceTypeName: GetType().Name,
+                        isExecutionIncrement: false));
                 })
                 .DisposeWith(disposables);
 
@@ -134,16 +137,15 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
                     });
                 })
                 .DisposeWith(disposables);
-            
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
-                .DisposeWith(disposables);
-            
+
             // Subscribe to the SearchCommand's Executed observable
             // Subscribe to the SearchCommand itself
             SaveCommand.Subscribe(_ =>
                 {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent(
+                        sourceTypeName: GetType().Name,
+                        isExecutionIncrement: false));
+
                     MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                         new ActionStatus
                         {
@@ -226,10 +228,12 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
                 Console.WriteLine($"Error: {response.StatusCode}");
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 Console.WriteLine($"Error: {errorContent}");
-                
+
                 // throw an exception with error code and content
                 throw new Exception($"Error: {response.StatusCode} - {errorContent}");
-            };
+            }
+
+            ;
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var resultShopWorkdayDetail = JsonSerializer.Deserialize<ShopWorkdayDetail>(content,
@@ -254,6 +258,7 @@ public class ShopWorkdayDetailEditViewModel : ViewModelBase
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(DoSave)} operation cancelled.");
+            throw;
         }
         catch (Exception e)
         {

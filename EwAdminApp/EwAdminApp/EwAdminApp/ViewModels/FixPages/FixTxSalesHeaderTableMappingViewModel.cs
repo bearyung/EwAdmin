@@ -13,6 +13,7 @@ public class FixTxSalesHeaderTableMappingViewModel : ViewModelBase
     private ViewModelBase? _shopSelectorPanel;
     private ViewModelBase? _shopWorkdaySelectorPanel;
     private ViewModelBase? _txSalesHeaderListPanel;
+    private ViewModelBase? _txSalesHeaderDetailPanel;
     private ViewModelBase? _txSalesHeaderTableMappingPanel;
 
     // add a constructor
@@ -39,17 +40,18 @@ public class FixTxSalesHeaderTableMappingViewModel : ViewModelBase
         ShopSelectorPanel = shopSelectorPanelViewModel;
 
         // add a new instance of ShopWorkdayListViewModel to the ShopWorkdaySelectorPanel property
-        // code here
         var shopWorkdaySelectorPanelViewModel = new ShopWorkdayDetailListViewModel();
         ShopWorkdaySelectorPanel = shopWorkdaySelectorPanelViewModel;
 
         // add a new instance of TxSalesHeaderListViewModel to the TxSalesHeaderListPanel property
-        // code here
         var txSalesHeaderListPanelViewModel = new TxSalesHeaderListViewModel();
         TxSalesHeaderListPanel = txSalesHeaderListPanelViewModel;
+        
+        // add a new instance of TxSalesHeaderDetailViewModel to the TxSalesHeaderDetailPanel property
+        var txSalesHeaderDetailPanelViewModel = new TxSalesHeaderDetailViewModel();
+        TxSalesHeaderDetailPanel = txSalesHeaderDetailPanelViewModel;
 
         // add a new instance of TxSalesHeaderDetailEditTableViewModel to the TxSalesHeaderDetailEditTablePanel property
-        // code here
         var txSalesHeaderDetailEditTablePanelViewModel = new TxSalesHeaderDetailEditTableViewModel();
         TxSalesHeaderTableMappingPanel = txSalesHeaderDetailEditTablePanelViewModel;
         
@@ -57,27 +59,6 @@ public class FixTxSalesHeaderTableMappingViewModel : ViewModelBase
         {
             // log when the viewmodel is activated
             Console.WriteLine($"{GetType().Name} activated");
-            
-            // when the ExecutingCommandsCount property of the
-            // ShopSelectorPanel, ShopWorkdaySelectorPanel, TxSalesHeaderListPanel, TxPaymentListPanel, TxPaymentDetailPanel, and TxPaymentDetailEditPanel changes,
-            // use CombineLatest to get the sum of the ExecutingCommandsCount properties
-            // update the ExecutingCommandsCount property of this view model
-            // code here
-            this.WhenAnyValue(x => x.ShopSelectorPanel!.ExecutingCommandsCount)
-                .CombineLatest(this.WhenAnyValue(x => x.ShopWorkdaySelectorPanel!.ExecutingCommandsCount))
-                .CombineLatest(this.WhenAnyValue(x => x.TxSalesHeaderListPanel!.ExecutingCommandsCount))
-                .CombineLatest(this.WhenAnyValue(x => x.TxSalesHeaderTableMappingPanel!.ExecutingCommandsCount))
-                .Subscribe(x =>
-                {
-                    var combinedCount = x.Item1.Item1.Item1 + x.Item1.Item1.Item2 + x.Item1.Item2 + x.Item2;
-
-                    // log the ExecutingCommandsCount properties
-                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {combinedCount}");
-
-                    // Update the ExecutingCommandsCount property
-                    ExecutingCommandsCount = combinedCount;
-                })
-                .DisposeWith(disposables);
             
             // log when the viewmodel is deactivated
             Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))
@@ -107,5 +88,11 @@ public class FixTxSalesHeaderTableMappingViewModel : ViewModelBase
     {
         get => _txSalesHeaderTableMappingPanel;
         set => this.RaiseAndSetIfChanged(ref _txSalesHeaderTableMappingPanel, value);
+    }
+    
+    public ViewModelBase? TxSalesHeaderDetailPanel
+    {
+        get => _txSalesHeaderDetailPanel;
+        set => this.RaiseAndSetIfChanged(ref _txSalesHeaderDetailPanel, value);
     }
 }

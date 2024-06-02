@@ -87,17 +87,16 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
             // when the SaveCommand is executing, set the IsBusy property to true
             SaveCommand.IsExecuting.Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     // set the IsBusy property
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                            sourceTypeName: GetType().Name, 
+                            isExecutionIncrement: true));
+                        
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -110,7 +109,14 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
 
             // handle the exception when the SaveCommand is executed
             SaveCommand.ThrownExceptions
-                .Subscribe(ex => { Console.WriteLine($"An error occurred: {ex.Message}"); })
+                .Subscribe(ex =>
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                    
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                })
                 .DisposeWith(disposables);
 
             // listen to the Message Bus for the ShopWorkdayPeriodDetailEvent
@@ -133,15 +139,14 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
                 })
                 .DisposeWith(disposables);
             
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
-                .DisposeWith(disposables);
-
             // Subscribe to the SaveCommand's Executed observable
             // Subscribe to the SaveCommand itself
             SaveCommand.Subscribe(_ =>
                 {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                    
                     MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                         new ActionStatus
                         {
@@ -247,6 +252,7 @@ public class ShopWorkdayPeriodDetailEditViewModel : ViewModelBase
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(DoSave)} operation cancelled");
+            throw;
         }
         catch (Exception e)
         {

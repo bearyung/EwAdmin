@@ -17,6 +17,6 @@ public partial class TestDialogHostView : ReactiveUserControl<TestDialogHostView
 
     private void Button_OnClick(object? sender, RoutedEventArgs e)
     {
-        DialogHost.Show(new TestDialogHostView());
+        DialogHost.Close(null);
     }
 }

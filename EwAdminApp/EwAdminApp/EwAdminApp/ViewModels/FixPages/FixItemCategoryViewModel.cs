@@ -31,20 +31,6 @@ public class FixItemCategoryViewModel : ViewModelBase
         {
             // log when the viewmodel is activated
             Console.WriteLine($"{GetType().Name} activated");
-
-            this.WhenAnyValue(x => x.BrandSelectorPanel!.ExecutingCommandsCount)
-                .CombineLatest(this.WhenAnyValue(x => x.ItemCategorySelectorPanel!.ExecutingCommandsCount))
-                .CombineLatest(this.WhenAnyValue(x => x.ItemCategoryDetailPanel!.ExecutingCommandsCount))
-                .CombineLatest(this.WhenAnyValue(x => x.ItemCategoryDetailEditPanel!.ExecutingCommandsCount))
-                .Subscribe(x =>
-                {
-                    var combinedCount = x.Item1.Item1.Item1 + x.Item1.Item1.Item2 + x.Item1.Item2 + x.Item2;
-
-                    Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {combinedCount}");
-
-                    ExecutingCommandsCount = combinedCount;
-                })
-                .DisposeWith(disposables);
             
             // log when the viewmodel is deactivated
             Disposable.Create(() => Console.WriteLine($"{GetType().Name} is being deactivated."))

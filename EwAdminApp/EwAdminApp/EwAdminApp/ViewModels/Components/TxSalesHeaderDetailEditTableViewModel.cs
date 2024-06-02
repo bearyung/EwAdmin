@@ -1,7 +1,9 @@
 using System;
 using System.Reactive;
+using System.Reactive.Disposables;
 using DialogHostAvalonia;
 using EwAdmin.Common.Models.Pos;
+using EwAdminApp.Events;
 using EwAdminApp.Views;
 using ReactiveUI;
 
@@ -49,8 +51,41 @@ public class TxSalesHeaderDetailEditTableViewModel : ViewModelBase
         SelectTableCommand = ReactiveCommand.Create(() =>
         {
             // popup a viewmodel to select a table using DialogHost.Avalonia
+            // DialogHost.Show(new TableMasterListViewModel());
+            DialogHost.Show(new TestDialogHostViewModel());
+        });
+        
+        this.WhenActivated(disposables =>
+        {
+            // log when the viewmodel is activated
+            Console.WriteLine($"{GetType().Name} activated");
+            
+            // listen to the Message Bus for the TxSalesHeaderEvent
+            // when the event is received, update the SelectedTxSalesHeader property
             // code here
-            DialogHost.Show(new TestDialogHostView());
+            MessageBus.Current.Listen<TxSalesHeaderEvent>()
+                .Subscribe(x =>
+                {
+                    SelectedTxSalesHeader = x.TxSalesHeaderMessage;
+                })
+                .DisposeWith(disposables);
+            
+            // listen to the message bus for the ShopEvent
+            // when the event is received, update the SelectedShop property
+            // code here
+            MessageBus.Current.Listen<ShopEvent>()
+                .Subscribe(x =>
+                {
+                    SelectedShop = x.ShopMessage;
+                })
+                .DisposeWith(disposables);
+            
+            // log when the viewmodel is deactivated
+            Disposable.Create(() =>
+                {
+                    Console.WriteLine($"{GetType().Name} is being deactivated.");
+                })
+                .DisposeWith(disposables);
         });
     }
 }

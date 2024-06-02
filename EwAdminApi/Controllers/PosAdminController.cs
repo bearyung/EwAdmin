@@ -737,6 +737,7 @@ public class PosAdminController : ControllerBase
     /// <param name="showEnabled"></param>
     /// <param name="showTempTable"></param>
     /// <param name="showTakeAway"></param>
+    /// <param name="showDineIn"></param>
     /// <returns>
     /// An IActionResult that represents the result of the action method:
     /// - If the tables are found, it returns an HTTP 200 status code along with the table details.
@@ -750,7 +751,8 @@ public class PosAdminController : ControllerBase
     public async Task<IActionResult> GetTableList(
         [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
         [FromQuery] int? tableId = null, [FromQuery] string? tableCode = null, 
-        [FromQuery] bool showDisabled = false, [FromQuery] bool showEnabled = true, [FromQuery] bool showTempTable = true, [FromQuery] bool showTakeAway = true)
+        [FromQuery] bool showDisabled = false, [FromQuery] bool showEnabled = true, [FromQuery] bool showTempTable = true, 
+        [FromQuery] bool showTakeAway = true, [FromQuery] bool showDineIn = true)
     {
         // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
         if (page <= 0 || pageSize <= 0)
@@ -766,7 +768,8 @@ public class PosAdminController : ControllerBase
 
         // get the table list from PosTableMasterRepository
         var resultList = await _posTableMasterRepository
-            .GetTableListAsync(accountId, shopId, page, pageSize, tableId, tableCode, showDisabled, showEnabled, showTempTable, showTakeAway)
+            .GetTableListAsync(accountId, shopId, page, pageSize, tableId, tableCode, 
+                showDisabled, showEnabled, showTempTable, showTakeAway, showDineIn)
             .ConfigureAwait(false);
 
         return Ok(resultList);

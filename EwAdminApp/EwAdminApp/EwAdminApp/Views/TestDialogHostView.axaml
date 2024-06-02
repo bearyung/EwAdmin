@@ -3,10 +3,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:EwAdminApp.ViewModels"
+             xmlns:component="clr-namespace:EwAdminApp.Views.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Width="800" Height="450"
              x:Class="EwAdminApp.Views.TestDialogHostView"
              x:DataType="vm:TestDialogHostViewModel">
-    <StackPanel>
-        <Button Click="Button_OnClick">Show Dialog</Button>
-    </StackPanel>
+    <DockPanel Margin="0" Background="Black">
+        <StackPanel DockPanel.Dock="Bottom">
+            <Button Click="Button_OnClick">CLICK ME</Button>
+        </StackPanel>
+        <component:TableMasterListView/>
+    </DockPanel>
 </UserControl>

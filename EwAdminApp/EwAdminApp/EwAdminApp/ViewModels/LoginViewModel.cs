@@ -108,22 +108,25 @@ public class LoginViewModel : ViewModelBase
                                 Message = "Login failed. Invalid API key."
                             }));
                     }
+                    
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
                 })
                 .DisposeWith(disposables);
 
             // set the isBusy property to true when the SaveApiKeyCommand is executing
             SaveApiKeyCommand.IsExecuting.Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                            sourceTypeName: GetType().Name, 
+                            isExecutionIncrement: true));
+                        
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -170,11 +173,6 @@ public class LoginViewModel : ViewModelBase
                 })
                 .DisposeWith(disposables);
             
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
-                .DisposeWith(disposables);
-
             // Subscribe to the SaveApiKeyCommand's Executed observable
             // Subscribe to the SaveApiKeyCommand itself
             SaveApiKeyCommand.Subscribe(_ =>

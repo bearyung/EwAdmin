@@ -50,9 +50,6 @@ public DashboardViewDataViewModel()
                 .Select(x => x != null ? SelectViewModel(x.Function) : null)
                 .Subscribe(SwitchViewModel)
                 .DisposeWith(disposables);
-            
-            // when the ExecutingCommandsCount property of the SelectedContentViewModel changes,
-            // update the view model's ExecutingCommandsCount property
         });
     }
 

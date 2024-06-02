@@ -17,7 +17,7 @@
         <Grid Grid.Row="0" Grid.Column="2" RowSpan="2"
               RowDefinitions="*, 250">
             <ContentControl Grid.Row="0" Grid.Column="0"
-                            />
+                            Content="{Binding TxSalesHeaderDetailPanel}"/>
             <ContentControl Grid.Row="1" Grid.Column="0"
                             Content="{Binding TxSalesHeaderTableMappingPanel}"/>
         </Grid>

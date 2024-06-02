@@ -77,17 +77,16 @@ public class ItemCategoryDetailEditViewModel : ViewModelBase
             // when the SaveCommand is executing, set the IsBusy to true
             SaveCommand.IsExecuting.Subscribe(isExecuting =>
                 {
-                    var isInitial = ExecutingCommandsCount == 0 && !isExecuting;
-
                     // set the IsBusy property
                     IsBusy = isExecuting;
 
-                    // increment or decrement the ExecutingCommandsCount property
-                    ExecutingCommandsCount += isExecuting ? 1 : (ExecutingCommandsCount > 0 ? -1 : 0);
-
                     // emit the ActionStatusMessageEvent using the ReactiveUI MessageBus only if it is not the initial execution
-                    if (!isInitial && isExecuting)
+                    if (isExecuting)
                     {
+                        MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                            sourceTypeName: GetType().Name, 
+                            isExecutionIncrement: true));
+                        
                         MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                             new ActionStatus
                             {
@@ -101,6 +100,10 @@ public class ItemCategoryDetailEditViewModel : ViewModelBase
             // handle the exceptions thrown by the SaveCommand
             SaveCommand.ThrownExceptions.Subscribe(ex =>
                 {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                    
                     // log the exception
                     Console.WriteLine($"An error occurred: {ex.Message}");
                 })
@@ -124,15 +127,14 @@ public class ItemCategoryDetailEditViewModel : ViewModelBase
                 })
                 .DisposeWith(disposables);
             
-            // Subscribe to the ExecutingCommandsCount property
-            this.WhenAnyValue(x => x.ExecutingCommandsCount)
-                .Subscribe(count => { Console.WriteLine($"{GetType().Name}: ExecutingCommandsCount: {count}"); })
-                .DisposeWith(disposables);
-            
             // Subscribe to the SaveCommand's Executed observable
             // Subscribe to the SaveCommand itself
             SaveCommand.Subscribe(_ =>
                 {
+                    MessageBus.Current.SendMessage(new ExecutingCommandFlagEvent( 
+                        sourceTypeName: GetType().Name, 
+                        isExecutionIncrement: false));
+                    
                     MessageBus.Current.SendMessage(new ActionStatusMessageEvent(
                         new ActionStatus
                         {
@@ -236,6 +238,7 @@ public class ItemCategoryDetailEditViewModel : ViewModelBase
         {
             // log the operation cancelled
             Console.WriteLine($"{nameof(DoSave)} operation cancelled.");
+            throw;
         }
         catch (Exception e)
         {
