@@ -1,12 +1,11 @@
 using System;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using EwAdminApp.ViewModels.Components;
 using ReactiveUI;
 
 namespace EwAdminApp.ViewModels.FixPages;
 
-public class FixTxSalesHeaderTableMappingViewModel : ViewModelBase
+public class FixTxSalesHeaderCusCountViewModel : ViewModelBase
 {
     // add a property named "SelectedShop" of type Shop
     // code here
@@ -14,12 +13,12 @@ public class FixTxSalesHeaderTableMappingViewModel : ViewModelBase
     private ViewModelBase? _shopWorkdaySelectorPanel;
     private ViewModelBase? _txSalesHeaderListPanel;
     private ViewModelBase? _txSalesHeaderDetailPanel;
-    private ViewModelBase? _txSalesHeaderTableMappingPanel;
+    private ViewModelBase? _txSalesHeaderCusCountEditPanel;
 
     // add a constructor
     // when the SelectedShop property changes, console log the shop name
     // code here
-    public FixTxSalesHeaderTableMappingViewModel()
+    public FixTxSalesHeaderCusCountViewModel()
     {
         // add a new instance of ShopListViewModel to the ShopPanel property
         // code here
@@ -52,8 +51,8 @@ public class FixTxSalesHeaderTableMappingViewModel : ViewModelBase
         TxSalesHeaderDetailPanel = txSalesHeaderDetailPanelViewModel;
 
         // add a new instance of TxSalesHeaderDetailEditTableViewModel to the TxSalesHeaderDetailEditTablePanel property
-        var txSalesHeaderDetailEditTablePanelViewModel = new TxSalesHeaderDetailEditTableViewModel();
-        TxSalesHeaderTableMappingPanel = txSalesHeaderDetailEditTablePanelViewModel;
+        var txSalesHeaderDetailEditCusCountViewModel = new TxSalesHeaderDetailEditCusCountViewModel();
+        TxSalesHeaderCusCountEditPanel = txSalesHeaderDetailEditCusCountViewModel;
         
         this.WhenActivated((disposables) =>
         {
@@ -84,10 +83,10 @@ public class FixTxSalesHeaderTableMappingViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _txSalesHeaderListPanel, value);
     }
 
-    public ViewModelBase? TxSalesHeaderTableMappingPanel
+    public ViewModelBase? TxSalesHeaderCusCountEditPanel
     {
-        get => _txSalesHeaderTableMappingPanel;
-        set => this.RaiseAndSetIfChanged(ref _txSalesHeaderTableMappingPanel, value);
+        get => _txSalesHeaderCusCountEditPanel;
+        set => this.RaiseAndSetIfChanged(ref _txSalesHeaderCusCountEditPanel, value);
     }
     
     public ViewModelBase? TxSalesHeaderDetailPanel

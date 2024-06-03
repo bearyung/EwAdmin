@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.FixPages"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.FixPages.FixTxSalesHeaderCusCountView"
+             x:DataType="vm:FixTxSalesHeaderCusCountViewModel">
+    <Grid ColumnDefinitions="440, *, 200"
+          RowDefinitions="200, *">
+        <ContentControl Grid.Row="0" Grid.Column="0"
+                        Content="{Binding ShopSelectorPanel}" />
+        <ContentControl Grid.Row="0" Grid.Column="1"
+                        Content="{Binding  ShopWorkdaySelectorPanel}" />
+        <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                        Content="{Binding TxSalesHeaderListPanel}" />
+        <Grid Grid.Row="0" Grid.Column="2" RowSpan="2"
+              RowDefinitions="*, 320">
+            <ContentControl Grid.Row="0" Grid.Column="0"
+                            Content="{Binding TxSalesHeaderDetailPanel}"/>
+            <ContentControl Grid.Row="1" Grid.Column="0"
+                            Content="{Binding TxSalesHeaderCusCountEditPanel}"/>
+        </Grid>
+    </Grid>
+</UserControl>

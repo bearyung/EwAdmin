@@ -150,7 +150,7 @@ public class PosItemCategoryRepository : PosItemCategoryRepositoryBase
     public async Task<ItemCategory?> UpdateItemCategoryAsync(ItemCategory itemCategoryObj)
     {
         using var db = await GetPosDatabaseConnectionByAccount(itemCategoryObj.AccountId).ConfigureAwait(false);
-        var (query, parameters) = BuildUpdateQuery(itemCategoryObj, [
+        var (query, parameters) = BuildItemCategoryUpdateQuery(itemCategoryObj, [
             nameof(ItemCategory.ParentCategoryId),
             nameof(ItemCategory.IsTerminal),
             nameof(ItemCategory.Enabled),

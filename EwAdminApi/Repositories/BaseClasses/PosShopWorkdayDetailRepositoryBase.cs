@@ -9,7 +9,7 @@ namespace EwAdminApi.Repositories.BaseClasses;
 public class PosShopWorkdayDetailRepositoryBase(
     IConnectionService connectionService,
     IHttpContextAccessor httpContextAccessor)
-    : PosRepositoryBase(connectionService)
+    : PosRepositoryBase(connectionService, httpContextAccessor)
 {
     protected (string query, DynamicParameters parameters) BuildUpdateQuery(ShopWorkdayDetail shopWorkdayDetailObj,
         HashSet<string> includedProperties, HashSet<string>? explicitProperties = null)

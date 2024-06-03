@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.TxSalesHeaderDetailEditCusCountView"
+             x:DataType="vm:TxSalesHeaderDetailEditCusCountViewModel">
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <Border
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        Margin="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,*,46">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    TxSalesHeader Detail
+                </Label>
+            </Border>
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Margin="8">
+                    <Label>AccountId ID</Label>
+                    <TextBox Classes="Readonly"
+                             Focusable="False"
+                             Text="{Binding SelectedTxSalesHeader.AccountId, 
+                                FallbackValue='', TargetNullValue=''}" />
+                    <Label>Shop ID</Label>
+                    <TextBox Classes="Readonly"
+                             Focusable="False"
+                             Text="{Binding SelectedTxSalesHeader.ShopId, 
+                                FallbackValue='', TargetNullValue=''}" />
+                    <Label>TxSalesHeaderId</Label>
+                    <TextBox Classes="Readonly"
+                             Focusable="False"
+                             Text="{Binding SelectedTxSalesHeader.TxSalesHeaderId, 
+                                FallbackValue='', TargetNullValue=''}" />
+                    <Label>Cus Count</Label>
+                    <TextBox
+                        Text="{Binding CusCountStringInput, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                </StackPanel>
+            </ScrollViewer>
+            <StackPanel Grid.Row="2"
+                        Margin="8"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="4">
+                <Button Content="Save"
+                        Background="Green"
+                        Command="{Binding SaveCommand}" />
+                <Button Content="Cancel"
+                        Command="{Binding CancelCommand}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

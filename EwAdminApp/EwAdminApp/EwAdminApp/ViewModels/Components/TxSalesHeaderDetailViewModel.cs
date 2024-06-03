@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Text.Json;
 using System.Threading;
@@ -118,10 +119,23 @@ public class TxSalesHeaderDetailViewModel : ViewModelBase
                     SearchCommand.Dispose();
 
                     // clear the SelectedTxSalesHeader property
-                    SelectedTxSalesHeader = null;
+                    RxApp.MainThreadScheduler.Schedule(() => SelectedTxSalesHeader = null);
 
                     // set the SelectedTxSalesHeaderMin property
                     SelectedTxSalesHeaderMin = txSalesHeaderMinEvent.TxSalesHeaderMinMessage;
+                })
+                .DisposeWith(disposables);
+            
+            // use ReactiveUI MessageBus to subscribe the TxSalesHeaderEvent
+            MessageBus.Current.Listen<TxSalesHeaderEvent>()
+                .Subscribe(txSalesHeaderEvent =>
+                {
+                    // console log the event
+                    Console.WriteLine(
+                        $"Received {txSalesHeaderEvent.GetType().Name}: {txSalesHeaderEvent.TxSalesHeaderMessage?.TxSalesHeaderId}");
+
+                    // set the SelectedTxSalesHeader property
+                    RxApp.MainThreadScheduler.Schedule(() => SelectedTxSalesHeader = txSalesHeaderEvent.TxSalesHeaderMessage);
                 })
                 .DisposeWith(disposables);
             

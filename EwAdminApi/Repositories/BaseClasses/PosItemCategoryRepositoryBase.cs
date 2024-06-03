@@ -9,9 +9,9 @@ namespace EwAdminApi.Repositories.BaseClasses;
 public class PosItemCategoryRepositoryBase(
     IConnectionService connectionService,
     IHttpContextAccessor httpContextAccessor)
-    : PosRepositoryBase(connectionService)
+    : PosRepositoryBase(connectionService, httpContextAccessor)
 {
-    protected (string query, DynamicParameters parameters) BuildUpdateQuery(ItemCategory itemCategoryObj,
+    protected (string query, DynamicParameters parameters) BuildItemCategoryUpdateQuery(ItemCategory itemCategoryObj,
         HashSet<string> includedProperties, HashSet<string>? explicitProperties = null)
     {
         var updateQuery = new StringBuilder("UPDATE ItemCategory SET ");

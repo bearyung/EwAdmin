@@ -774,4 +774,54 @@ public class PosAdminController : ControllerBase
 
         return Ok(resultList);
     }
+    
+    /// <summary>
+    /// Handles the PATCH request to update a transaction header.
+    /// </summary>
+    /// <param name="txSalesHeader">The transaction header to be updated. Only tableId, tableCode, sectionId, sectionName, cusCount, and enabled fields are updated.</param>
+    /// <returns>
+    /// An IActionResult that represents the result of the action method:
+    /// - If the transaction header is updated successfully, it returns an HTTP 200 status code along with the updated transaction header.
+    /// - If the user data is not found, it returns an HTTP 400 status code with a custom error message.
+    /// </returns>
+    [HttpPatch("updateTxSalesHeader")]
+    [ProducesResponseType(typeof(TxSalesHeader), 200)]
+    [ProducesResponseType(typeof(CustomErrorRequestResultDto), 400)]
+    [Produces("application/json")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> UpdateTxSalesHeader(
+        [JsonBinder, Required] TxSalesHeader txSalesHeader)
+    {
+        // Validate the ID fields
+        if (txSalesHeader.AccountId == 0 || txSalesHeader.ShopId == 0 || txSalesHeader.TxSalesHeaderId == 0)
+        {
+            return new CustomBadRequestResult("AccountId, ShopId and TxSalesHeaderId must be greater than zero.");
+        }
+
+        // Get the Monday user data from the HttpContext
+        var mondayUserData = HttpContext.Items["MondayUserData"] as MondayUserResponse;
+
+        if (mondayUserData == null)
+        {
+            // Handle the case where the data is not found
+            return new CustomBadRequestResult("User data not found.");
+        }
+
+        // override the modified by field with the user name from Monday
+        txSalesHeader.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        txSalesHeader.ModifiedDate = DateTime.Now;
+
+        // Implementation to update transaction header
+        var updatedTxSalesHeader =
+            await _posTxSalesRepository.UpdateTxSalesHeaderAsync(txSalesHeader).ConfigureAwait(false);
+
+        // If the transaction header is not updated successfully, return a custom 400 Bad Request response with a custom error message.
+        // Otherwise, return an HTTP 200 OK response with the updated transaction header.
+        if (updatedTxSalesHeader == null)
+        {
+            return new CustomBadRequestResult("Failed to update transaction header.");
+        }
+
+        return Ok(updatedTxSalesHeader);
+    }
 }

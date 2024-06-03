@@ -5,9 +5,10 @@ using EwAdminApi.Services;
 
 namespace EwAdminApi.Repositories;
 
-public class PosTxSalesRepository : PosRepositoryBase
+public class PosTxSalesRepository : PosTxSalesRepositoryBase
 {
-    public PosTxSalesRepository(IConnectionService connectionService) : base(connectionService)
+    public PosTxSalesRepository(IConnectionService connectionService, IHttpContextAccessor httpContextAccessor) :
+        base(connectionService, httpContextAccessor)
     {
     }
     
@@ -432,7 +433,7 @@ public class PosTxSalesRepository : PosRepositoryBase
     /// </summary>
     /// <param name="txPayment"></param>
     /// <returns>
-    /// Return true if the txpayment record is updated successfully
+    /// Return true if the txPayment record is updated successfully
     /// </returns>
     public async Task<TxPayment?> UpdateTxPaymentAsync(TxPayment txPayment)
     {
@@ -465,5 +466,38 @@ public class PosTxSalesRepository : PosRepositoryBase
         return null;
     }
     
-    
+    // add a new method to update the txSalesHeader 
+    // input: txSalesHeader object
+    //        Only the CusCount, TableId, TableCode, SectionId, SectionName, Enabled and ModifiedBy can be updated, modifiedDate is updated automatically
+    // output: boolean
+    public async Task<TxSalesHeader?> UpdateTxSalesHeaderAsync(TxSalesHeader txSalesHeaderObj)
+    {
+        using var db = await GetPosDatabaseConnectionByAccount(txSalesHeaderObj.AccountId).ConfigureAwait(false);
+        var (query, parameters) = BuildTxSalesHeaderUpdateQuery(txSalesHeaderObj, [
+            nameof(TxSalesHeader.CusCount),
+            nameof(TxSalesHeader.TableId),
+            nameof(TxSalesHeader.TableCode),
+            nameof(TxSalesHeader.SectionId),
+            nameof(TxSalesHeader.SectionName),
+            nameof(TxSalesHeader.Enabled)
+        ], [
+            nameof(TxSalesHeader.ModifiedDate),
+            nameof(TxSalesHeader.ModifiedBy)
+        ]);
+        
+
+        if (db != null)
+        {
+            // if update is successful, return the updated txsalesheader object
+            // otherwise, return null
+            var result = await db.ExecuteAsync(query, parameters).ConfigureAwait(false);
+            if (result > 0)
+            {
+                return await GetTxSalesHeaderAsync(txSalesHeaderObj.AccountId, txSalesHeaderObj.ShopId, txSalesHeaderObj.TxSalesHeaderId)
+                    .ConfigureAwait(false);
+            }
+        }
+
+        return null;
+    }
 }
