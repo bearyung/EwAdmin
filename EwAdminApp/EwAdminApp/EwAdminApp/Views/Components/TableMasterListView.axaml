@@ -85,6 +85,14 @@
                                             Binding="{Binding DisplayIndex}" />
                         <DataGridTextColumn Header="Enabled"
                                             Binding="{Binding Enabled}" />
+                        <DataGridTextColumn Header="CreatedDate"
+                                            Binding="{Binding CreatedDate}" />
+                        <DataGridTextColumn Header="CreatedBy"
+                                            Binding="{Binding CreatedBy}" />
+                        <DataGridTextColumn Header="ModifiedDate"
+                                            Binding="{Binding ModifiedDate}" />
+                        <DataGridTextColumn Header="ModifiedBy"
+                                            Binding="{Binding ModifiedBy}" />
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

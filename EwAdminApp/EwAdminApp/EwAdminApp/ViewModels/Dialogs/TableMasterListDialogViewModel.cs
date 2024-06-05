@@ -42,15 +42,17 @@ public class TableMasterListDialogViewModel : ViewModelBase
     // add a command for DialogHost closing event
     public ReactiveCommand<bool, Unit> CloseDialogCommand { get; set; }
 
-    public TableMasterListDialogViewModel(Shop? selectedShop)
+    public TableMasterListDialogViewModel(Shop? selectedShop = null)
     {
         SelectedShop = selectedShop;
+        
+        // initialize the CloseDialogCommand property with a new ReactiveCommand
+        CloseDialogCommand = ReactiveCommand.Create<bool>(isCancelled =>
+        {
+            IsCancelled = isCancelled;
+            DialogHost.Close(null);
+        });
 
-        ViewModelInitComplete();
-    }
-
-    public TableMasterListDialogViewModel()
-    {
         ViewModelInitComplete();
     }
 
@@ -64,12 +66,7 @@ public class TableMasterListDialogViewModel : ViewModelBase
             tableMasterListViewModel.SelectedShop = SelectedShop;
         }
         
-        // initialize the CloseDialogCommand property with a new ReactiveCommand
-        CloseDialogCommand = ReactiveCommand.Create<bool>(isCancelled =>
-        {
-            IsCancelled = isCancelled;
-            DialogHost.Close(null);
-        });
+        
 
         this.WhenActivated(disposables =>
         {
