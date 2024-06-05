@@ -24,8 +24,8 @@ public class DashboardFixViewModel : ViewModelBase
         //     { DisplayName = "Fix Incorrect Day-end", Function = UserFunctionEnum.FixIncorrectDayEnd},
         // new FunctionItem
         //     { DisplayName = "Fix Table Master", Function = UserFunctionEnum.FixTableMaster },
-        // new FunctionItem
-        //    { DisplayName = "Remap Table to Tx", Function = UserFunctionEnum.FixTxTableRemap },
+        new FunctionItem
+            { DisplayName = "Remap Table to Tx", Function = UserFunctionEnum.FixTxTableRemap },
         // new FunctionItem
         //     { DisplayName = "Remap Cash Drawer to Tx", Function = UserFunctionEnum.FixTxCashDrawerRemap },
         new FunctionItem
@@ -80,8 +80,8 @@ public class DashboardFixViewModel : ViewModelBase
                 return new FixItemCategoryViewModel();
             case UserFunctionEnum.FixTxCustomerCount:
                 return new FixTxSalesHeaderCusCountViewModel();
-            //case UserFunctionEnum.FixTxTableRemap:
-            //    return new FixTxSalesHeaderTableMappingViewModel();
+            case UserFunctionEnum.FixTxTableRemap:
+                return new FixTxSalesHeaderTableMappingViewModel();
             default:
                 return null;
         }

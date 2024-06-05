@@ -22,7 +22,7 @@ public class TableMasterListViewModel : ViewModelBase
     // properties
     // SelectedShop, TableMasterList, SelectedTableMaster, IsBusy
     private Shop? _selectedShop;
-    private ObservableCollection<TableMaster>? _tableMasterList;
+    private ObservableCollection<TableMaster>? _tableMasterList = [];
     private TableMaster? _selectedTableMaster;
     private bool _isBusy;
     
@@ -31,10 +31,10 @@ public class TableMasterListViewModel : ViewModelBase
     private string? _searchTextTableId;
     private string? _searchTextTableCode;
     private bool _showDisabled;
-    private bool _showEnabled;
-    private bool _showTempTable;
-    private bool _showTakeAway;
-    private bool _showDineIn;
+    private bool _showEnabled = true;
+    private bool _showTempTable = true;
+    private bool _showTakeAway = true;
+    private bool _showDineIn = true;
     
     public Shop? SelectedShop
     {
@@ -164,13 +164,16 @@ public class TableMasterListViewModel : ViewModelBase
                 .DisposeWith(disposables);
             
             // subscribe to the SelectedTableMaster property
-            // emit the TableMasterEvent using the ReactiveUI MessageBus
-            this.WhenAnyValue(x => x.SelectedTableMaster)
-                .Subscribe(x =>
-                {
-                    MessageBus.Current.SendMessage(new TableMasterEvent(x));
-                })
-                .DisposeWith(disposables);
+            // emit the TableMasterEvent using the ReactiveUI MessageBus if IsStandaloneMode is false
+            if (!IsStandaloneMode)
+            {
+                this.WhenAnyValue(x => x.SelectedTableMaster)
+                    .Subscribe(x =>
+                    {
+                        MessageBus.Current.SendMessage(new TableMasterEvent(x));
+                    })
+                    .DisposeWith(disposables);
+            }
             
             // subscribe to the ShopEvent to update the SelectedShop property
             MessageBus.Current.Listen<ShopEvent>()

@@ -67,6 +67,7 @@ public class PosTableMasterRepository(
             ShowEnabled = showEnabled ? 1 : 0,
             ShowTempTable = showTempTable ? 1 : 0,
             ShowTakeAway = showTakeAway ? 1 : 0,
+            ShowDineIn = showDineIn? 1 : 0, 
             Offset = offset,
             PageSize = pageSize,
             AccountId = accountId,

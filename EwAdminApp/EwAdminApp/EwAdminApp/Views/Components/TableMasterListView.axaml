@@ -16,31 +16,26 @@
         Name="WorkdaySelectorPanel"
         BorderBrush="DimGray"
         BorderThickness="1"
-        Margin="1"
         IsEnabled="{Binding IsBusy, 
             Converter={x:Static BoolConverters.Not}}">
         <DockPanel>
-            <StackPanel DockPanel.Dock="Bottom"
-                        Orientation="Horizontal">
-                <Button>OK</Button>
-            </StackPanel>
             <Grid RowDefinitions="16,38, *">
                 <Border Background="DimGray"
                         BorderThickness="0">
                     <Label FontSize="8" Foreground="#232323" FontWeight="Bold">TableMaster List</Label>
                 </Border>
                 <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
-                    <Grid ColumnDefinitions="70,70,70,70,70,70,70,*,70">
+                    <Grid ColumnDefinitions="100,100,100,100,90,100,110,*,70">
                         <TextBox BorderBrush="Transparent"
                                  Grid.Column="0"
-                                 Watermark="Table ID"
-                                 Text="{Binding SearchTextTableId}"
+                                 Watermark="Table Code"
+                                 Text="{Binding SearchTextTableCode}"
                                  Margin="0 0 0 0"
                                  KeyDown="SearchTextBox_OnKeyDown" />
                         <TextBox BorderBrush="Transparent"
                                  Grid.Column="1"
-                                 Watermark="Table Code"
-                                 Text="{Binding SearchTextTableCode}"
+                                 Watermark="Table ID"
+                                 Text="{Binding SearchTextTableId}"
                                  Margin="0 0 0 0"
                                  KeyDown="SearchTextBox_OnKeyDown" />
                         <CheckBox Grid.Column="2"

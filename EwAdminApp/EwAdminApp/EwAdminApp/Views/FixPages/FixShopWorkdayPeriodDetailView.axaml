@@ -10,16 +10,21 @@
     <Grid ColumnDefinitions="440, *, 200"
           RowDefinitions="300, *">
         <ContentControl Grid.Row="0" Grid.Column="0"
+                        Margin="1"
                         Content="{Binding ShopSelectorPanel}" />
         <ContentControl Grid.Row="0" Grid.Column="1"
+                        Margin="1"
                         Content="{Binding ShopWorkdaySelectorPanel}"/>
         <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                        Margin="1"
                         Content="{Binding ShopWorkdayPeriodSelectorPanel}" />
         <Grid Grid.Row="0" Grid.Column="2" RowSpan="2"
               RowDefinitions="*, 300">
             <ContentControl Grid.Row="0"
+                            Margin="1"
                             Content="{Binding ShopWorkdayPeriodDetailPanel}"/>
             <ContentControl Grid.Row="1"
+                            Margin="1"
                             Content="{Binding ShopWorkdayPeriodDetailEditPanel}"/>
         </Grid>
     </Grid>

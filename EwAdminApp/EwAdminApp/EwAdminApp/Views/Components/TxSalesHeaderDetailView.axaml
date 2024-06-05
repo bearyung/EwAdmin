@@ -9,7 +9,7 @@
     <!-- set the style of textboxes with no border -->
     <UserControl.Styles>
         <Style Selector="TextBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
             <Setter Property="Margin" Value="0,0,0,8"></Setter>
         </Style>
@@ -21,7 +21,6 @@
         Name="TxPaymentDetailPanel"
         BorderBrush="DimGray"
         BorderThickness="1"
-        Margin="1"
         IsEnabled="{Binding IsBusy, Converter={x:Static BoolConverters.Not}}">
         <Grid RowDefinitions="16,*">
             <Border Background="DimGray"
@@ -52,9 +51,164 @@
                              Text="{Binding SelectedTxSalesHeader.ReceiptNo, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
+                    <Label>Tx Code</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TxCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Tx Date</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TxDate, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Enabled</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.Enabled, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
                     <Label>Is Current Tx</Label>
                     <TextBox Classes="Readonly"
                              Text="{Binding SelectedTxSalesHeader.IsCurrentTx, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Table ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TableId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Table Code</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TableCode, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Checkin Datetime</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CheckinDatetime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Checkout Datetime</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CheckoutDatetime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Checkin User ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CheckinUserId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Checkin User Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CheckinUserName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Checkout User ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CheckoutUserId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Checkout User Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CheckoutUserName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Cashier User ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CashierUserId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Cashier User Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CashierUserName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Cashier Datetime</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.CashierDatetime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Paid</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountPaid, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Change</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountChange, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Subtotal</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountSubtotal, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Service Charge</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountServiceCharge, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Discount</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountDiscount, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Total</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountTotal, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Rounding</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountRounding, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Tx Completed</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TxCompleted, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Tx Checked</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.TxChecked, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Taxation</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountTaxation, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Amount Min Charge Offset</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.AmountMinChargeOffset, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Disabled Reason ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DisabledReasonId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Disabled Reason Desc</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DisabledReasonDesc, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Disabled By User ID</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DisabledByUserId, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Disabled By User Name</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DisabledByUserName, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Disabled DateTime</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.DisabledDateTime, 
+                        FallbackValue='', 
+                        TargetNullValue=''}" />
+                    <Label>Is Odo Tx</Label>
+                    <TextBox Classes="Readonly"
+                             Text="{Binding SelectedTxSalesHeader.IsOdoTx, 
                         FallbackValue='', 
                         TargetNullValue=''}" />
                     <Label>Voided</Label>

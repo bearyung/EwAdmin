@@ -18,7 +18,6 @@
         Name="ShopSelectorPanel"
         BorderBrush="DimGray"
         BorderThickness="1"
-        Margin="1"
         IsEnabled="{Binding IsBusy, Converter={x:Static BoolConverters.Not}}">
         <Grid RowDefinitions="16,38, *">
             <Border Background="DimGray"

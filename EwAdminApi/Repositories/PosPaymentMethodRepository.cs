@@ -37,8 +37,8 @@ public class PosPaymentMethodRepository : PosRepositoryBase
             ON a.AccountId = b.AccountId and a.PaymentMethodId = b.PaymentMethodId
             WHERE a.accountId = @AccountId
             AND a.Enabled = 1
-            and b.Enabled = 1
-            AND b.shopid = @ShopId
+            and ( b.Enabled = 1 or b.Enabled is null)
+            AND (b.shopid = 6176 or b.Enabled is null)
           ORDER BY a.DisplayIndex
           OFFSET @Offset ROWS 
           FETCH NEXT @PageSize ROWS ONLY

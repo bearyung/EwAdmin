@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Dialogs"
+             xmlns:converters="clr-namespace:EwAdmin.Common.Converters;assembly=EwAdmin.Common"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             MaxWidth="800" Height="450" Margin="0"
+             x:Class="EwAdminApp.Views.Dialogs.TableMasterListDialogView"
+             x:DataType="vm:TableMasterListDialogViewModel">
+    <UserControl.Resources>
+        <converters:StringToBoolConverter x:Key="StringToBoolConverter"/> 
+    </UserControl.Resources>
+    <DockPanel Margin="0" Background="Black">
+        <Border DockPanel.Dock="Bottom" BorderBrush="DimGray" BorderThickness="1,0,1,1">
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8" Margin="8">
+                <Button Content="OK" Command="{Binding CloseDialogCommand}" CommandParameter="{Binding Converter={StaticResource StringToBoolConverter}, ConverterParameter=False}"/>
+                <Button Content="Cancel" Command="{Binding CloseDialogCommand}" CommandParameter="{Binding Converter={StaticResource StringToBoolConverter}, ConverterParameter=True}"/>
+            </StackPanel>
+        </Border>
+        <ContentControl Content="{Binding TableSelectorPanel}"/>
+    </DockPanel>
+</UserControl>

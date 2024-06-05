@@ -11,18 +11,24 @@
     <Grid ColumnDefinitions="440, *, 200"
           RowDefinitions="200, *, 200">
         <ContentControl Grid.Row="0" Grid.Column="0"
+                        Margin="1"
                         Content="{Binding ShopSelectorPanel}" />
         <ContentControl Grid.Row="0" Grid.Column="1"
+                        Margin="1"
                         Content="{Binding  ShopWorkdaySelectorPanel}" />
         <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                        Margin="1"
                         Content="{Binding TxSalesHeaderListPanel}" />
         <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                        Margin="1"
                         Content="{Binding TxPaymentListPanel}" />
         <Grid Grid.Row="0" Grid.Column="2" RowSpan="3"
               RowDefinitions="*, 250">
             <ContentControl Grid.Row="0" Grid.Column="0"
+                            Margin="1"
                             Content="{Binding TxPaymentDetailPanel}"/>
             <ContentControl Grid.Row="1" Grid.Column="0"
+                            Margin="1"
                             Content="{Binding TxPaymentDetailEditPanel}"/>
         </Grid>
     </Grid>
