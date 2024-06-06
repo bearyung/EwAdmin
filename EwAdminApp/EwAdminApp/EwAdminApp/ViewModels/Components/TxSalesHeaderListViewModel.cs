@@ -322,7 +322,8 @@ public class TxSalesHeaderListViewModel : ViewModelBase
                 $"/api/PosAdmin/txSalesHeaderList?" +
                 $"accountid={SelectedShop?.AccountId}" +
                 $"&shopid={SelectedShop?.ShopId}" +
-                $"&txDate={SelectedShopWorkdayDetail?.OpenDatetime:yyyy-MM-dd}" +
+                $"&txDateGte={SelectedShopWorkdayDetail?.OpenDatetime:yyyy-MM-dd}" +
+                $"&txDateLte={SelectedShopWorkdayDetail?.OpenDatetime:yyyy-MM-dd}" +
                 $"&txSalesHeaderId={SearchTextTxSalesHeaderId}" + 
                 $"&cusCountGte={SearchTextCusCount}" +
                 $"&tableCode={SearchTextTableCode}" +

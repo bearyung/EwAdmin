@@ -228,10 +228,45 @@ public class ShopWorkdayDetailListViewModel : ViewModelBase
 
             var httpClient = Locator.Current.GetService<HttpClient>();
             if (httpClient == null) return;
+            
+            // create the parameters of startDate, endDate from SearchText for the request
+            // input format of SearchText is "2024-01-01:2024-11-30" or "2024-12-01" or "2024-05-01:" or ":2024-12-31"
+            var startDate = "";
+            var endDate = "";
+            if (!string.IsNullOrEmpty(SearchText))
+            {
+                var searchTextArrl = SearchText.Split(':');
+                if (searchTextArrl.Length == 1)
+                {
+                    // case of ":2024-12-31", user want date less than or equal to 2024-12-31
+                    if (searchTextArrl[0].StartsWith(":"))
+                    {
+                        endDate = searchTextArrl[0].Substring(1);
+                    }
+                    // case of "2024-05-01:", user want date greater than or equal to 2024-05-01
+                    else if (searchTextArrl[0].EndsWith(":"))
+                    {
+                        startDate = searchTextArrl[0];
+                    }
+                    // case of "2024-12-01", user want exact date 2024-12-01
+                    else
+                    {
+                        startDate = searchTextArrl[0];
+                        endDate = searchTextArrl[0];
+                    }
+                }
+                // case of "1000:2000", user want amount between 1000 and 2000 (inclusive)
+                else if (searchTextArrl.Length == 2)
+                {
+                    startDate = searchTextArrl[0];
+                    endDate = searchTextArrl[1];
+                }
+            }
 
             var request =
                 new HttpRequestMessage(HttpMethod.Get,
-                    $"/api/PosAdmin/shopworkdaydetaillist?accountid={SelectedShop?.AccountId}&shopid={SelectedShop?.ShopId}&startDate={SearchText}");
+                    $"/api/posAdmin/shopWorkdayDetailList?accountId={SelectedShop?.AccountId}" +
+                    $"&shopId={SelectedShop?.ShopId}&startDate={startDate}&endDate={endDate}");
             request.Headers.Add("Authorization", $"Bearer {currentLoginSettings.ApiKey}");
 
             var response = await httpClient

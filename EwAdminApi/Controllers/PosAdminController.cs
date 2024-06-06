@@ -238,8 +238,8 @@ public class PosAdminController : ControllerBase
             return new CustomBadRequestResult("User data not found.");
         }
 
-        // override the modified by field with the user name from Monday
-        shopWorkdayPeriodDetail.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        // override the modified by field with the username from Monday
+        shopWorkdayPeriodDetail.ModifiedBy = mondayUserData.Data?.Me?.Name;
         shopWorkdayPeriodDetail.ModifiedDate = DateTime.Now;
 
         // Implementation to update shop workday period detail
@@ -289,8 +289,8 @@ public class PosAdminController : ControllerBase
             return new CustomBadRequestResult("User data not found.");
         }
 
-        // override the modified by field with the user name from Monday
-        shopWorkdayDetail.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        // override the modified by field with the username from Monday
+        shopWorkdayDetail.ModifiedBy = mondayUserData.Data?.Me?.Name;
         shopWorkdayDetail.ModifiedDate = DateTime.Now;
 
         // Implementation to update shop workday detail
@@ -385,7 +385,8 @@ public class PosAdminController : ControllerBase
     /// </summary>
     /// <param name="accountId"></param>
     /// <param name="shopId"></param>
-    /// <param name="txDate"></param>
+    /// <param name="txDateGte"></param>
+    /// <param name="txDateLte"></param>
     /// <param name="txSalesHeaderId"></param>
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
@@ -404,7 +405,8 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTxSalesHeaderList(
-        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery, Required] DateTime txDate,
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId,
+        [FromQuery] DateTime? txDateGte, [FromQuery] DateTime? txDateLte,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
         [FromQuery] int? txSalesHeaderId = null, [FromQuery] string? tableCode = null,
         [FromQuery] int? cusCountGte = null, [FromQuery] decimal? amountTotalGte = null,
@@ -422,14 +424,15 @@ public class PosAdminController : ControllerBase
         }
 
         // get the transaction header list from PosTxRepository
-        var resultList =
-            await _posTxSalesRepository
-                .GetTxSalesHeaderListAsync(accountId, shopId, txDate, page, pageSize, txSalesHeaderId, tableCode,
-                    cusCountGte, amountTotalGte, amountTotalLte)
-                .ConfigureAwait(false);
+        var resultList = await _posTxSalesRepository
+            .GetTxSalesHeaderListAsync(accountId, shopId, txDateGte, txDateLte, page, pageSize, txSalesHeaderId,
+                tableCode,
+                cusCountGte, amountTotalGte, amountTotalLte)
+            .ConfigureAwait(false);
 
         return Ok(resultList);
     }
+
 
     /// <summary>
     /// Handles the GET request to fetch the list of transaction payments for a specific transaction header.
@@ -535,8 +538,8 @@ public class PosAdminController : ControllerBase
             return new CustomBadRequestResult("User data not found.");
         }
 
-        // override the modified by field with the user name from Monday
-        txPayment.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        // override the modified by field with the username from Monday
+        txPayment.ModifiedBy = mondayUserData.Data?.Me?.Name;
         txPayment.ModifiedDate = DateTime.Now;
 
         // Implementation to update transaction payment
@@ -705,8 +708,8 @@ public class PosAdminController : ControllerBase
             return new CustomBadRequestResult("User data not found.");
         }
 
-        // override the modified by field with the user name from Monday
-        itemCategory.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        // override the modified by field with the username from Monday
+        itemCategory.ModifiedBy = mondayUserData.Data?.Me?.Name;
         itemCategory.ModifiedDate = DateTime.Now;
 
         // Implementation to update item category
@@ -722,7 +725,7 @@ public class PosAdminController : ControllerBase
 
         return Ok(updatedItemCategory);
     }
-    
+
     // add an API endpoint tableList to return the list of tables
     /// <summary>
     /// Handles the GET request to fetch the list of tables.
@@ -749,9 +752,11 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> GetTableList(
-        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20,
-        [FromQuery] int? tableId = null, [FromQuery] string? tableCode = null, 
-        [FromQuery] bool showDisabled = false, [FromQuery] bool showEnabled = true, [FromQuery] bool showTempTable = true, 
+        [FromQuery, Required] int accountId, [FromQuery, Required] int shopId, [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] int? tableId = null, [FromQuery] string? tableCode = null,
+        [FromQuery] bool showDisabled = false, [FromQuery] bool showEnabled = true,
+        [FromQuery] bool showTempTable = true,
         [FromQuery] bool showTakeAway = true, [FromQuery] bool showDineIn = true)
     {
         // Check if page or pageSize is less than or equal to 0. If so, return a BadRequest.
@@ -768,13 +773,13 @@ public class PosAdminController : ControllerBase
 
         // get the table list from PosTableMasterRepository
         var resultList = await _posTableMasterRepository
-            .GetTableListAsync(accountId, shopId, page, pageSize, tableId, tableCode, 
+            .GetTableListAsync(accountId, shopId, page, pageSize, tableId, tableCode,
                 showDisabled, showEnabled, showTempTable, showTakeAway, showDineIn)
             .ConfigureAwait(false);
 
         return Ok(resultList);
     }
-    
+
     /// <summary>
     /// Handles the PATCH request to update a transaction header.
     /// </summary>
@@ -807,8 +812,8 @@ public class PosAdminController : ControllerBase
             return new CustomBadRequestResult("User data not found.");
         }
 
-        // override the modified by field with the user name from Monday
-        txSalesHeader.ModifiedBy = mondayUserData?.Data?.Me?.Name;
+        // override the modified by field with the username from Monday
+        txSalesHeader.ModifiedBy = mondayUserData.Data?.Me?.Name;
         txSalesHeader.ModifiedDate = DateTime.Now;
 
         // Implementation to update transaction header

@@ -26,7 +26,7 @@
             <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0, 0, 0, 1">
                 <Grid ColumnDefinitions="*, 70">
                     <TextBox BorderBrush="Transparent"
-                             Grid.Column="0" Watermark="yyyy-MM-dd"
+                             Grid.Column="0" Watermark="yyyy-MM-dd [from:to]"
                              Text="{Binding SearchText}"
                              Margin="0 0 0 0"
                              KeyDown="SearchTextBox_OnKeyDown" />

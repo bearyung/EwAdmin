@@ -11,7 +11,7 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
         base(connectionService, httpContextAccessor)
     {
     }
-    
+
     /// <summary>
     /// Check if there are any transactions in the given workday detail id
     /// returns the count of transactions
@@ -46,7 +46,7 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
 
         return -1;
     }
-    
+
     /// <summary>
     /// Returns the details of a transaction given the txsalesheaderid, accountid, and shopid.
     /// </summary>
@@ -184,11 +184,12 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
     }
 
     /// <summary>
-    /// Returns a list of transactions for the given account, shop, and transaction date.
+    /// Returns a list of transactions for the given account, shop, and transaction date range.
     /// </summary>
     /// <param name="accountId"></param>
     /// <param name="shopId"></param>
-    /// <param name="txDate"></param>
+    /// <param name="txDateGte"></param>
+    /// <param name="txDateLte"></param>
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
     /// <param name="txSalesHeaderId"></param>
@@ -197,69 +198,70 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
     /// <param name="amountTotalGte"></param>
     /// <param name="amountTotalLte"></param>
     /// <returns>
-    /// A list of transactions for the given account, shop, and transaction date.
+    /// A list of transactions for the given account, shop, and transaction date range.
     /// </returns>
     public async Task<IEnumerable<TxSalesHeaderMin>> GetTxSalesHeaderListAsync(int accountId, int shopId,
-        DateTime txDate, int page, int pageSize, 
-        int? txSalesHeaderId = null, string? tableCode = null, 
+        DateTime? txDateGte, DateTime? txDateLte, int page, int pageSize,
+        int? txSalesHeaderId = null, string? tableCode = null,
         int? cusCountGte = null, decimal? amountTotalGte = null, decimal? amountTotalLte = null)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
-        
-        // if txSalesHeaderid is not null, add it to the query
+
         var query = @"
-            SELECT 
-                [TxSalesHeaderId]
-              ,[AccountId]
-              ,[ShopId]
-              ,[TxCode]
-              ,[TxDate]
-              ,[Enabled]
-              ,[TableId]
-              ,[TableCode]
-              ,[CheckinDatetime]
-              ,[CheckoutDatetime]
-              ,[CheckinUserId]
-              ,[CheckinUserName]
-              ,[CheckoutUserId]
-              ,[CheckoutUserName]
-              ,[CashierUserId]
-              ,[CashierUserName]
-              ,[CashierDatetime]
-              ,[AmountPaid]
-              ,[AmountChange]
-              ,[AmountSubtotal]
-              ,[AmountServiceCharge]
-              ,[AmountDiscount]
-              ,[AmountTotal]
-              ,[AmountRounding]
-              ,[TxCompleted]
-              ,[TxChecked]
-              ,[AmountTaxation]
-              ,[AmountMinChargeOffset]
-              ,[DisabledReasonId]
-              ,[DisabledReasonDesc]
-              ,[DisabledByUserId]
-              ,[DisabledByUserName]
-              ,[DisabledDateTime]
-              ,[IsodoTx] 
-            FROM [dbo].[TxSalesHeader]
-            WHERE AccountId = @AccountId AND ShopId = @ShopId AND TxDate = @TxDate
-            AND (@TxSalesHeaderId IS NULL OR TxSalesHeaderId = @TxSalesHeaderId)
-            AND (@TableCode IS NULL OR TableCode = @TableCode)
-            AND (@CusCountGte IS NULL OR CusCount >= @CusCountGte)
-            AND (@AmountTotalGte IS NULL OR AmountTotal >= @AmountTotalGte)
-            AND (@AmountTotalLte IS NULL OR AmountTotal <= @AmountTotalLte)
-            ORDER BY TxSalesHeaderId DESC
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-        
-        // parameters for the query
+        SELECT 
+            [TxSalesHeaderId]
+          ,[AccountId]
+          ,[ShopId]
+          ,[TxCode]
+          ,[TxDate]
+          ,[Enabled]
+          ,[TableId]
+          ,[TableCode]
+          ,[CheckinDatetime]
+          ,[CheckoutDatetime]
+          ,[CheckinUserId]
+          ,[CheckinUserName]
+          ,[CheckoutUserId]
+          ,[CheckoutUserName]
+          ,[CashierUserId]
+          ,[CashierUserName]
+          ,[CashierDatetime]
+          ,[AmountPaid]
+          ,[AmountChange]
+          ,[AmountSubtotal]
+          ,[AmountServiceCharge]
+          ,[AmountDiscount]
+          ,[AmountTotal]
+          ,[AmountRounding]
+          ,[TxCompleted]
+          ,[TxChecked]
+          ,[AmountTaxation]
+          ,[AmountMinChargeOffset]
+          ,[DisabledReasonId]
+          ,[DisabledReasonDesc]
+          ,[DisabledByUserId]
+          ,[DisabledByUserName]
+          ,[DisabledDateTime]
+          ,[IsodoTx] 
+        FROM [dbo].[TxSalesHeader]
+        WHERE AccountId = @AccountId AND ShopId = @ShopId
+        AND (@TxSalesHeaderId IS NULL OR TxSalesHeaderId = @TxSalesHeaderId)
+        AND (@TableCode IS NULL OR TableCode = @TableCode)
+        AND (@CusCountGte IS NULL OR CusCount >= @CusCountGte)
+        AND (@AmountTotalGte IS NULL OR AmountTotal >= @AmountTotalGte)
+        AND (@AmountTotalLte IS NULL OR AmountTotal <= @AmountTotalLte)
+        AND (@TxDateGte IS NULL OR TxDate >= @TxDateGte)
+        AND (@TxDateLte IS NULL OR TxDate <= @TxDateLte)
+        ORDER BY TxSalesHeaderId DESC
+        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+
         var parameters = new
         {
             AccountId = accountId,
             ShopId = shopId,
-            TxDate = txDate,
+            TxDateGte = txDateGte,
+            TxDateLte = txDateLte,
             TxSalesHeaderId = txSalesHeaderId,
             Offset = offset,
             PageSize = pageSize,
@@ -268,15 +270,16 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
             AmountTotalGte = amountTotalGte,
             AmountTotalLte = amountTotalLte
         };
-        
+
         if (db != null)
         {
-            return await db.QueryAsync<TxSalesHeader>(query, parameters).ConfigureAwait(false);
+            return await db.QueryAsync<TxSalesHeaderMin>(query, parameters).ConfigureAwait(false);
         }
-        
+
         return [];
     }
-    
+
+
     /// <summary>
     /// Returns a list of payments for the given account, shop, and transaction sales header id.
     /// </summary>
@@ -288,7 +291,8 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
     /// <returns>
     /// A list of payments for the given account, shop, and transaction sales header id.
     /// </returns>
-    public async Task<IEnumerable<TxPaymentMin>> GetTxPaymentListAsync(int accountId, int shopId, int txSalesHeaderId, int page, int pageSize)
+    public async Task<IEnumerable<TxPaymentMin>> GetTxPaymentListAsync(int accountId, int shopId, int txSalesHeaderId,
+        int page, int pageSize)
     {
         using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
         var offset = (page - 1) * pageSize;
@@ -318,15 +322,15 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
             Offset = offset,
             PageSize = pageSize
         };
-        
+
         if (db != null)
         {
             return await db.QueryAsync<TxPaymentMin>(query, parameters).ConfigureAwait(false);
         }
-        
+
         return [];
     }
-    
+
     // A new method to get the full details (all the fields in TxPayment class TxPayment : TxPaymentMin) of txpayment given the txpaymentid
     // input: accountId, shopId, txPaymentId
     // output: TxPayment object 
@@ -423,7 +427,7 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
 
         return null;
     }
-    
+
     // a new method to update the txpayment record
     // input: txPayment object
     //        Only the PaymentMethodId, Enabled and ModifiedBy can be updated, modifiedDate is updated automatically
@@ -459,13 +463,14 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
             var result = await db.ExecuteAsync(query, parameters).ConfigureAwait(false);
             if (result > 0)
             {
-                return await GetTxPaymentAsync(txPayment.AccountId, txPayment.ShopId, txPayment.TxPaymentId).ConfigureAwait(false);
+                return await GetTxPaymentAsync(txPayment.AccountId, txPayment.ShopId, txPayment.TxPaymentId)
+                    .ConfigureAwait(false);
             }
         }
 
         return null;
     }
-    
+
     // add a new method to update the txSalesHeader 
     // input: txSalesHeader object
     //        Only the CusCount, TableId, TableCode, SectionId, SectionName, Enabled and ModifiedBy can be updated, modifiedDate is updated automatically
@@ -484,7 +489,7 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
             nameof(TxSalesHeader.ModifiedDate),
             nameof(TxSalesHeader.ModifiedBy)
         ]);
-        
+
 
         if (db != null)
         {
@@ -493,7 +498,8 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
             var result = await db.ExecuteAsync(query, parameters).ConfigureAwait(false);
             if (result > 0)
             {
-                return await GetTxSalesHeaderAsync(txSalesHeaderObj.AccountId, txSalesHeaderObj.ShopId, txSalesHeaderObj.TxSalesHeaderId)
+                return await GetTxSalesHeaderAsync(txSalesHeaderObj.AccountId, txSalesHeaderObj.ShopId,
+                        txSalesHeaderObj.TxSalesHeaderId)
                     .ConfigureAwait(false);
             }
         }
