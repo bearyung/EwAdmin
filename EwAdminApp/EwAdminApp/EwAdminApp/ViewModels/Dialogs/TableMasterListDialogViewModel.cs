@@ -13,7 +13,7 @@ public class TableMasterListDialogViewModel : ViewModelBase
     private ViewModelBase? _tableSelectorPanel;
     private TableMaster? _selectedTableMaster;
     private Shop? _selectedShop;
-    private bool _isCancelled;
+    private bool _isCancelled = true;
 
     public ViewModelBase? TableSelectorPanel
     {
