@@ -272,7 +272,7 @@ public class PosAdminController : ControllerBase
     [Produces("application/json")]
     [Consumes("application/json")]
     public async Task<IActionResult> UpdateShopWorkdayDetail(
-        [FromBody, Required] ShopWorkdayDetail shopWorkdayDetail)
+        [JsonBinder, Required] ShopWorkdayDetail shopWorkdayDetail)
     {
         // Validate the ID fields
         if (shopWorkdayDetail.AccountId == 0 || shopWorkdayDetail.ShopId == 0 || shopWorkdayDetail.WorkdayDetailId == 0)
