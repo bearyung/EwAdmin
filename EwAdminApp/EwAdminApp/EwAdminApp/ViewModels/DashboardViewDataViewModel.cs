@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using EwAdminApp.Models;
+using EwAdminApp.ViewModels.ViewPages;
 using ReactiveUI;
 
 namespace EwAdminApp.ViewModels;
@@ -11,8 +12,9 @@ public class DashboardViewDataViewModel : ViewModelBase
 {
     public ObservableCollection<FunctionItem> AvailableUserFunctions { get; set; } =
     [
-        /*new FunctionItem
+        new FunctionItem
             { DisplayName = "View Day-end History", Function = UserFunctionEnum.ViewDayEndHistory },
+        /*
         new FunctionItem
             { DisplayName = "View TxPayment History", Function = UserFunctionEnum.ViewTxPaymentHistory },
         new FunctionItem
@@ -57,6 +59,8 @@ public DashboardViewDataViewModel()
     {
         switch (function)
         {
+            case UserFunctionEnum.ViewDayEndHistory:
+                return new ViewDayendDetailViewModel();
             default:
                 return null;
         }

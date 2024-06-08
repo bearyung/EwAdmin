@@ -1,0 +1,98 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Components"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EwAdminApp.Views.Components.ReportTurnoverHeaderListView"
+             x:DataType="vm:ReportTurnoverHeaderListViewModel">
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+    </UserControl.Styles>
+    <Border
+        Name="WorkdaySelectorPanel"
+        BorderBrush="DimGray"
+        BorderThickness="1"
+        IsEnabled="{Binding IsBusy, 
+            Converter={x:Static BoolConverters.Not}}">
+        <Grid RowDefinitions="16,38,*">
+            <Border Background="DimGray"
+                    BorderThickness="0">
+                <Label FontSize="8" Foreground="#232323" FontWeight="Bold">
+                    ReportTurnoverHeader List
+                </Label>
+            </Border>
+            <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0,0,0,1">
+                <Grid ColumnDefinitions="*,70">
+                    <TextBox BorderBrush="Transparent"
+                             Grid.Column="0" Watermark="yyyy-MM-dd [from:to]"
+                             Text="{Binding SearchText}"
+                             Margin="0 0 0 0"
+                             KeyDown="SearchTextBox_OnKeyDown" />
+                    <Button Grid.Column="1" Content="Search"
+                            Command="{Binding SearchCommand}"
+                            Margin="0 0 0 0" />
+                </Grid>
+            </Border>
+            <DataGrid Name="ShopListDataGrid"
+                      Grid.Row="2" IsReadOnly="True"
+                      SelectionMode="Single"
+                      GridLinesVisibility="All"
+                      ItemsSource="{Binding ReportTurnoverHeaderList}"
+                      SelectedItem="{Binding SelectedReportTurnoverHeader}"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Report Turnover Header ID"
+                                        Binding="{Binding ReportTurnoverHeaderId}" />
+                    <DataGridTextColumn Header="Account ID"
+                                        Binding="{Binding AccountId}" />
+                    <DataGridTextColumn Header="Shop ID"
+                                        Binding="{Binding ShopId}" />
+                    <DataGridTextColumn Header="Clearing Datetime"
+                                        Binding="{Binding ClearingDatetime, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
+                    <DataGridTextColumn Header="Last Print Datetime"
+                                        Binding="{Binding LastPrintDatetime, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
+                    <DataGridTextColumn Header="Last Print Count"
+                                        Binding="{Binding LastPrintCount}" />
+                    <DataGridTextColumn Header="Last Print By"
+                                        Binding="{Binding LastPrintBy}" />
+                    <DataGridTextColumn Header="Day Turnover"
+                                        Binding="{Binding DayTurnover, StringFormat='F2'}" />
+                    <DataGridTextColumn Header="Day Discount"
+                                        Binding="{Binding DayDiscount, StringFormat='F2'}" />
+                    <DataGridTextColumn Header="Day Service Fee"
+                                        Binding="{Binding DayServiceFee, StringFormat='F2'}" />
+                    <DataGridTextColumn Header="Day Rounding"
+                                        Binding="{Binding DayRounding, StringFormat='F2'}" />
+                    <DataGridTextColumn Header="Day Net Turnover Amount"
+                                        Binding="{Binding DayNetTurnoverAmount, StringFormat='F2'}" />
+                    <DataGridTextColumn Header="Day Net Turnover Tx Count"
+                                        Binding="{Binding DayNetTurnoverTxCount}" />
+                    <DataGridTextColumn Header="Unclose Tx Count"
+                                        Binding="{Binding UncloseTxCount}" />
+                    <DataGridTextColumn Header="Unclose Tx Amount"
+                                        Binding="{Binding UncloseTxAmount, StringFormat='F2'}" />
+                    <DataGridTextColumn Header="Workday Detail ID"
+                                        Binding="{Binding WorkdayDetailId}" />
+                    <DataGridTextColumn Header="Workday Open Datetime"
+                                        Binding="{Binding WorkdayOpenDatetime, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
+                    <DataGridTextColumn Header="Workday Close Datetime"
+                                        Binding="{Binding WorkdayCloseDatetime, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
+                    <DataGridTextColumn Header="Enabled"
+                                        Binding="{Binding Enabled}" />
+                    <DataGridTextColumn Header="Created Date"
+                                        Binding="{Binding CreatedDate, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
+                    <DataGridTextColumn Header="Created By"
+                                        Binding="{Binding CreatedBy}" />
+                    <DataGridTextColumn Header="Modified Date"
+                                        Binding="{Binding ModifiedDate, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
+                    <DataGridTextColumn Header="Modified By"
+                                        Binding="{Binding ModifiedBy}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Border>
+</UserControl>
