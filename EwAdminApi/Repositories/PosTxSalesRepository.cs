@@ -243,7 +243,8 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
           ,[DisabledByUserId]
           ,[DisabledByUserName]
           ,[DisabledDateTime]
-          ,[IsodoTx] 
+          ,[IsodoTx]
+          ,[CashDrawerCode]
         FROM [dbo].[TxSalesHeader]
         WHERE AccountId = @AccountId AND ShopId = @ShopId
         AND (@TxSalesHeaderId IS NULL OR TxSalesHeaderId = @TxSalesHeaderId)
@@ -506,4 +507,131 @@ public class PosTxSalesRepository : PosTxSalesRepositoryBase
 
         return null;
     }
+    
+    // add a new method to check if there's any closed transaction
+    // do not have the CashDrawerCode
+    // input: accountId, shopId
+    // output: int (count of closed transactions)
+    public async Task<int> GetClosedTxCountWithoutCashDrawerCodeAsync(int accountId, int shopId)
+    {
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
+        var query = @"
+            SELECT COUNT(1) FROM TxSalesHeader
+            WHERE AccountId = @AccountId AND ShopId = @ShopId
+            AND Enabled = 1 AND TxCompleted = 1 AND TxChecked = 1 
+            AND AmountTotal <> 0
+            AND CashDrawerCode IS NULL";
+        
+        var parameters = new
+        {
+            AccountId = accountId,
+            ShopId = shopId
+        };
+
+        if (db != null)
+        {
+            return await db.QuerySingleAsync<int>(query, parameters).ConfigureAwait(false);
+        }
+
+        return -1;
+    }
+    
+    // add a new method to get the closed transactions
+    // do not have the CashDrawerCode
+    // input: accountId, shopId, page, pageSize
+    // output: List of TxSalesHeaderMin
+    public async Task<IEnumerable<TxSalesHeaderMin>> GetClosedTxWithoutCashDrawerCodeAsync(int accountId, int shopId, int page, int pageSize)
+    {
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
+        var offset = (page - 1) * pageSize;
+        var query = @"
+            SELECT 
+                [TxSalesHeaderId]
+              ,[AccountId]
+              ,[ShopId]
+              ,[TxCode]
+              ,[TxDate]
+              ,[Enabled]
+              ,[TableId]
+              ,[TableCode]
+              ,[CheckinDatetime]
+              ,[CheckoutDatetime]
+              ,[CheckinUserId]
+              ,[CheckinUserName]
+              ,[CheckoutUserId]
+              ,[CheckoutUserName]
+              ,[CashierUserId]
+              ,[CashierUserName]
+              ,[CashierDatetime]
+              ,[AmountPaid]
+              ,[AmountChange]
+              ,[AmountSubtotal]
+              ,[AmountServiceCharge]
+              ,[AmountDiscount]
+              ,[AmountTotal]
+              ,[AmountRounding]
+              ,[TxCompleted]
+              ,[TxChecked]
+              ,[AmountTaxation]
+              ,[AmountMinChargeOffset]
+              ,[DisabledReasonId]
+              ,[DisabledReasonDesc]
+              ,[DisabledByUserId]
+              ,[DisabledByUserName]
+              ,[DisabledDateTime]
+              ,[IsodoTx]
+              ,[CashDrawerCode]
+            FROM [dbo].[TxSalesHeader]
+            WHERE AccountId = @AccountId AND ShopId = @ShopId
+            AND Enabled = 1 AND TxCompleted = 1 AND TxChecked = 1 
+            AND AmountTotal <> 0
+            AND CashDrawerCode IS NULL
+            ORDER BY TxSalesHeaderId DESC
+            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+        var parameters = new
+        {
+            AccountId = accountId,
+            ShopId = shopId,
+            Offset = offset,
+            PageSize = pageSize
+        };
+
+        if (db != null)
+        {
+            return await db.QueryAsync<TxSalesHeaderMin>(query, parameters).ConfigureAwait(false);
+        }
+
+        return [];
+    }
+    
+    // add a new method to update the CashDrawerCode for the closed transactions
+    // do not have the CashDrawerCode
+    // input: accountId, shopId, cashDrawerCode
+    // output: int (count of updated transactions)
+    public async Task<int> UpdateCashDrawerCodeForClosedTxWithoutCashDrawerCodeAsync(int accountId, int shopId, string cashDrawerCode)
+    {
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
+        var query = @"
+            UPDATE TxSalesHeader
+            SET CashDrawerCode = @CashDrawerCode
+            WHERE AccountId = @AccountId AND ShopId = @ShopId
+            AND Enabled = 1 AND TxCompleted = 1 AND TxChecked = 1 
+            AND AmountTotal <> 0
+            AND CashDrawerCode IS NULL";
+        
+        var parameters = new
+        {
+            AccountId = accountId,
+            ShopId = shopId,
+            CashDrawerCode = cashDrawerCode
+        };
+
+        if (db != null)
+        {
+            return await db.ExecuteAsync(query, parameters).ConfigureAwait(false);
+        }
+
+        return -1;
+    }
+    
 }

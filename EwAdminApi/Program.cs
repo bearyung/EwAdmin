@@ -28,6 +28,7 @@ builder.Services.AddScoped<WebAdminCompanyMasterRepository>();
 builder.Services.AddScoped<WebAdminBrandMasterRepository>();
 builder.Services.AddScoped<PosTableMasterRepository>();
 builder.Services.AddScoped<PosReportTurnoverHeaderRepository>();
+builder.Services.AddScoped<PosSyncRepository>();
 
 // builder.Services.TryAddMondayClient(options =>
 // {

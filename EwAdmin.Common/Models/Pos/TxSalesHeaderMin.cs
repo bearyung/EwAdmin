@@ -69,4 +69,6 @@ public class TxSalesHeaderMin
     public DateTime? DisabledDateTime { get; set; }
     
     public bool? IsOdoTx { get; set; }
+    
+    public string? CashDrawerCode { get; set; }
 }

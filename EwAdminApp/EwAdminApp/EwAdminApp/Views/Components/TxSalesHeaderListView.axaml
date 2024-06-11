@@ -94,6 +94,8 @@
                                         Binding="{Binding CashierUserName}" />
                     <DataGridTextColumn Header="CashierDatetime"
                                         Binding="{Binding CashierDatetime}" />
+                    <DataGridTextColumn Header="CashDrawerCode"
+                                        Binding="{Binding CashDrawerCode}" />
                     <DataGridTextColumn Header="IsOdoTx"
                                         Binding="{Binding IsOdoTx}" />
                     <DataGridTextColumn Header="Enabled"
