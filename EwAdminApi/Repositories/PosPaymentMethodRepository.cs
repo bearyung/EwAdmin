@@ -33,13 +33,14 @@ public class PosPaymentMethodRepository : PosRepositoryBase
                 ,a.[IsNonSalesPayment]
                 ,a.[IsCashPayment]
             FROM [dbo].[PaymentMethod] a
-            INNER JOIN [dbo].[PaymentMethodShopDetail] b
-            ON a.AccountId = b.AccountId and a.PaymentMethodId = b.PaymentMethodId
+            LEFT JOIN 
+            ( select * from [dbo].[PaymentMethodShopDetail] where AccountId = @AccountId and shopId = @ShopId ) as b
+            ON a.AccountId = b.AccountId 
+                and a.PaymentMethodId = b.PaymentMethodId
             WHERE a.accountId = @AccountId
             AND a.Enabled = 1
-            and ( b.Enabled = 1 or b.Enabled is null)
-            AND (b.shopid = @ShopId or b.Enabled is null)
-          ORDER BY a.DisplayIndex
+            and (b.Enabled = 1 or b.Enabled is null)
+          ORDER BY a.PaymentMethodId
           OFFSET @Offset ROWS 
           FETCH NEXT @PageSize ROWS ONLY
           ";
