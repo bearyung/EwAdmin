@@ -173,4 +173,223 @@ public class PosItemCategoryRepository : PosItemCategoryRepositoryBase
 
         return null;
     }
+    
+    public async Task<ItemCategory?> InsertItemCategoryAsync(ItemCategory itemCategoryObj)
+    {
+        using var db = await GetPosDatabaseConnectionByAccount(itemCategoryObj.AccountId).ConfigureAwait(false);
+        
+        // create the new item category
+        // return the newly created item category (with the new CategoryId)
+        // code here
+        var query = @"
+            INSERT INTO [dbo].[ItemCategory]
+            (
+                 [AccountId]
+                ,[CategoryName]
+                ,[CategoryNameAlt]
+                ,[DisplayIndex]
+                ,[ParentCategoryId]
+                ,[IsTerminal]
+                ,[IsPublicDisplay]
+                ,[ButtonStyleId]
+                ,[PrinterName]
+                ,[IsModifier]
+                ,[Enabled]
+                ,[CreatedDate]
+                ,[CreatedBy]
+                ,[ModifiedDate]
+                ,[ModifiedBy]
+                ,[PrinterName2]
+                ,[PrinterName3]
+                ,[PrinterName4]
+                ,[PrinterName5]
+                ,[CategoryTypeId]
+                ,[ImageFileName]
+                ,[ImageFileName2]
+                ,[ImageFileName3]
+                ,[IsSelfOrderingDisplay]
+                ,[IsOnlineStoreDisplay]
+                ,[CategoryCode]
+            )
+            VALUES
+            (
+                 @AccountId
+                ,@CategoryName
+                ,@CategoryNameAlt
+                ,@DisplayIndex
+                ,@ParentCategoryId
+                ,@IsTerminal
+                ,@IsPublicDisplay
+                ,@ButtonStyleId
+                ,@PrinterName
+                ,@IsModifier
+                ,@Enabled
+                ,@CreatedDate
+                ,@CreatedBy
+                ,@ModifiedDate
+                ,@ModifiedBy
+                ,@PrinterName2
+                ,@PrinterName3
+                ,@PrinterName4
+                ,@PrinterName5
+                ,@CategoryTypeId
+                ,@ImageFileName
+                ,@ImageFileName2
+                ,@ImageFileName3
+                ,@IsSelfOrderingDisplay
+                ,@IsOnlineStoreDisplay
+                ,@CategoryCode
+            )
+            SELECT SCOPE_IDENTITY()
+            ";
+        
+        var parameters = new
+        {
+            itemCategoryObj.AccountId,
+            itemCategoryObj.CategoryName,
+            itemCategoryObj.CategoryNameAlt,
+            itemCategoryObj.DisplayIndex,
+            itemCategoryObj.ParentCategoryId,
+            itemCategoryObj.IsTerminal,
+            itemCategoryObj.IsPublicDisplay,
+            itemCategoryObj.ButtonStyleId,
+            itemCategoryObj.PrinterName,
+            itemCategoryObj.IsModifier,
+            itemCategoryObj.Enabled,
+            itemCategoryObj.CreatedDate,
+            itemCategoryObj.CreatedBy,
+            itemCategoryObj.ModifiedDate,
+            itemCategoryObj.ModifiedBy,
+            itemCategoryObj.PrinterName2,
+            itemCategoryObj.PrinterName3,
+            itemCategoryObj.PrinterName4,
+            itemCategoryObj.PrinterName5,
+            itemCategoryObj.CategoryTypeId,
+            itemCategoryObj.ImageFileName,
+            itemCategoryObj.ImageFileName2,
+            itemCategoryObj.ImageFileName3,
+            itemCategoryObj.IsSelfOrderingDisplay,
+            itemCategoryObj.IsOnlineStoreDisplay,
+            itemCategoryObj.CategoryCode
+        };
+        
+        if (db != null)
+        {
+            var newCategoryId = await db.QueryFirstOrDefaultAsync<int>(query, parameters).ConfigureAwait(false);
+            if (newCategoryId > 0)
+            {
+                return await GetItemCategoryDetailAsync(itemCategoryObj.AccountId, newCategoryId).ConfigureAwait(false);
+            }
+        }
+        return null;
+    }
+    
+    public async Task<ItemCategoryShopDetail?> InsertItemCategoryShopDetailAsync(ItemCategoryShopDetail itemCategoryShopDetailObj)
+    {
+        using var db = await GetPosDatabaseConnectionByAccount(itemCategoryShopDetailObj.AccountId).ConfigureAwait(false);
+        
+        // create the new item category shop detail
+        // return the newly created item category shop detail (with the new CategoryId)
+        // code here
+        var query = @"
+            INSERT INTO [dbo].[ItemCategoryShopDetail]
+            (
+                 [CategoryId]
+                ,[ShopId]
+                ,[AccountId]
+                ,[DisplayName]
+                ,[DisplayIndex]
+                ,[IsPublicDisplay]
+                ,[Enabled]
+                ,[CreatedDate]
+                ,[CreatedBy]
+                ,[ModifiedDate]
+                ,[ModifiedBy]
+            )
+            VALUES
+            (
+                 @CategoryId
+                ,@ShopId
+                ,@AccountId
+                ,@DisplayName
+                ,@DisplayIndex
+                ,@IsPublicDisplay
+                ,@Enabled
+                ,@CreatedDate
+                ,@CreatedBy
+                ,@ModifiedDate
+                ,@ModifiedBy
+            )
+            SELECT SCOPE_IDENTITY()
+            ";
+        
+        var parameters = new
+        {
+            itemCategoryShopDetailObj.CategoryId,
+            itemCategoryShopDetailObj.ShopId,
+            itemCategoryShopDetailObj.AccountId,
+            itemCategoryShopDetailObj.DisplayName,
+            itemCategoryShopDetailObj.DisplayIndex,
+            itemCategoryShopDetailObj.IsPublicDisplay,
+            itemCategoryShopDetailObj.Enabled,
+            itemCategoryShopDetailObj.CreatedDate,
+            itemCategoryShopDetailObj.CreatedBy,
+            itemCategoryShopDetailObj.ModifiedDate,
+            itemCategoryShopDetailObj.ModifiedBy
+        };
+        
+        if (db != null)
+        {
+            var newCategoryShopDetailId = await db.QueryFirstOrDefaultAsync<int>(query, parameters).ConfigureAwait(false);
+            if (newCategoryShopDetailId > 0)
+            {
+                return await GetItemCategoryShopDetailAsync(
+                    itemCategoryShopDetailObj.AccountId, 
+                    itemCategoryShopDetailObj.ShopId, 
+                    itemCategoryShopDetailObj.CategoryId)
+                    .ConfigureAwait(false);
+            }
+        }
+        return null;
+    }
+    
+    public async Task<ItemCategoryShopDetail?> GetItemCategoryShopDetailAsync(
+        int accountId, 
+        int shopId,
+        int categoryId)
+    {
+        using var db = await GetPosDatabaseConnectionByAccount(accountId).ConfigureAwait(false);
+        var query = @"
+            SELECT 
+                ,[CategoryId]
+                ,[ShopId]
+                ,[AccountId]
+                ,[DisplayName]
+                ,[DisplayIndex]
+                ,[IsPublicDisplay]
+                ,[Enabled]
+                ,[CreatedDate]
+                ,[CreatedBy]
+                ,[ModifiedDate]
+                ,[ModifiedBy]
+            FROM [dbo].[ItemCategoryShopDetail]
+            WHERE AccountId = @AccountId
+            AND ShopId = @ShopId
+            AND CategoryShopDetailId = @CategoryShopDetailId
+            ";
+
+        var parameters = new
+        {
+            AccountId = accountId,
+            ShopId = shopId,
+            CategoryId = categoryId
+        };
+
+        if (db != null)
+        {
+            return await db.QueryFirstOrDefaultAsync<ItemCategoryShopDetail>(query, parameters).ConfigureAwait(false);
+        }
+
+        return null;
+    }
 }

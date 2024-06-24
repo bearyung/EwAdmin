@@ -5,7 +5,6 @@
              xmlns:vm="clr-namespace:EwAdminApp.ViewModels.Dialogs"
              xmlns:converters="clr-namespace:EwAdmin.Common.Converters;assembly=EwAdmin.Common"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             MaxWidth="800" Height="450" Margin="0"
              x:Class="EwAdminApp.Views.Dialogs.TableMasterListDialogView"
              x:DataType="vm:TableMasterListDialogViewModel">
     <UserControl.Resources>
@@ -18,6 +17,7 @@
                 <Button Content="Cancel" Command="{Binding CloseDialogCommand}" CommandParameter="{Binding Converter={StaticResource StringToBoolConverter}, ConverterParameter=True}"/>
             </StackPanel>
         </Border>
-        <ContentControl Content="{Binding TableSelectorPanel}"/>
+        <ContentControl 
+            Content="{Binding TableSelectorPanel}"/>
     </DockPanel>
 </UserControl>

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:EwAdminApp.ViewModels"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:positioners="clr-namespace:DialogHostAvalonia.Positioners;assembly=DialogHost.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EwAdminApp.Views.MainView"
              x:DataType="vm:MainViewModel"
@@ -16,9 +17,13 @@
     </Design.DataContext>
     <dialogHostAvalonia:DialogHost 
         Name="MainViewDialogHost"
+        Classes="disable-content-cover-animations"
         CloseOnClickAway="True" 
-        DisableOpeningAnimation="True" 
+        DisableOpeningAnimation="True"
         OverlayBackground="Black">
+        <dialogHostAvalonia:DialogHost.PopupPositioner>
+            <positioners:AlignmentDialogPopupPositioner HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="32"/>
+        </dialogHostAvalonia:DialogHost.PopupPositioner>
         <dialogHostAvalonia:DialogHost.DialogContent>
             <!-- put your dialog content here-->
         </dialogHostAvalonia:DialogHost.DialogContent>
